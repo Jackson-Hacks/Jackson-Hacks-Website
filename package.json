@@ -1,0 +1,10 @@
+{
+  "name": "jackson-hacks-root",
+  "private": true,
+  "scripts": {
+    "frontend:dev": "npm run dev --prefix frontend",
+    "frontend:build": "npm run build --prefix frontend",
+    "dev": "npm run frontend:dev",
+    "build": "npm run frontend:build"
+  }
+}
