@@ -44,9 +44,9 @@ const faqs = [
 
 export default function FAQSection() {
   return (
-    <section id="faq" className="relative py-32 bg-[#0F0A1F]">
+    <section id="faq" className="relative py-32 bg-[#272727]">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-purple-900/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#084F9A]/14 via-transparent to-transparent" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-6">
         {/* Section header */}
@@ -57,12 +57,12 @@ export default function FAQSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <span className="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-4 block">
+          <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
             Got Questions?
           </span>
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
@@ -83,9 +83,9 @@ export default function FAQSection() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-white/[0.03] border border-white/[0.05] rounded-xl px-6 data-[state=open]:bg-white/[0.05] transition-colors"
+                className="bg-[#084F9A]/12 border border-[#2072C7]/20 rounded-xl px-6 data-[state=open]:bg-[#084F9A]/20 transition-colors"
               >
-                <AccordionTrigger className="text-left text-white hover:text-purple-300 text-lg font-medium py-5 hover:no-underline">
+                <AccordionTrigger className="text-left text-white hover:text-[#F68A42] text-lg font-medium py-5 hover:no-underline">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-gray-400 pb-5 leading-relaxed">
@@ -106,7 +106,7 @@ export default function FAQSection() {
         >
           <p className="text-gray-400">
             Still have questions?{' '}
-            <a href="mailto:hello@hackathon.com" className="text-purple-400 hover:text-purple-300 underline underline-offset-4">
+            <a href="mailto:hello@hackathon.com" className="text-[#2072C7] hover:text-[#F68A42] underline underline-offset-4">
               Reach out to us
             </a>
           </p>

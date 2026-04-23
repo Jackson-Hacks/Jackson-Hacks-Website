@@ -4,6 +4,7 @@ import { Button } from '../ui/button.jsx';
 import { Menu, X, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useAuth } from '@/lib/AuthContext';
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -14,6 +15,7 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, isLoadingAuth } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,7 +33,7 @@ export default function Navbar() {
         transition={{ duration: 0.6 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled 
-            ? 'bg-[#0F0A1F]/80 backdrop-blur-xl border-b border-white/5' 
+            ? 'bg-[#272727]/85 backdrop-blur-xl border-b border-[#2072C7]/20' 
             : 'bg-transparent'
         }`}
       >
@@ -39,7 +41,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <a href="#" className="text-2xl font-bold text-white">
-              <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent">
                 JACKSON
               </span>
               <span className="text-white">HACKS</span>
@@ -56,15 +58,29 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <Link to={createPageUrl('Register')}>
-                <Button 
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-6 rounded-full"
-                >
-                  <Zap size={16} className="mr-1" />
-                  Apply
-                </Button>
-              </Link>
+              {!isLoadingAuth && (
+                isAuthenticated ? (
+                  <Link to={createPageUrl('Dashboard')}>
+                    <Button 
+                      size="sm"
+                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-6 rounded-full"
+                    >
+                      <Zap size={16} className="mr-1" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to={createPageUrl('Register')}>
+                    <Button 
+                      size="sm"
+                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-6 rounded-full"
+                    >
+                      <Zap size={16} className="mr-1" />
+                      Apply
+                    </Button>
+                  </Link>
+                )
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -85,7 +101,7 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#0F0A1F]/98 backdrop-blur-xl pt-24 px-6 md:hidden"
+            className="fixed inset-0 z-40 bg-[#272727]/98 backdrop-blur-xl pt-24 px-6 md:hidden"
           >
             <div className="flex flex-col gap-6">
               {navLinks.map((link, index) => (
@@ -98,18 +114,35 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <Link 
-                to={createPageUrl('Register')}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-violet-600 text-white w-full mt-4 rounded-full"
-                >
-                  <Zap size={18} className="mr-2" />
-                  Apply Now
-                </Button>
-              </Link>
+              {!isLoadingAuth && (
+                isAuthenticated ? (
+                  <Link 
+                    to={createPageUrl('Dashboard')}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] text-white w-full mt-4 rounded-full"
+                    >
+                      <Zap size={18} className="mr-2" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link 
+                    to={createPageUrl('Register')}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] text-white w-full mt-4 rounded-full"
+                    >
+                      <Zap size={18} className="mr-2" />
+                      Apply Now
+                    </Button>
+                  </Link>
+                )
+              )}
             </div>
           </motion.div>
         )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,28 +26,36 @@ const steps = [
   { id: 4, title: 'Final Details', icon: Check },
 ];
 
-export default function ApplicationForm({ user, onSuccess }) {
+export default function ApplicationForm({ user, onSuccess, existingApplication = null }) {
+  const buildInitialFormData = (application = null) => ({
+    full_name: application?.full_name || user?.full_name || '',
+    email: application?.email || user?.email || '',
+    phone: application?.phone || '',
+    age: application?.age ? String(application.age) : '',
+    school: application?.school || '',
+    grade: application?.grade || '',
+    experience_level: application?.experience_level || '',
+    dietary_restrictions: application?.dietary_restrictions || '',
+    tshirt_size: application?.tshirt_size || '',
+    why_attend: application?.why_attend || '',
+    project_idea: application?.project_idea || '',
+    heard_from: application?.heard_from || '',
+    emergency_contact_name: application?.emergency_contact_name || '',
+    emergency_contact_phone: application?.emergency_contact_phone || '',
+    agree_to_terms: application?.agree_to_terms ?? false,
+  });
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-  
-  const [formData, setFormData] = useState({
-    full_name: user?.full_name || '',
-    email: user?.email || '',
-    phone: '',
-    age: '',
-    school: '',
-    grade: '',
-    experience_level: '',
-    dietary_restrictions: '',
-    tshirt_size: '',
-    why_attend: '',
-    project_idea: '',
-    heard_from: '',
-    emergency_contact_name: '',
-    emergency_contact_phone: '',
-    agree_to_terms: false,
-  });
+
+  const [formData, setFormData] = useState(buildInitialFormData(existingApplication));
+
+  useEffect(() => {
+    setFormData(buildInitialFormData(existingApplication));
+    setCurrentStep(1);
+    setErrors({});
+  }, [existingApplication, user]);
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -104,13 +112,32 @@ export default function ApplicationForm({ user, onSuccess }) {
         user_id: user?.id,
       };
 
-      const { error } = await supabase
-        .from('applications')
-        .insert([applicationWithUserId]);
+      let savedApplication = null;
+      let error = null;
+
+      if (existingApplication?.id) {
+        const { data, error: updateError } = await supabase
+          .from('applications')
+          .update(applicationWithUserId)
+          .eq('id', existingApplication.id)
+          .eq('user_id', user?.id)
+          .select()
+          .single();
+        savedApplication = data;
+        error = updateError;
+      } else {
+        const { data, error: insertError } = await supabase
+          .from('applications')
+          .insert([applicationWithUserId])
+          .select()
+          .single();
+        savedApplication = data;
+        error = insertError;
+      }
 
       if (error) throw error;
-      
-      onSuccess();
+
+      onSuccess(savedApplication);
     } catch (error) {
       console.error('Failed to submit application:', error);
       setErrors({ submit: 'Something went wrong. Please try again.' });
@@ -139,7 +166,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   id="full_name"
                   value={formData.full_name}
                   onChange={(e) => updateField('full_name', e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="Your full name"
                 />
               </div>
@@ -157,7 +184,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateField('email', e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="your@email.com"
                 />
               </div>
@@ -173,7 +200,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                    className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                     placeholder="(123) 456-7890"
                   />
                 </div>
@@ -187,7 +214,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   type="number"
                   value={formData.age}
                   onChange={(e) => updateField('age', e.target.value)}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="17"
                 />
                 {errors.age && <p className="text-red-400 text-sm mt-1">{errors.age}</p>}
@@ -214,7 +241,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   id="school"
                   value={formData.school}
                   onChange={(e) => updateField('school', e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="Your school name"
                 />
               </div>
@@ -234,10 +261,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   <SelectItem value="10">Grade 10</SelectItem>
                   <SelectItem value="11">Grade 11</SelectItem>
                   <SelectItem value="12">Grade 12</SelectItem>
-                  <SelectItem value="university_1">University - 1st Year</SelectItem>
-                  <SelectItem value="university_2">University - 2nd Year</SelectItem>
-                  <SelectItem value="university_3">University - 3rd Year</SelectItem>
-                  <SelectItem value="university_4">University - 4th Year+</SelectItem>
+                  <SelectItem value="university">University</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -279,7 +303,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                 id="why_attend"
                 value={formData.why_attend}
                 onChange={(e) => updateField('why_attend', e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500 min-h-[120px]"
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7] min-h-[120px]"
                 placeholder="Tell us what excites you about this hackathon..."
               />
               {errors.why_attend && <p className="text-red-400 text-sm mt-1">{errors.why_attend}</p>}
@@ -293,7 +317,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                 id="project_idea"
                 value={formData.project_idea}
                 onChange={(e) => updateField('project_idea', e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500 min-h-[100px]"
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7] min-h-[100px]"
                 placeholder="Share any ideas you have in mind (optional)..."
               />
             </div>
@@ -350,7 +374,7 @@ export default function ApplicationForm({ user, onSuccess }) {
                   id="dietary_restrictions"
                   value={formData.dietary_restrictions}
                   onChange={(e) => updateField('dietary_restrictions', e.target.value)}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="None, Vegetarian, etc."
                 />
               </div>
@@ -362,31 +386,31 @@ export default function ApplicationForm({ user, onSuccess }) {
                 <Input
                   value={formData.emergency_contact_name}
                   onChange={(e) => updateField('emergency_contact_name', e.target.value)}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="Contact name"
                 />
                 <Input
                   value={formData.emergency_contact_phone}
                   onChange={(e) => updateField('emergency_contact_phone', e.target.value)}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                   placeholder="Contact phone"
                 />
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+            <div className="p-4 rounded-xl bg-[#084F9A]/20 border border-[#2072C7]/30">
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="agree_to_terms"
                   checked={formData.agree_to_terms}
                   onCheckedChange={(checked) => updateField('agree_to_terms', checked)}
-                  className="mt-1 border-purple-400 data-[state=checked]:bg-purple-600"
+                  className="mt-1 border-[#2072C7] data-[state=checked]:bg-[#084F9A]"
                 />
                 <Label htmlFor="agree_to_terms" className="text-gray-300 text-sm leading-relaxed cursor-pointer">
                   I agree to the{' '}
-                  <a href="#" className="text-purple-400 hover:underline">Code of Conduct</a>
+                  <a href="#" className="text-[#2072C7] hover:text-[#F68A42] hover:underline">Code of Conduct</a>
                   {' '}and{' '}
-                  <a href="#" className="text-purple-400 hover:underline">Terms of Service</a>.
+                  <a href="#" className="text-[#2072C7] hover:text-[#F68A42] hover:underline">Terms of Service</a>.
                   I understand that my application will be reviewed and I will be notified via email.
                   <span className="text-red-400"> *</span>
                 </Label>
@@ -416,7 +440,7 @@ export default function ApplicationForm({ user, onSuccess }) {
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   currentStep >= step.id
-                    ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white'
+                    ? 'bg-gradient-to-r from-[#2072C7] to-[#084F9A] text-white'
                     : 'bg-white/5 text-gray-500'
                 }`}
               >
@@ -434,7 +458,7 @@ export default function ApplicationForm({ user, onSuccess }) {
             </div>
             {index < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 ${
-                currentStep > step.id ? 'bg-purple-600' : 'bg-white/10'
+                currentStep > step.id ? 'bg-[#2072C7]' : 'bg-white/10'
               }`} />
             )}
           </React.Fragment>
@@ -460,7 +484,7 @@ export default function ApplicationForm({ user, onSuccess }) {
           variant="outline"
           onClick={prevStep}
           disabled={currentStep === 1}
-          className="border-white/20 text-white hover:bg-white/10 disabled:opacity-30"
+          className="border-white/20 hover:bg-white/10 hover:text-white disabled:opacity-30 text-black"
         >
           <ArrowLeft size={18} className="mr-2" />
           Back
@@ -469,7 +493,7 @@ export default function ApplicationForm({ user, onSuccess }) {
         {currentStep < 4 ? (
           <Button
             onClick={nextStep}
-            className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white"
+            className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white"
           >
             Next
             <ArrowRight size={18} className="ml-2" />
@@ -488,7 +512,7 @@ export default function ApplicationForm({ user, onSuccess }) {
             ) : (
               <>
                 <Check size={18} className="mr-2" />
-                Submit Application
+                {existingApplication ? 'Resubmit Application' : 'Submit Application'}
               </>
             )}
           </Button>

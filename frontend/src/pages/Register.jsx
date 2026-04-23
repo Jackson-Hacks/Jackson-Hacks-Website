@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PartyPopper, Sparkles, CheckCircle2, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,10 +11,12 @@ import ApplicationForm from '@/components/register/ApplicationForm';
 import { useAuth } from '@/lib/AuthContext';
 
 export default function Register() {
+  const navigate = useNavigate();
   const { user, isAuthenticated, isLoadingAuth, signIn, signUp } = useAuth();
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [existingApplication, setExistingApplication] = useState(null);
+  const [isEditingApplication, setIsEditingApplication] = useState(false);
   
   // Auth state
   const [isLogin, setIsLogin] = useState(true);
@@ -71,18 +73,18 @@ export default function Register() {
 
   if (isLoadingAuth || isLoadingApp) {
     return (
-      <div className="min-h-screen bg-[#0F0A1F] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#272727] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#2072C7] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0A1F] relative overflow-hidden">
+    <div className="min-h-screen bg-[#272727] relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2072C7]/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#F68A42]/12 rounded-full blur-[100px]" />
       </div>
 
       {/* Back button */}
@@ -95,10 +97,21 @@ export default function Register() {
         </Link>
       </div>
 
+      {/* Bypass to dashboard */}
+      <div className="absolute top-6 right-6 z-20">
+        <Button
+          variant="outline"
+          onClick={() => navigate(createPageUrl('Dashboard'))}
+          className="text-black border-[#2072C7]/35 hover:bg-[#084F9A]/30 hover:text-white"
+        >
+          Go to Dashboard
+        </Button>
+      </div>
+
       <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-20">
         <div className="w-full max-w-2xl">
           {/* Success State */}
-          {(applicationSubmitted || existingApplication) && (
+          {(applicationSubmitted || (existingApplication && !isEditingApplication)) && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -124,7 +137,7 @@ export default function Register() {
                     existingApplication.status === 'accepted' ? 'text-green-400' :
                     existingApplication.status === 'rejected' ? 'text-red-400' :
                     existingApplication.status === 'waitlisted' ? 'text-yellow-400' :
-                    'text-purple-400'
+                    'text-[#2072C7]'
                   }`}>
                     {existingApplication.status}
                   </span>
@@ -132,12 +145,24 @@ export default function Register() {
               )}
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link to={createPageUrl('Home')}>
+                {existingApplication && (
+                  <Button
+                    size="lg"
+                    onClick={() => {
+                      setApplicationSubmitted(false);
+                      setIsEditingApplication(true);
+                    }}
+                    className="bg-gradient-to-r from-[#2072C7] to-[#084F9A] hover:from-[#084F9A] hover:to-[#2072C7] text-white px-8 rounded-full"
+                  >
+                    Edit and Resubmit
+                  </Button>
+                )}
+                <Link to={createPageUrl('Dashboard')}>
                   <Button 
                     size="lg"
-                    className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-8 rounded-full"
+                    className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-8 rounded-full"
                   >
-                    Back to Home
+                    Back to Dashboard
                   </Button>
                 </Link>
               </div>
@@ -151,12 +176,12 @@ export default function Register() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <div className="inline-flex p-4 rounded-full bg-purple-500/10 mb-6">
-                <Sparkles className="w-8 h-8 text-purple-400" />
+              <div className="inline-flex p-4 rounded-full bg-[#2072C7]/15 mb-6">
+                <Sparkles className="w-8 h-8 text-[#F68A42]" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 Apply to{' '}
-                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
                   Jackson Hacks
                 </span>
               </h1>
@@ -193,7 +218,7 @@ export default function Register() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                       />
                     </div>
                   </div>
@@ -209,7 +234,7 @@ export default function Register() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
+                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
                       />
                     </div>
                   </div>
@@ -218,7 +243,7 @@ export default function Register() {
                     type="submit"
                     disabled={isAuthSubmitting}
                     size="lg"
-                    className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white rounded-full mt-4"
+                    className="w-full bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white rounded-full mt-4"
                   >
                     {isAuthSubmitting ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -234,7 +259,7 @@ export default function Register() {
                       setIsLogin(!isLogin);
                       setAuthError(null);
                     }}
-                    className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                    className="text-[#2072C7] hover:text-[#F68A42] text-sm transition-colors"
                   >
                     {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
                   </button>
@@ -244,27 +269,34 @@ export default function Register() {
           )}
 
           {/* Application Form */}
-          {isAuthenticated && !applicationSubmitted && !existingApplication && (
+          {isAuthenticated && (isEditingApplication || (!applicationSubmitted && !existingApplication)) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-center mb-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                  Apply to{' '}
-                  <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    Jackson Hacks
+                  {isEditingApplication ? 'Edit Your ' : 'Apply to '}
+                  <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
+                    {isEditingApplication ? 'Application' : 'Jackson Hacks'}
                   </span>
                 </h1>
                 <p className="text-gray-400">
-                  Fill out the form below to submit your application
+                  {isEditingApplication
+                    ? 'Update your answers and resubmit your application'
+                    : 'Fill out the form below to submit your application'}
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+              <div className="p-8 rounded-2xl bg-[#084F9A]/15 border border-[#2072C7]/20">
                 <ApplicationForm 
                   user={user} 
-                  onSuccess={() => setApplicationSubmitted(true)} 
+                  existingApplication={existingApplication}
+                  onSuccess={(savedApplication) => {
+                    setExistingApplication(savedApplication || existingApplication);
+                    setApplicationSubmitted(true);
+                    setIsEditingApplication(false);
+                  }} 
                 />
               </div>
             </motion.div>

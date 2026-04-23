@@ -5,9 +5,9 @@ import { Mail, FileText } from 'lucide-react';
 
 export default function SponsorsSection() {
   return (
-    <section id="sponsors" className="relative py-32 bg-[#0F0A1F]">
+    <section id="sponsors" className="relative py-32 bg-[#272727]">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-900/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#084F9A]/10 to-transparent" />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header */}
@@ -18,7 +18,7 @@ export default function SponsorsSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <span className="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-4 block">
+          <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
             Our Partners
           </span>
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
@@ -41,7 +41,7 @@ export default function SponsorsSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mb-20"
         >
-          <div className="text-center py-16 rounded-2xl bg-white/[0.02] border border-dashed border-white/10">
+          <div className="text-center py-16 rounded-2xl bg-[#084F9A]/10 border border-dashed border-[#2072C7]/25">
             <div className="text-6xl mb-4">🤝</div>
             <h3 className="text-2xl font-semibold text-white mb-2">Sponsors Coming Soon</h3>
             <p className="text-gray-400">Interested in sponsoring? Get in touch!</p>
@@ -56,8 +56,8 @@ export default function SponsorsSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-3xl blur-xl" />
-          <div className="relative p-10 md:p-14 rounded-3xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 text-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2072C7]/20 to-[#F68A42]/20 rounded-3xl blur-xl" />
+          <div className="relative p-10 md:p-14 rounded-3xl bg-gradient-to-r from-[#084F9A]/20 to-[#F68A42]/12 border border-[#2072C7]/25 text-center">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Become a Sponsor
             </h3>
@@ -68,7 +68,7 @@ export default function SponsorsSection() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-8 py-6 rounded-full"
+                className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-8 py-6 rounded-full"
               >
                 <FileText className="mr-2" size={20} />
                 View Sponsorship Package

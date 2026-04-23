@@ -1,9 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=AR+One+Sans:wght@400;500;600;700&family=Righteous&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    --font-title: 'Righteous', sans-serif;
+    --font-body: 'AR One Sans', sans-serif;
+    --brand-blue: #2072C7;
+    --brand-blue-dark: #084F9A;
+    --brand-orange: #F68A42;
+    --brand-orange-dark: #E06E0A;
+    --brand-black: #272727;
+    --brand-white: #F3F1F1;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -84,5 +94,16 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+}
+
+@layer utilities {
+  .font-title {
+    font-family: var(--font-title);
+  }
+
+  .font-description {
+    font-family: var(--font-body);
   }
 }

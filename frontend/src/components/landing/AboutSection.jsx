@@ -7,45 +7,45 @@ const features = [
     icon: Code2,
     title: 'Build Projects',
     description: 'Create innovative tech projects from scratch in just 24 hours with your team.',
-    color: 'from-purple-500 to-violet-500'
+    color: 'from-[#2072C7] to-[#084F9A]'
   },
   {
     icon: Users,
     title: 'Meet People',
     description: 'Connect with like-minded hackers, mentors, and industry professionals.',
-    color: 'from-cyan-500 to-blue-500'
+    color: 'from-[#2072C7] to-[#084F9A]'
   },
   {
     icon: Lightbulb,
     title: 'Learn Skills',
     description: 'Attend workshops and learn from experts in AI, web dev, and more.',
-    color: 'from-yellow-500 to-orange-500'
+    color: 'from-[#F68A42] to-[#E06E0A]'
   },
   {
     icon: Trophy,
     title: 'Win Prizes',
     description: 'Compete for amazing prizes and recognition for your innovative solutions.',
-    color: 'from-pink-500 to-rose-500'
+    color: 'from-[#F68A42] to-[#E06E0A]'
   },
   {
     icon: Coffee,
     title: 'Free Food & Swag',
     description: 'Enjoy free meals, snacks, and take home exclusive hackathon merch.',
-    color: 'from-green-500 to-emerald-500'
+    color: 'from-[#2072C7] to-[#084F9A]'
   },
   {
     icon: Rocket,
     title: 'Launch Ideas',
     description: 'Turn your wildest ideas into reality and kickstart your tech journey.',
-    color: 'from-indigo-500 to-purple-500'
+    color: 'from-[#2072C7] to-[#084F9A]'
   }
 ];
 
 export default function AboutSection() {
   return (
-    <section id="about" className="relative py-32 bg-[#0F0A1F]">
+    <section id="about" className="relative py-32 bg-[#272727]">
       {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#084F9A]/10 to-transparent" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Section header */}
@@ -56,12 +56,12 @@ export default function AboutSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <span className="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-4 block">
+          <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
             About the Event
           </span>
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             What is a{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
               Hackathon
             </span>
             ?
@@ -112,7 +112,7 @@ export default function AboutSection() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="mt-20 text-center"
         >
-          <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-[#084F9A]/20 to-[#F68A42]/10 border border-[#2072C7]/25">
             <div className="text-left">
               <p className="text-white font-semibold text-lg">Ready to join the adventure?</p>
               <p className="text-gray-400">No experience required. All skill levels welcome!</p>

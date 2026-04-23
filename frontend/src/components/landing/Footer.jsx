@@ -18,13 +18,13 @@ const quickLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#080510] border-t border-white/5">
+    <footer className="relative bg-[#272727] border-t border-[#2072C7]/20">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div>
             <h3 className="text-2xl font-bold text-white mb-4">
-              <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent">
                 JACKSON HACKS
               </span>
             </h3>
@@ -39,7 +39,7 @@ export default function Footer() {
                   key={index}
                   href={social.href}
                   aria-label={social.label}
-                  className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                  className="p-2.5 rounded-full bg-[#084F9A]/25 hover:bg-[#084F9A]/40 text-gray-400 hover:text-white transition-colors"
                 >
                   <social.icon size={18} />
                 </a>
@@ -55,7 +55,7 @@ export default function Footer() {
                 <li key={index}>
                   <a 
                     href={link.href}
-                    className="text-gray-400 hover:text-purple-400 transition-colors"
+                    className="text-gray-400 hover:text-[#2072C7] transition-colors"
                   >
                     {link.label}
                   </a>
@@ -70,13 +70,13 @@ export default function Footer() {
             <div className="space-y-3 text-gray-400">
               <p>
                 <span className="text-gray-500">General Inquiries:</span><br />
-                <a href="mailto:hello@hackathon.com" className="hover:text-purple-400 transition-colors">
+                <a href="mailto:hello@hackathon.com" className="hover:text-[#2072C7] transition-colors">
                   hello@hackathon.com
                 </a>
               </p>
               <p>
                 <span className="text-gray-500">Sponsorship:</span><br />
-                <a href="mailto:sponsor@hackathon.com" className="hover:text-purple-400 transition-colors">
+                <a href="mailto:sponsor@hackathon.com" className="hover:text-[#2072C7] transition-colors">
                   sponsor@hackathon.com
                 </a>
               </p>
@@ -85,7 +85,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-[#2072C7]/20 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} Jackson Hacks. All rights reserved.
           </p>
