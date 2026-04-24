@@ -7,7 +7,7 @@ import { createPageUrl } from '@/utils';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#272727] via-[#084F9A]/35 to-[#272727]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#2072C7] via-[#5A78AF] to-[#F68A42]">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid pattern */}
@@ -63,7 +63,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-10 md:mt-16">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,13 +82,8 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-6 tracking-tight"
         >
-          <span className="bg-gradient-to-r from-white via-[#F68A42] to-white bg-clip-text text-transparent">
-            JACKSON
-          </span>
-          <br className="md:hidden" />
-          <span className="bg-gradient-to-r from-[#2072C7] via-[#F68A42] to-[#E06E0A] bg-clip-text text-transparent">
-            HACKS
-          </span>
+          <span className="block text-white">JACKSON</span>
+          <span className="block text-white">HACKS</span>
         </motion.h1>
 
         {/* Tagline */}
@@ -156,10 +151,10 @@ export default function HeroSection() {
             { value: '$5K+', label: 'In Prizes' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
+              <div className="text-3xl md:text-4xl font-bold text-white">
                 {stat.value}
               </div>
-              <div className="text-gray-500 text-sm mt-1">{stat.label}</div>
+              <div className="text-white text-sm mt-1">{stat.label}</div>
             </div>
           ))}
         </motion.div>

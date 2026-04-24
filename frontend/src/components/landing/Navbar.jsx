@@ -5,6 +5,7 @@ import { Menu, X, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
+import pantherLogo from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -40,7 +41,12 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <a href="#" className="text-2xl font-bold text-white">
+            <a href="#" className="text-2xl font-bold text-white flex items-center gap-2">
+              <img
+                src={pantherLogo}
+                alt="Jackson Hacks logo"
+                className="w-8 h-8 object-contain"
+              />
               <span className="bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent">
                 JACKSON
               </span>
