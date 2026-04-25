@@ -47,7 +47,7 @@ export default function Navbar() {
                 alt="Jackson Hacks logo"
                 className="w-8 h-8 object-contain"
               />
-              <span className="bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent">
+              <span className={isScrolled ? "bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent" : "text-[#F68A42]"}>
                 JACKSON
               </span>
               <span className="text-white">HACKS</span>

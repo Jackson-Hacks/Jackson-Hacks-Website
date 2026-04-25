@@ -12,6 +12,33 @@ export default function Dashboard() {
   const { user, logout, isLoadingAuth } = useAuth();
   const [application, setApplication] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const targetDate = new Date('2026-11-21T08:00:00');
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = targetDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -164,6 +191,24 @@ export default function Dashboard() {
                 <span>You'll receive acceptance confirmation via email</span>
               </li>
             </ul>
+
+            <div className="mt-8 border-t border-white/15 pt-6">
+              <p className="text-base text-white font-semibold">Time until Hackathon</p>
+              <div className="mt-4 grid grid-cols-4 gap-3">
+                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">{timeLeft.days}d</div>
+                </div>
+                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">{timeLeft.hours}h</div>
+                </div>
+                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">{timeLeft.minutes}m</div>
+                </div>
+                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">{timeLeft.seconds}s</div>
+                </div>
+              </div>
+            </div>
           </Card>
         </motion.div>
       </div>
