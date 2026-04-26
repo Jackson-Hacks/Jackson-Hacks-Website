@@ -73,9 +73,9 @@ export default function HeroSection() {
   const triangleOpacity = useTransform(scrollYProgress, [0, 0.03, 0.14, 0.75, 0.9], [0, 0, 0.95, 0.95, 0]);
   const introOpacity = useTransform(scrollYProgress, [0, 0.2, 0.34], [1, 1, 0]);
   const introScale = useTransform(scrollYProgress, [0, 0.15, 0.3], [1, 0.9, 0.72]);
-  const branchOpacity = useTransform(scrollYProgress, [0.55, 0.65, 1], [0, 1, 1]);
+  const branchOpacity = useTransform(scrollYProgress, [0.48, 0.6, 1], [0, 1, 1]);
   const branchLineProgress = useTransform(scrollYProgress, [0.68, 0.82, 0.92], [0, 1, 1]);
-  const branchScale = useTransform(scrollYProgress, [0.55, 0.82, 0.92], [0.92, 1, 1]);
+  const branchScale = useTransform(scrollYProgress, [0.48, 0.8, 0.94], [0.92, 1, 1]);
   const branchLineOpacity = useTransform(scrollYProgress, [0.68, 0.8, 0.9, 1], [0, 1, 1, 0.2]);
   const jhIconOpacity = useTransform(scrollYProgress, [0, 0.8, 0.9, 1], [0, 0, 1, 1]);
   const jhIconScale = useTransform(scrollYProgress, [0.8, 0.9], [3.2, 0.3]);
@@ -89,18 +89,18 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#2072C7] via-[#5A78AF] to-[#F68A42]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:70px_70px] opacity-30" />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-center gap-8 px-6 text-center">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-center gap-6 px-6 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm">
             <Sparkles size={16} className="text-white" />
             <span>Applications Now Open</span>
           </div>
 
-          <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+          <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
             <span className="block text-white">JACKSON</span>
             <span className="block text-white">HACKS</span>
           </h1>
 
-          <p className="text-base font-light text-white/95 sm:text-xl">
+          <p className="text-sm font-light text-white/95 sm:text-xl">
             Build. Learn. Connect. Innovate.
           </p>
 
@@ -113,11 +113,11 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <div className="flex w-full max-w-sm flex-col items-center justify-center gap-3">
+          <div className="flex w-full max-w-sm flex-col items-center justify-center gap-2">
             <Link className="w-full" to={createPageUrl('Register')}>
               <Button
                 size="lg"
-                className="w-full rounded-full bg-[#F68A42] px-8 py-5 text-base text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A]"
+                className="w-full rounded-full bg-[#F68A42] px-7 py-4 text-sm text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A]"
               >
                 <Zap className="mr-2" size={20} />
                 Apply Now
@@ -127,30 +127,30 @@ export default function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full rounded-full border-white/40 px-8 py-5 text-base text-black hover:bg-white/10 hover:text-white"
+                className="w-full rounded-full border-white/40 px-7 py-4 text-sm text-black hover:bg-white/10 hover:text-white"
               >
                 Learn More
               </Button>
             </a>
           </div>
 
-          <div className="grid w-full max-w-md grid-cols-3 gap-3">
+          <div className="grid w-full max-w-md grid-cols-3 gap-2">
             {[
               { value: '24', label: 'Hours' },
               { value: '200+', label: 'Hackers' },
               { value: '$5K+', label: 'In Prizes' },
             ].map((stat) => (
               <div key={stat.label} className="text-center text-white">
-                <div className="text-xl font-bold text-white sm:text-3xl">{stat.value}</div>
+                <div className="text-lg font-bold text-white sm:text-3xl">{stat.value}</div>
                 <div className="mt-1 text-xs text-white/95 sm:text-sm">{stat.label}</div>
               </div>
             ))}
           </div>
 
-          <div className="w-full max-w-xl rounded-3xl border border-white/20 bg-[#272727]/40 p-5 text-left text-white backdrop-blur-sm sm:p-6">
+          <div className="w-full max-w-xl rounded-3xl border border-white/20 bg-[#272727]/40 p-4 text-left text-white backdrop-blur-sm sm:p-6">
             <p className="text-xs uppercase tracking-[0.2em] text-white/80">About the event</p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">What is Jackson Hacks?</h2>
-            <p className="mt-3 text-sm leading-6 text-white/90 sm:text-base sm:leading-7">
+            <h2 className="mt-2 text-xl font-black sm:text-3xl">What is Jackson Hacks?</h2>
+            <p className="mt-2 text-sm leading-5 text-white/90 sm:text-base sm:leading-7">
               Jackson Hacks is a 24-hour hackathon where students come together to build
               creative tech projects, learn from workshops, meet new people, and turn ideas
               into something real.
@@ -159,20 +159,20 @@ export default function HeroSection() {
 
           <div className="w-full max-w-xl text-left text-white">
             <p className="text-xs uppercase tracking-[0.2em] text-white/80">What you can do</p>
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-2">
               {branchNodes.map((node) => {
                 const Icon = node.icon;
 
                 return (
                   <div
                     key={node.title}
-                    className="rounded-2xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-sm"
+                    className="rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-sm"
                   >
-                    <div className="mb-3 inline-flex rounded-xl bg-white/15 p-2 text-white">
-                      <Icon size={18} />
+                    <div className="mb-2 inline-flex rounded-xl bg-white/15 p-2 text-white">
+                      <Icon size={16} />
                     </div>
-                    <h3 className="text-base font-semibold text-white">{node.title}</h3>
-                    <p className="mt-1 text-sm leading-5 text-white/90">
+                    <h3 className="text-sm font-semibold text-white">{node.title}</h3>
+                    <p className="mt-1 text-xs leading-4 text-white/90">
                       {node.description}
                     </p>
                   </div>
@@ -186,7 +186,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section ref={containerRef} className="relative h-[800vh] bg-[#272727]">
+    <section ref={containerRef} className="relative h-[1000vh] bg-[#272727]">
       <div className="sticky top-0 h-screen overflow-hidden bg-gradient-to-b from-[#2072C7] via-[#5A78AF] to-[#F68A42]">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:90px_90px] opacity-30" />
