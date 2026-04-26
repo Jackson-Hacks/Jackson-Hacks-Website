@@ -19,6 +19,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated, isLoadingAuth } = useAuth();
   const isMobile = useIsMobile();
+  const showNavSurface = isMobile || isScrolled || isMobileMenuOpen;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,28 +32,28 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        initial={isMobile ? false : { y: -100 }}
-        animate={isMobile ? undefined : { y: 0 }}
+        initial={false}
+        animate={{ y: 0 }}
         transition={isMobile ? undefined : { duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-[#272727]/85 backdrop-blur-xl border-b border-[#2072C7]/20' 
+        className={`fixed left-0 right-0 top-0 z-[70] transition-all duration-300 ${
+          showNavSurface
+            ? 'border-b border-[#2072C7]/20 bg-[#272727]/90 backdrop-blur-xl'
             : 'bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex h-16 items-center justify-between sm:h-20">
             {/* Logo */}
-            <a href="#" className="text-2xl font-bold text-white flex items-center gap-2">
+            <a href="#" className="flex items-center gap-2 text-lg font-bold text-[#F3F1F1] sm:text-2xl">
               <img
                 src={pantherLogo}
                 alt="Jackson Hacks logo"
-                className="w-8 h-8 object-contain"
+                className="h-8 w-8 object-contain"
               />
-              <span className={isScrolled ? "bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent" : "text-[#F68A42]"}>
+              <span className={showNavSurface ? "bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent" : "text-[#F68A42]"}>
                 JACKSON
               </span>
-              <span className="text-white">HACKS</span>
+              <span className="text-[#F3F1F1]">HACKS</span>
             </a>
 
             {/* Desktop nav */}
@@ -94,7 +95,8 @@ export default function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-white"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="rounded-full border border-[#F3F1F1]/15 bg-[#084F9A]/55 p-2 text-[#F3F1F1] shadow-lg shadow-black/20 md:hidden"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -109,7 +111,7 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#272727]/98 backdrop-blur-xl pt-24 px-6 md:hidden"
+            className="fixed inset-0 z-[60] bg-[#272727]/98 px-6 pt-24 backdrop-blur-xl md:hidden"
           >
             <div className="flex flex-col gap-6">
               {navLinks.map((link, index) => (
