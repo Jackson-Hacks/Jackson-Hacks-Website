@@ -85,26 +85,26 @@ export default function HeroSection() {
 
   if (isMobile) {
     return (
-      <section className="relative overflow-visible bg-[#272727] pt-24 pb-16">
+      <section className="relative overflow-visible bg-[#272727] pt-24 pb-16 max-[380px]:pt-20 max-[380px]:pb-12">
         <div className="absolute inset-0 bg-gradient-to-b from-[#2072C7] via-[#5A78AF] to-[#F68A42]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:70px_70px] opacity-30" />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-center gap-6 px-6 text-center">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-center gap-6 px-6 text-center max-[380px]:gap-4 max-[380px]:px-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm">
             <Sparkles size={16} className="text-white" />
             <span>Applications Now Open</span>
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+          <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl max-[380px]:text-2xl">
             <span className="block text-white">JACKSON</span>
             <span className="block text-white">HACKS</span>
           </h1>
 
-          <p className="text-sm font-light text-white/95 sm:text-xl">
+          <p className="text-sm font-light text-white/95 sm:text-xl max-[380px]:text-xs">
             Build. Learn. Connect. Innovate.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-white sm:text-base">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-white sm:text-base max-[380px]:gap-2 max-[380px]:text-xs">
             <span className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5">
               November 21st, 2026
             </span>
@@ -113,11 +113,11 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <div className="flex w-full max-w-sm flex-col items-center justify-center gap-2">
+          <div className="flex w-full max-w-sm flex-col items-center justify-center gap-2 max-[380px]:gap-1.5">
             <Link className="w-full" to={createPageUrl('Register')}>
               <Button
                 size="lg"
-                className="w-full rounded-full bg-[#F68A42] px-7 py-4 text-sm text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A]"
+                className="w-full rounded-full bg-[#F68A42] px-7 py-4 text-sm text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A] max-[380px]:px-6 max-[380px]:py-3.5 max-[380px]:text-xs"
               >
                 <Zap className="mr-2" size={20} />
                 Apply Now
@@ -127,30 +127,30 @@ export default function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full rounded-full border-white/40 px-7 py-4 text-sm text-black hover:bg-white/10 hover:text-white"
+                className="w-full rounded-full border-white/40 px-7 py-4 text-sm text-black hover:bg-white/10 hover:text-white max-[380px]:px-6 max-[380px]:py-3.5 max-[380px]:text-xs"
               >
                 Learn More
               </Button>
             </a>
           </div>
 
-          <div className="grid w-full max-w-md grid-cols-3 gap-2">
+          <div className="grid w-full max-w-md grid-cols-3 gap-2 max-[380px]:gap-1.5">
             {[
               { value: '24', label: 'Hours' },
               { value: '200+', label: 'Hackers' },
               { value: '$5K+', label: 'In Prizes' },
             ].map((stat) => (
               <div key={stat.label} className="text-center text-white">
-                <div className="text-lg font-bold text-white sm:text-3xl">{stat.value}</div>
-                <div className="mt-1 text-xs text-white/95 sm:text-sm">{stat.label}</div>
+                <div className="text-lg font-bold text-white sm:text-3xl max-[380px]:text-base">{stat.value}</div>
+                <div className="mt-1 text-xs text-white/95 sm:text-sm max-[380px]:text-[10px]">{stat.label}</div>
               </div>
             ))}
           </div>
 
-          <div className="w-full max-w-xl rounded-3xl border border-white/20 bg-[#272727]/40 p-4 text-left text-white backdrop-blur-sm sm:p-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/80">About the event</p>
-            <h2 className="mt-2 text-xl font-black sm:text-3xl">What is Jackson Hacks?</h2>
-            <p className="mt-2 text-sm leading-5 text-white/90 sm:text-base sm:leading-7">
+          <div className="w-full max-w-xl rounded-3xl border border-white/20 bg-[#272727]/40 p-4 text-left text-white backdrop-blur-sm sm:p-6 max-[380px]:p-3.5">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/80 max-[380px]:text-[10px]">About the event</p>
+            <h2 className="mt-2 text-xl font-black sm:text-3xl max-[380px]:mt-1 max-[380px]:text-lg">What is Jackson Hacks?</h2>
+            <p className="mt-2 text-sm leading-5 text-white/90 sm:text-base sm:leading-7 max-[380px]:text-xs max-[380px]:leading-4">
               Jackson Hacks is a 24-hour hackathon where students come together to build
               creative tech projects, learn from workshops, meet new people, and turn ideas
               into something real.
@@ -158,21 +158,21 @@ export default function HeroSection() {
           </div>
 
           <div className="w-full max-w-xl text-left text-white">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/80">What you can do</p>
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/80 max-[380px]:text-[10px]">What you can do</p>
+            <div className="mt-3 -mx-6 flex gap-3 overflow-x-auto px-6 pb-2 snap-x snap-mandatory max-[380px]:-mx-4 max-[380px]:gap-2 max-[380px]:px-4">
               {branchNodes.map((node) => {
                 const Icon = node.icon;
 
                 return (
                   <div
                     key={node.title}
-                    className="rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-sm"
+                    className="min-w-[14rem] flex-shrink-0 snap-start rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-sm max-[380px]:min-w-[11.5rem] max-[380px]:p-2.5"
                   >
-                    <div className="mb-2 inline-flex rounded-xl bg-white/15 p-2 text-white">
-                      <Icon size={16} />
+                    <div className="mb-2 inline-flex rounded-xl bg-white/15 p-2 text-white max-[380px]:mb-1.5 max-[380px]:p-1.5">
+                      <Icon size={16} className="max-[380px]:h-3.5 max-[380px]:w-3.5" />
                     </div>
-                    <h3 className="text-sm font-semibold text-white">{node.title}</h3>
-                    <p className="mt-1 text-xs leading-4 text-white/90">
+                    <h3 className="text-sm font-semibold text-white max-[380px]:text-xs">{node.title}</h3>
+                    <p className="mt-1 text-xs leading-4 text-white/90 max-[380px]:mt-0.5 max-[380px]:text-[10px] max-[380px]:leading-3.5">
                       {node.description}
                     </p>
                   </div>
