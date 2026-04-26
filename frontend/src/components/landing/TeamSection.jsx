@@ -1,28 +1,33 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users } from 'lucide-react';
+import { Code2, Megaphone, Palette, Handshake, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const teamMembers = [
   {
-    name: 'Team Member 1',
-    role: 'Organizer',
-    image: '👤',
+    name: 'Webdev',
+    role: 'Website, registration, judging tools, and demos',
+    icon: Code2,
   },
   {
-    name: 'Team Member 2',
-    role: 'Organizer',
-    image: '👤',
+    name: 'Creative',
+    role: 'Brand, visuals, hacker experience, signage, and social assets',
+    icon: Palette,
   },
   {
-    name: 'Team Member 3',
-    role: 'Organizer',
-    image: '👤',
+    name: 'Logistics',
+    role: 'Venue, food, check-in, and event flow',
+    icon: Users,
   },
   {
-    name: 'Team Member 4',
-    role: 'Organizer',
-    image: '👤',
+    name: 'Marketing',
+    role: 'Social media, announcements, outreach, and community hype',
+    icon: Megaphone,
+  },
+  {
+    name: 'Sponsorship',
+    role: 'Sponsor relations, packages, partners, and event support',
+    icon: Handshake,
   },
 ];
 
@@ -30,70 +35,63 @@ export default function TeamSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="team" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F68A42]/5 to-transparent" />
+    <section id="team" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2072C7]/35 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(246,138,66,0.09),transparent_44%,rgba(8,79,154,0.14))]" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8 }}
-          className="text-center mb-16"
+          className="mb-8 max-w-3xl sm:mb-10"
         >
-          <span className="text-[#F68A42] text-sm font-semibold tracking-widest uppercase mb-4 block">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
             The People Behind
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
-            Meet the{' '}
-            <span className="bg-gradient-to-r from-[#2072C7] to-[#084F9A] bg-clip-text text-transparent">
-              Team
-            </span>
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            The passionate organizers making Jackson Hacks happen
+          <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">Meet the Team</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#F3F1F1]/75 sm:text-lg">
+            A student-led crew handling the pieces that turn a school day into a polished hackathon.
           </p>
         </motion.div>
 
-        {/* Team grid */}
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
         >
           {teamMembers.map((member, index) => (
             <motion.div
               key={index}
               whileHover={isMobile ? undefined : { y: -8 }}
-              className="rounded-2xl border border-white/10 bg-[#084F9A]/10 p-6 text-center hover:bg-[#084F9A]/20 transition-colors"
+              className="rounded-2xl border border-[#2072C7]/25 bg-[#084F9A]/35 p-5 shadow-sm transition-colors hover:border-[#F68A42]/45 sm:p-6"
             >
-              <div className="text-5xl mb-4">{member.image}</div>
-              <h3 className="text-xl font-semibold text-white mb-1">{member.name}</h3>
-              <p className="text-gray-400">{member.role}</p>
+              <div className="mb-5 inline-flex rounded-lg bg-[#2072C7]/30 p-3 text-[#F3F1F1]">
+                <member.icon size={24} />
+              </div>
+              <h3 className="mb-2 font-title text-xl text-[#F3F1F1]">{member.name}</h3>
+              <p className="text-sm leading-6 text-[#F3F1F1]/70">{member.role}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Placeholder message */}
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8, delay: 0.4 }}
-          className="text-center"
+          className="rounded-2xl border border-[#2072C7]/20 bg-[#272727] p-5 sm:p-6"
         >
-          <div className="inline-block px-8 py-4 rounded-2xl bg-[#2072C7]/10 border border-[#2072C7]/25">
-            <p className="text-gray-300 flex items-center gap-2">
-              <Users size={20} />
-              Team bios and photos coming soon
-            </p>
-          </div>
+          <p className="flex flex-col gap-3 text-sm leading-6 text-[#F3F1F1]/75 sm:flex-row sm:items-center sm:text-base">
+            <Users size={20} className="shrink-0 text-[#F68A42]" />
+            Team bios and photos are coming soon. For now, each lane shows what the organizing team is actively covering.
+          </p>
         </motion.div>
       </div>
     </section>
   );
 }
+

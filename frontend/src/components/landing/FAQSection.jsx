@@ -1,82 +1,80 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { HelpCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../ui/accordion";
+} from '../ui/accordion';
 
 const faqs = [
   {
-    question: "What is a hackathon?",
-    answer: "A hackathon is an event where students come together to create tech-based projects over a set period (usually 24 hours). You'll work in teams to build something amazing, attend workshops, connect with mentors, and compete for prizes!"
+    question: 'What is a hackathon?',
+    answer: "A hackathon is an event where students come together to create tech-based projects over a set period. You'll work in teams to build something useful, attend workshops, connect with mentors, and compete for prizes.",
   },
   {
-    question: "Do I need coding experience?",
-    answer: "Not at all! Hackathons are for everyone, regardless of skill level. We have workshops for beginners, experienced mentors to help you, and you can contribute to your team in many ways - design, ideation, presentation, and more."
+    question: 'Do I need coding experience?',
+    answer: 'Not at all. Hackathons are for everyone, regardless of skill level. Workshops and mentors will help beginners, and teams need design, ideation, presentation, and product thinking too.',
   },
   {
-    question: "Is it free to attend?",
-    answer: "Yes! The hackathon is completely free to attend. Thanks to our amazing sponsors, we provide free food, drinks, snacks, and swag throughout the event."
+    question: 'Is it free to attend?',
+    answer: 'Yes. The hackathon is completely free to attend. Sponsors help provide food, drinks, snacks, and swag throughout the event.',
   },
   {
-    question: "What should I bring?",
-    answer: "Bring your laptop, charger, any hardware you want to use, toiletries, a change of clothes (if staying overnight), sleeping bag or blanket, and most importantly - your creativity and enthusiasm!"
+    question: 'What should I bring?',
+    answer: 'Bring your laptop, charger, any hardware you want to use, toiletries if needed, and your creativity. We will share a final packing list before the event.',
   },
   {
-    question: "Can I participate solo or do I need a team?",
-    answer: "You can participate either way! If you don't have a team, don't worry - we'll have team formation activities at the start of the event where you can meet other hackers and form a team."
+    question: 'Can I participate solo or do I need a team?',
+    answer: "You can participate either way. If you do not have a team, we will have team formation activities at the start of the event so you can meet other hackers.",
   },
   {
-    question: "What can I build?",
-    answer: "Anything you can dream of! Whether it's a web app, mobile app, game, hardware project, AI tool, or something completely unique - as long as it involves technology, you're good to go."
+    question: 'What can I build?',
+    answer: 'Anything you can dream of: a web app, mobile app, game, hardware project, AI tool, or something completely unique, as long as it involves technology.',
   },
   {
-    question: "Will there be food?",
-    answer: "Absolutely! We provide all meals throughout the event including breakfast, lunch, dinner, and midnight snacks. We also accommodate dietary restrictions - just let us know in your application."
+    question: 'Will there be food?',
+    answer: 'Absolutely. We provide meals and snacks throughout the event. We also accommodate dietary restrictions when they are included in your application.',
   },
   {
-    question: "How are projects judged?",
-    answer: "Projects are judged based on innovation, technical complexity, design, usefulness, and presentation. We have multiple prize categories so there are many ways to win!"
-  }
+    question: 'How are projects judged?',
+    answer: 'Projects are judged based on innovation, technical complexity, design, usefulness, and presentation. Multiple prize categories mean there are many ways to win.',
+  },
 ];
 
 export default function FAQSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="faq" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#084F9A]/14 via-transparent to-transparent" />
-      
-      <div className="relative z-10 max-w-4xl mx-auto px-6">
-        {/* Section header */}
+    <section id="faq" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/45 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,79,154,0.16),transparent_48%,rgba(246,138,66,0.08))]" />
+
+      <div className="relative z-10 mx-auto max-w-5xl px-6">
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8 }}
-          className="text-center mb-16"
+          className="mb-8 grid gap-5 sm:mb-10 md:grid-cols-[0.85fr_1.15fr] md:items-end"
         >
-          <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
-            Got Questions?
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6">
-            Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
-              Questions
+          <div>
+            <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#2072C7] sm:text-sm">
+              Got Questions?
             </span>
-          </h2>
-          <p className="text-xl text-gray-400">
-            Everything you need to know about the hackathon
+            <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-[#F3F1F1]/75 sm:text-lg md:justify-self-end">
+            The practical stuff: teams, skill levels, food, judging, and what to bring.
           </p>
         </motion.div>
 
-        {/* FAQ Accordion */}
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
@@ -84,14 +82,17 @@ export default function FAQSection() {
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
-                key={index}
+                key={faq.question}
                 value={`item-${index}`}
-                className="bg-[#084F9A]/12 border border-[#2072C7]/20 rounded-xl px-6 data-[state=open]:bg-[#084F9A]/20 transition-colors"
+                className="rounded-xl border border-[#2072C7]/25 bg-[#084F9A]/35 px-4 shadow-sm transition-colors data-[state=open]:border-[#F68A42]/45 sm:px-6"
               >
-                <AccordionTrigger className="text-left text-white hover:text-[#F68A42] text-lg font-medium py-5 hover:no-underline">
-                  {faq.question}
+                <AccordionTrigger className="py-4 text-left text-base font-semibold text-[#F3F1F1] hover:text-[#F68A42] hover:no-underline sm:py-5 sm:text-lg">
+                  <span className="flex min-w-0 items-center gap-3 pr-3">
+                    <HelpCircle size={18} className="shrink-0 text-[#F68A42]" />
+                    <span>{faq.question}</span>
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 pb-5 leading-relaxed">
+                <AccordionContent className="pb-5 text-sm leading-6 text-[#F3F1F1]/75 sm:text-base">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -99,17 +100,16 @@ export default function FAQSection() {
           </Accordion>
         </motion.div>
 
-        {/* Contact CTA */}
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 20 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.6, delay: 0.4 }}
-          className="mt-12 text-center"
+          className="mt-8 text-center sm:mt-10"
         >
-          <p className="text-gray-400">
+          <p className="text-sm text-[#F3F1F1]/70 sm:text-base">
             Still have questions?{' '}
-            <a href="mailto:hello@hackathon.com" className="text-[#2072C7] hover:text-[#F68A42] underline underline-offset-4">
+            <a href="mailto:hello@hackathon.com" className="font-semibold text-[#F68A42] underline underline-offset-4 hover:text-[#2072C7]">
               Reach out to us
             </a>
           </p>
@@ -118,3 +118,4 @@ export default function FAQSection() {
     </section>
   );
 }
+

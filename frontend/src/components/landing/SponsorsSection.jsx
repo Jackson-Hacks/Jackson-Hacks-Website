@@ -1,85 +1,63 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Mail, FileText } from 'lucide-react';
+import { FileText, Handshake, Mail } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function SponsorsSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="sponsors" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#084F9A]/10 to-transparent" />
-      
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
+    <section id="sponsors" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(8,79,154,0.18),transparent_48%,rgba(246,138,66,0.10))]" />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8 }}
-          className="text-center mb-16"
+          className="mb-8 max-w-3xl sm:mb-10"
         >
-          <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
             Our Partners
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
-            Backed by{' '}
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-              Amazing
-            </span>{' '}
-            Sponsors
+          <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">
+            Sponsors Make Jackson Hacks Possible
           </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            We're grateful for the support of our sponsors who make this event possible
-          </p>
         </motion.div>
 
-        {/* Placeholder for sponsors */}
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
-          className="mb-20"
+          className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]"
         >
-          <div className="text-center py-16 rounded-2xl bg-[#084F9A]/10 border border-dashed border-[#2072C7]/25">
-            <div className="text-6xl mb-4">🤝</div>
-            <h3 className="text-2xl font-semibold text-white mb-2">Sponsors Coming Soon</h3>
-            <p className="text-gray-400">Interested in sponsoring? Get in touch!</p>
-          </div>
-        </motion.div>
-
-        {/* Sponsor CTA */}
-        <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 30 }}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8, delay: 0.4 }}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2072C7]/20 to-[#F68A42]/20 rounded-3xl blur-xl" />
-          <div className="relative p-10 md:p-14 rounded-3xl bg-gradient-to-r from-[#084F9A]/20 to-[#F68A42]/12 border border-[#2072C7]/25 text-center">
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Become a Sponsor
-            </h3>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Support the next generation of innovators. Connect with talented students, 
-              gain exposure in the tech community, and help shape the future of technology.
+          <div className="rounded-2xl border border-dashed border-[#F68A42]/45 bg-[#F68A42]/10 p-5 sm:p-6">
+            <Handshake size={32} className="mb-5 text-[#F68A42]" />
+            <h3 className="font-title text-2xl text-[#F3F1F1]">Sponsors Coming Soon</h3>
+            <p className="mt-2 text-sm leading-6 text-[#F3F1F1]/75 sm:text-base">
+              Sponsor logos and confirmed partners will appear here as packages are finalized.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button 
+          </div>
+          <div className="rounded-2xl border border-[#2072C7]/30 bg-[#084F9A]/45 p-5 text-[#F3F1F1] sm:p-7 lg:p-8">
+            <h3 className="font-title text-2xl sm:text-3xl md:text-4xl">Become a Sponsor</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#F3F1F1]/75 sm:text-lg">
+              Support the next generation of innovators. Connect with talented students, gain exposure in the tech community, and help shape the future of technology.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Button
                 size="lg"
-                className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-8 py-6 rounded-full"
+                className="w-full rounded-full bg-[#F68A42] px-6 py-6 text-[#272727] hover:bg-[#E06E0A] sm:w-auto"
               >
                 <FileText className="mr-2" size={20} />
-                View Sponsorship Package
+                Sponsorship Package
               </Button>
-              <Button 
+              <Button
                 size="lg"
                 variant="outline"
-                className="border-white/20 text-black hover:text-white hover:bg-white/10 px-8 py-6 rounded-full"
+                className="w-full rounded-full border-[#F3F1F1]/25 bg-[#F3F1F1]/10 px-6 py-6 text-[#F3F1F1] hover:bg-[#F3F1F1] hover:text-[#272727] sm:w-auto"
               >
                 <Mail className="mr-2" size={20} />
                 sponsor@hackathon.com
@@ -91,3 +69,4 @@ export default function SponsorsSection() {
     </section>
   );
 }
+

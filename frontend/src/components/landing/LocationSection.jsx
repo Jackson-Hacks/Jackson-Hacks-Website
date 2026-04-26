@@ -1,91 +1,98 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Clock3, CalendarDays, Navigation } from 'lucide-react';
+import { CalendarDays, Clock3, MapPin, Navigation } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function LocationSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="location" className="relative py-16 sm:py-20 lg:py-28 bg-[#272727]">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#2072C7]/10 to-transparent" />
+    <section id="location" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2072C7]/45 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(32,114,199,0.16),transparent_42%,rgba(246,138,66,0.10))]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 24 }}
+          initial={false}
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.7 }}
-          className="mb-14 text-center"
+          className="mb-8 max-w-3xl sm:mb-10 lg:mb-12"
         >
-          <span className="mb-4 block text-sm font-semibold uppercase tracking-widest text-[#2072C7]">
-            Location
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
+            Event Details
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl md:text-6xl">Location</h2>
-          
+          <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">Location</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#F3F1F1]/75 sm:text-lg">
+            Join us at A. Y. Jackson Secondary School for a full day of building, workshops, food, and demos.
+          </p>
         </motion.div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
           <motion.div
-            initial={isMobile ? false : { opacity: 0, y: 26 }}
+            initial={false}
             whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
             viewport={isMobile ? undefined : { once: true }}
             transition={isMobile ? undefined : { duration: 0.7, delay: 0.1 }}
-            className="rounded-3xl border border-[#2072C7]/25 bg-[#084F9A]/15 p-6 sm:p-8"
+            className="rounded-2xl border border-[#2072C7]/30 bg-[#084F9A]/45 p-5 shadow-2xl shadow-black/20 sm:p-7 lg:p-8"
           >
-            <div className="mb-5 inline-flex rounded-xl bg-[#2072C7]/25 p-3 text-white">
+            <div className="mb-5 inline-flex rounded-lg bg-[#2072C7]/25 p-3 text-[#F3F1F1]">
               <MapPin size={24} />
             </div>
 
-            <h3 className="text-xl font-semibold text-white sm:text-2xl">A. Y. Jackson SS</h3>
-            <p className="mt-2 text-sm text-gray-300 sm:text-base">A. Y. Jackson SS</p>
+            <h3 className="font-title text-2xl text-[#F3F1F1] sm:text-3xl">A. Y. Jackson SS</h3>
+            <p className="mt-2 text-sm text-[#F3F1F1]/75 sm:text-base">50 Francine Dr, North York, ON</p>
 
-            <div className="mt-8 space-y-4 text-gray-200">
-              <div className="flex items-center gap-3">
-                <CalendarDays size={18} className="text-[#F68A42]" />
-                <span className="text-sm sm:text-base">November 21st, 2026 (Saturday)</span>
+            <div className="mt-7 grid gap-3 text-[#F3F1F1] sm:grid-cols-3 lg:grid-cols-1">
+              <div className="rounded-xl border border-[#F3F1F1]/10 bg-[#F3F1F1]/[0.03] p-4">
+                <CalendarDays size={19} className="mb-3 text-[#F68A42]" />
+                <span className="block text-xs uppercase tracking-widest text-[#F3F1F1]/45">Date</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">Nov. 21, 2026</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Clock3 size={18} className="text-[#F68A42]" />
-                <span className="text-sm sm:text-base">8am - 10pm</span>
+              <div className="rounded-xl border border-[#F3F1F1]/10 bg-[#F3F1F1]/[0.03] p-4">
+                <Clock3 size={19} className="mb-3 text-[#F68A42]" />
+                <span className="block text-xs uppercase tracking-widest text-[#F3F1F1]/45">Time</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">8 AM - 10 PM</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Navigation size={18} className="text-[#F68A42]" />
-                <span className="text-sm sm:text-base">Parking and transit info shared before check-in</span>
+              <div className="rounded-xl border border-[#F3F1F1]/10 bg-[#F3F1F1]/[0.03] p-4">
+                <Navigation size={19} className="mb-3 text-[#F68A42]" />
+                <span className="block text-xs uppercase tracking-widest text-[#F3F1F1]/45">Arrival</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">Details before check-in</span>
               </div>
             </div>
           </motion.div>
 
           <motion.div
-            initial={isMobile ? false : { opacity: 0, y: 26 }}
+            initial={false}
             whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
             viewport={isMobile ? undefined : { once: true }}
             transition={isMobile ? undefined : { duration: 0.7, delay: 0.2 }}
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2072C7]/20 via-[#5A78AF]/15 to-[#F68A42]/15 p-6 sm:p-8"
+            className="relative overflow-hidden rounded-2xl border border-[#2072C7]/30 bg-[#084F9A]/45 p-5 text-[#F3F1F1] shadow-2xl shadow-black/20 sm:p-7 lg:p-8"
           >
-            <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[#F68A42]/20 blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[#2072C7]/20 blur-3xl" />
-
-            <div className="relative z-10 flex h-full min-h-[220px] flex-col justify-between rounded-2xl border border-white/20 bg-[#272727]/45 p-5 sm:p-6 backdrop-blur-sm">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-[#2072C7] sm:text-sm">Campus Zone</p>
-                <p className="mt-3 text-xl font-semibold text-white sm:text-2xl">Easy to Find. Easy to Build.</p>
-                <p className="mt-3 max-w-md text-sm text-gray-300 sm:text-base">
-                  Close to food spots, parking, and transit. We&apos;ll send exact entry details and check-in instructions before the event.
-                </p>
-              </div>
-              <a
-                href="https://maps.google.com/?q=A.+Y.+Jackson+SS"
-                target="_blank"
-                rel="noreferrer"
-                className="mt-8 inline-flex w-fit items-center rounded-full border border-[#2072C7]/40 px-5 py-2.5 text-white transition-colors hover:border-[#F68A42] hover:text-[#F68A42]"
-              >
-                Open in Maps
-              </a>
+            <div className="overflow-hidden rounded-xl border border-[#F3F1F1]/10 bg-[#272727]">
+              <iframe
+                title="Map to A. Y. Jackson Secondary School"
+                src="https://www.google.com/maps?q=A.%20Y.%20Jackson%20Secondary%20School%2050%20Francine%20Dr%20North%20York%20ON&output=embed"
+                className="h-[260px] w-full border-0 sm:h-[320px] lg:h-[360px]"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             </div>
+
+            <a
+              href="https://maps.google.com/?q=A.+Y.+Jackson+SS"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-[#F68A42] px-5 py-2.5 text-sm font-semibold text-[#272727] transition-colors hover:bg-[#E06E0A]"
+            >
+              <Navigation size={17} />
+              Open in Maps
+            </a>
           </motion.div>
         </div>
       </div>
     </section>
   );
 }
+

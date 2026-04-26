@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Twitter, Instagram, Linkedin, Mail, Heart } from 'lucide-react';
+import { Github, Heart, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
 
 const socialLinks = [
   { icon: Instagram, href: '#', label: 'Instagram' },
@@ -13,33 +13,31 @@ const quickLinks = [
   { label: 'Location', href: '#location' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Sponsors', href: '#sponsors' },
+  { label: 'Team', href: '#team' },
   { label: 'Code of Conduct', href: '#' },
 ];
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#272727] border-t border-[#2072C7]/20">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-3 gap-12 mb-12">
-          {/* Brand */}
+    <footer className="relative border-t border-[#2072C7]/20 bg-[#272727]">
+      <div className="mx-auto max-w-7xl px-6 py-10 sm:py-12 lg:py-14">
+        <div className="grid gap-10 md:grid-cols-[1.25fr_0.75fr_1fr] lg:gap-14">
           <div>
-            <h3 className="text-2xl font-bold text-white mb-4">
+            <h3 className="mb-4 font-title text-2xl text-[#F3F1F1]">
               <span className="bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent">
                 JACKSON HACKS
               </span>
             </h3>
-            <p className="text-gray-400 leading-relaxed mb-6">
-              Join us for an incredible weekend of building, learning, and connecting 
-              with fellow hackers from around the region.
+            <p className="mb-6 max-w-md text-sm leading-6 text-[#F3F1F1]/65 sm:text-base">
+              Join us for a day of building, learning, and connecting with fellow hackers from around the region.
             </p>
-            {/* Social links */}
-            <div className="flex gap-3">
-              {socialLinks.map((social, index) => (
+            <div className="flex flex-wrap gap-3">
+              {socialLinks.map((social) => (
                 <a
-                  key={index}
+                  key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="p-2.5 rounded-full bg-[#084F9A]/25 hover:bg-[#084F9A]/40 text-gray-400 hover:text-white transition-colors"
+                  className="rounded-full bg-[#084F9A]/25 p-2.5 text-[#F3F1F1]/65 transition-colors hover:bg-[#084F9A]/40 hover:text-[#F3F1F1]"
                 >
                   <social.icon size={18} />
                 </a>
@@ -47,16 +45,12 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-3">
-              {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <a 
-                    href={link.href}
-                    className="text-gray-400 hover:text-[#2072C7] transition-colors"
-                  >
+            <h4 className="mb-4 font-title text-[#F3F1F1]">Quick Links</h4>
+            <ul className="grid grid-cols-2 gap-3 text-sm sm:block sm:space-y-3">
+              {quickLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.href} className="text-[#F3F1F1]/65 transition-colors hover:text-[#F68A42]">
                     {link.label}
                   </a>
                 </li>
@@ -64,19 +58,20 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Get in Touch</h4>
-            <div className="space-y-3 text-gray-400">
+            <h4 className="mb-4 font-title text-[#F3F1F1]">Get in Touch</h4>
+            <div className="space-y-4 text-sm text-[#F3F1F1]/65 sm:text-base">
               <p>
-                <span className="text-gray-500">General Inquiries:</span><br />
-                <a href="mailto:hello@hackathon.com" className="hover:text-[#2072C7] transition-colors">
+                <span className="text-[#F3F1F1]/45">General Inquiries:</span>
+                <br />
+                <a href="mailto:hello@hackathon.com" className="transition-colors hover:text-[#F68A42]">
                   hello@hackathon.com
                 </a>
               </p>
               <p>
-                <span className="text-gray-500">Sponsorship:</span><br />
-                <a href="mailto:sponsor@hackathon.com" className="hover:text-[#2072C7] transition-colors">
+                <span className="text-[#F3F1F1]/45">Sponsorship:</span>
+                <br />
+                <a href="mailto:sponsor@hackathon.com" className="transition-colors hover:text-[#F68A42]">
                   sponsor@hackathon.com
                 </a>
               </p>
@@ -84,13 +79,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-[#2072C7]/20 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Jackson Hacks. All rights reserved.
-          </p>
-          <p className="text-gray-500 text-sm flex items-center gap-1">
-            Made with <Heart size={14} className="text-red-500" /> by the organizing team
+        <div className="mt-10 flex flex-col gap-3 border-t border-[#2072C7]/20 pt-6 text-sm text-[#F3F1F1]/45 sm:flex-row sm:items-center sm:justify-between">
+          <p>Copyright {new Date().getFullYear()} Jackson Hacks. All rights reserved.</p>
+          <p className="flex items-center gap-1">
+            Made with <Heart size={14} className="text-[#F68A42]" /> by the organizing team
           </p>
         </div>
       </div>
