@@ -134,23 +134,10 @@ export default function HeroSection() {
             </a>
           </div>
 
-          <div className="grid w-full max-w-md grid-cols-3 gap-2 max-[380px]:gap-1.5">
-            {[
-              { value: '24', label: 'Hours' },
-              { value: '200+', label: 'Hackers' },
-              { value: '$5K+', label: 'In Prizes' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center text-white">
-                <div className="text-lg font-bold text-white sm:text-3xl max-[380px]:text-base">{stat.value}</div>
-                <div className="mt-1 text-xs text-white/95 sm:text-sm max-[380px]:text-[10px]">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
           <div className="w-full max-w-xl rounded-3xl border border-white/20 bg-[#272727]/40 p-4 text-left text-white backdrop-blur-sm sm:p-6 max-[380px]:p-3.5">
             <p className="text-xs uppercase tracking-[0.2em] text-white/80 max-[380px]:text-[10px]">About the event</p>
             <h2 className="mt-2 text-xl font-black sm:text-3xl max-[380px]:mt-1 max-[380px]:text-lg">What is Jackson Hacks?</h2>
-            <p className="mt-2 text-sm leading-5 text-white/90 sm:text-base sm:leading-7 max-[380px]:text-xs max-[380px]:leading-4">
+            <p className="mt-2 text-sm leading-5 text-white/90 sm:text-base sm:leading-7 max-[380px]:text-xs max-[380px]:leading-4 max-[430px]:text-xs max-[430px]:leading-4">
               Jackson Hacks is a 24-hour hackathon where students come together to build
               creative tech projects, learn from workshops, meet new people, and turn ideas
               into something real.
@@ -158,21 +145,21 @@ export default function HeroSection() {
           </div>
 
           <div className="w-full max-w-xl text-left text-white">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/80 max-[380px]:text-[10px]">What you can do</p>
-            <div className="mt-3 -mx-6 flex gap-3 overflow-x-auto px-6 pb-2 snap-x snap-mandatory max-[380px]:-mx-4 max-[380px]:gap-2 max-[380px]:px-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/80 max-[380px]:text-[10px] max-[430px]:text-[10px]">What you can do</p>
+            <div className="mt-3 grid grid-cols-1 gap-3 max-[380px]:gap-2 max-[430px]:gap-2">
               {branchNodes.map((node) => {
                 const Icon = node.icon;
 
                 return (
                   <div
                     key={node.title}
-                    className="min-w-[14rem] flex-shrink-0 snap-start rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-sm max-[380px]:min-w-[11.5rem] max-[380px]:p-2.5"
+                    className="rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-sm max-[380px]:p-2.5 max-[430px]:p-2.5"
                   >
-                    <div className="mb-2 inline-flex rounded-xl bg-white/15 p-2 text-white max-[380px]:mb-1.5 max-[380px]:p-1.5">
+                    <div className="mb-2 inline-flex rounded-xl bg-white/15 p-2 text-white max-[380px]:mb-1.5 max-[380px]:p-1.5 max-[430px]:mb-1.5 max-[430px]:p-1.5">
                       <Icon size={16} className="max-[380px]:h-3.5 max-[380px]:w-3.5" />
                     </div>
-                    <h3 className="text-sm font-semibold text-white max-[380px]:text-xs">{node.title}</h3>
-                    <p className="mt-1 text-xs leading-4 text-white/90 max-[380px]:mt-0.5 max-[380px]:text-[10px] max-[380px]:leading-3.5">
+                    <h3 className="text-sm font-semibold text-white max-[380px]:text-xs max-[430px]:text-xs">{node.title}</h3>
+                    <p className="mt-1 text-xs leading-4 text-white/90 max-[380px]:mt-0.5 max-[380px]:text-[10px] max-[380px]:leading-3.5 max-[430px]:mt-0.5 max-[430px]:text-[10px] max-[430px]:leading-3.5">
                       {node.description}
                     </p>
                   </div>

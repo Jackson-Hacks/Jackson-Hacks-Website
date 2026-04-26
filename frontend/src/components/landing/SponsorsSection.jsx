@@ -8,7 +8,7 @@ export default function SponsorsSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="sponsors" className="relative py-32 bg-[#272727]">
+    <section id="sponsors" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#084F9A]/10 to-transparent" />
       

@@ -30,7 +30,7 @@ export default function TeamSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="team" className="relative py-32 bg-[#272727]">
+    <section id="team" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F68A42]/5 to-transparent" />
 

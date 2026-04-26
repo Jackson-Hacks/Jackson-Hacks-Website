@@ -47,7 +47,7 @@ export default function FAQSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="faq" className="relative py-32 bg-[#272727]">
+    <section id="faq" className="relative py-16 sm:py-20 lg:py-32 bg-[#272727]">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#084F9A]/14 via-transparent to-transparent" />
       
@@ -63,7 +63,7 @@ export default function FAQSection() {
           <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
             Got Questions?
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6">
             Frequently Asked{' '}
             <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
               Questions

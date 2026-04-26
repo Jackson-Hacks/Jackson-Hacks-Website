@@ -7,7 +7,7 @@ export default function LocationSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="location" className="relative py-28 bg-[#272727]">
+    <section id="location" className="relative py-16 sm:py-20 lg:py-28 bg-[#272727]">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#2072C7]/10 to-transparent" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
@@ -31,7 +31,7 @@ export default function LocationSection() {
             whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
             viewport={isMobile ? undefined : { once: true }}
             transition={isMobile ? undefined : { duration: 0.7, delay: 0.1 }}
-            className="rounded-3xl border border-[#2072C7]/25 bg-[#084F9A]/15 p-8"
+            className="rounded-3xl border border-[#2072C7]/25 bg-[#084F9A]/15 p-6 sm:p-8"
           >
             <div className="mb-5 inline-flex rounded-xl bg-[#2072C7]/25 p-3 text-white">
               <MapPin size={24} />
@@ -61,12 +61,12 @@ export default function LocationSection() {
             whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
             viewport={isMobile ? undefined : { once: true }}
             transition={isMobile ? undefined : { duration: 0.7, delay: 0.2 }}
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2072C7]/20 via-[#5A78AF]/15 to-[#F68A42]/15 p-8"
+            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2072C7]/20 via-[#5A78AF]/15 to-[#F68A42]/15 p-6 sm:p-8"
           >
             <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[#F68A42]/20 blur-3xl" />
             <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[#2072C7]/20 blur-3xl" />
 
-            <div className="relative z-10 flex h-full min-h-[280px] flex-col justify-between rounded-2xl border border-white/20 bg-[#272727]/45 p-6 backdrop-blur-sm">
+            <div className="relative z-10 flex h-full min-h-[220px] flex-col justify-between rounded-2xl border border-white/20 bg-[#272727]/45 p-5 sm:p-6 backdrop-blur-sm">
               <div>
                 <p className="text-xs uppercase tracking-widest text-[#2072C7] sm:text-sm">Campus Zone</p>
                 <p className="mt-3 text-xl font-semibold text-white sm:text-2xl">Easy to Find. Easy to Build.</p>
