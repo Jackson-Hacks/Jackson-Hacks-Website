@@ -10,7 +10,7 @@ const socialLinks = [
 ];
 
 const quickLinks = [
-  { label: 'About', href: '#about' },
+  { label: 'Location', href: '#location' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Sponsors', href: '#sponsors' },
   { label: 'Code of Conduct', href: '#' },

@@ -5,10 +5,11 @@ import { Menu, X, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 import pantherLogo from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
 
 const navLinks = [
-  { label: 'About', href: '#about' },
+  { label: 'Location', href: '#location' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Sponsors', href: '#sponsors' },
 ];
@@ -17,6 +18,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated, isLoadingAuth } = useAuth();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,9 +31,9 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
+        initial={isMobile ? false : { y: -100 }}
+        animate={isMobile ? undefined : { y: 0 }}
+        transition={isMobile ? undefined : { duration: 0.6 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled 
             ? 'bg-[#272727]/85 backdrop-blur-xl border-b border-[#2072C7]/20' 

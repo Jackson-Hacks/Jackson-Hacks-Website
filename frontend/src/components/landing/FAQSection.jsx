@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Accordion,
   AccordionContent,
@@ -43,6 +44,8 @@ const faqs = [
 ];
 
 export default function FAQSection() {
+  const isMobile = useIsMobile();
+
   return (
     <section id="faq" className="relative py-32 bg-[#272727]">
       {/* Background */}
@@ -51,16 +54,16 @@ export default function FAQSection() {
       <div className="relative z-10 max-w-4xl mx-auto px-6">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.8 }}
           className="text-center mb-16"
         >
           <span className="text-[#2072C7] text-sm font-semibold tracking-widest uppercase mb-4 block">
             Got Questions?
           </span>
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
             Frequently Asked{' '}
             <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
               Questions
@@ -73,10 +76,10 @@ export default function FAQSection() {
 
         {/* FAQ Accordion */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
         >
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
@@ -98,10 +101,10 @@ export default function FAQSection() {
 
         {/* Contact CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          initial={isMobile ? false : { opacity: 0, y: 20 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.6, delay: 0.4 }}
           className="mt-12 text-center"
         >
           <p className="text-gray-400">

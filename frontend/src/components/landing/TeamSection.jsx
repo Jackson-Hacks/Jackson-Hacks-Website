@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Users } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const teamMembers = [
   {
@@ -26,6 +27,8 @@ const teamMembers = [
 ];
 
 export default function TeamSection() {
+  const isMobile = useIsMobile();
+
   return (
     <section id="team" className="relative py-32 bg-[#272727]">
       {/* Background */}
@@ -34,16 +37,16 @@ export default function TeamSection() {
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.8 }}
           className="text-center mb-16"
         >
           <span className="text-[#F68A42] text-sm font-semibold tracking-widest uppercase mb-4 block">
             The People Behind
           </span>
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
             Meet the{' '}
             <span className="bg-gradient-to-r from-[#2072C7] to-[#084F9A] bg-clip-text text-transparent">
               Team
@@ -56,16 +59,16 @@ export default function TeamSection() {
 
         {/* Team grid */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
         >
           {teamMembers.map((member, index) => (
             <motion.div
               key={index}
-              whileHover={{ y: -8 }}
+              whileHover={isMobile ? undefined : { y: -8 }}
               className="rounded-2xl border border-white/10 bg-[#084F9A]/10 p-6 text-center hover:bg-[#084F9A]/20 transition-colors"
             >
               <div className="text-5xl mb-4">{member.image}</div>
@@ -77,10 +80,10 @@ export default function TeamSection() {
 
         {/* Placeholder message */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          initial={isMobile ? false : { opacity: 0, y: 30 }}
+          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          viewport={isMobile ? undefined : { once: true }}
+          transition={isMobile ? undefined : { duration: 0.8, delay: 0.4 }}
           className="text-center"
         >
           <div className="inline-block px-8 py-4 rounded-2xl bg-[#2072C7]/10 border border-[#2072C7]/25">
