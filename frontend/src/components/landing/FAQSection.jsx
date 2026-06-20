@@ -48,9 +48,9 @@ export default function FAQSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="faq" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/45 to-transparent" />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,79,154,0.16),transparent_48%,rgba(246,138,66,0.08))]" />
+    <section id="faq" className="relative overflow-hidden bg-white py-12 sm:py-16 lg:py-24">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/35 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,79,154,0.07),transparent_48%,rgba(246,138,66,0.06))]" />
 
       <div className="relative z-10 mx-auto max-w-5xl px-6">
         <motion.div
@@ -64,11 +64,11 @@ export default function FAQSection() {
             <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#2072C7] sm:text-sm">
               Got Questions?
             </span>
-            <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">
+            <h2 className="font-title text-3xl text-[#1F2933] sm:text-4xl md:text-6xl">
               Frequently Asked Questions
             </h2>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-[#F3F1F1]/75 sm:text-lg md:justify-self-end">
+          <p className="max-w-xl text-sm leading-6 text-[#3F4D5A] sm:text-lg md:justify-self-end">
             The practical stuff: teams, skill levels, food, judging, and what to bring.
           </p>
         </motion.div>
@@ -84,15 +84,15 @@ export default function FAQSection() {
               <AccordionItem
                 key={faq.question}
                 value={`item-${index}`}
-                className="rounded-xl border border-[#2072C7]/25 bg-[#084F9A]/35 px-4 shadow-sm transition-colors data-[state=open]:border-[#F68A42]/45 sm:px-6"
+                className="rounded-xl border border-[#D7E4F5] bg-[#F8FAFD] px-4 shadow-sm shadow-[#084F9A]/5 transition-colors data-[state=open]:border-[#F68A42]/45 sm:px-6"
               >
-                <AccordionTrigger className="py-4 text-left text-base font-semibold text-[#F3F1F1] hover:text-[#F68A42] hover:no-underline sm:py-5 sm:text-lg">
+                <AccordionTrigger className="py-4 text-left text-base font-semibold text-[#1F2933] hover:text-[#F68A42] hover:no-underline sm:py-5 sm:text-lg">
                   <span className="flex min-w-0 items-center gap-3 pr-3">
                     <HelpCircle size={18} className="shrink-0 text-[#F68A42]" />
                     <span>{faq.question}</span>
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-sm leading-6 text-[#F3F1F1]/75 sm:text-base">
+                <AccordionContent className="pb-5 text-sm leading-6 text-[#52606D] sm:text-base">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -107,7 +107,7 @@ export default function FAQSection() {
           transition={isMobile ? undefined : { duration: 0.6, delay: 0.4 }}
           className="mt-8 text-center sm:mt-10"
         >
-          <p className="text-sm text-[#F3F1F1]/70 sm:text-base">
+          <p className="text-sm text-[#52606D] sm:text-base">
             Still have questions?{' '}
             <a href="mailto:hello@hackathon.com" className="font-semibold text-[#F68A42] underline underline-offset-4 hover:text-[#2072C7]">
               Reach out to us

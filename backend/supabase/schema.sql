@@ -23,13 +23,42 @@ CREATE TABLE applications (
   user_id UUID REFERENCES auth.users(id)
 );
 
+CREATE TABLE admin_users (
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.admin_users
+    WHERE user_id = auth.uid()
+  );
+$$;
+
 -- Enable Row Level Security
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
--- Allow anyone to insert (for registration)
-CREATE POLICY "Anyone can submit applications" ON applications
-  FOR INSERT WITH CHECK (true);
+-- Authenticated users can submit their own application
+CREATE POLICY "Authenticated users can submit own application" ON applications
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = user_id);
 
 -- Users can read their own application
 CREATE POLICY "Users can view own application" ON applications
+  FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+
+-- Users can update their own application
+CREATE POLICY "Users can update own application" ON applications
+  FOR UPDATE USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Admins can confirm their own admin access
+CREATE POLICY "Admins can view own admin row" ON admin_users
   FOR SELECT USING (auth.uid() = user_id);

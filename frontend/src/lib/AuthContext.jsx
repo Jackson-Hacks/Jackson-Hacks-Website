@@ -83,6 +83,17 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/Register',
+      },
+    });
+    if (error) throw error;
+    return data;
+  };
+
   const navigateToLogin = () => {
     // This can now be handled by the UI showing the login form
     console.log("Navigation to login requested");
@@ -100,6 +111,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       signIn,
       signUp,
+      signInWithGoogle,
       navigateToLogin,
       checkAppState: () => {}
     }}>

@@ -12,7 +12,7 @@ import { useAuth } from '@/lib/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoadingAuth, signIn, signUp } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, signIn, signUp, signInWithGoogle } = useAuth();
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [existingApplication, setExistingApplication] = useState(null);
@@ -24,6 +24,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(null);
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -68,6 +69,19 @@ export default function Register() {
       setAuthError(err.message || "Authentication failed. Please try again.");
     } finally {
       setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAuthError(null);
+    setIsGoogleSubmitting(true);
+
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      console.error("Google auth error:", err);
+      setAuthError(err.message || "Google sign in failed. Please try again.");
+      setIsGoogleSubmitting(false);
     }
   };
 
@@ -193,6 +207,31 @@ export default function Register() {
                 <h2 className="text-xl font-semibold text-white mb-6 text-center">
                   {isLogin ? 'Sign In' : 'Create Account'}
                 </h2>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isAuthSubmitting || isGoogleSubmitting}
+                  onClick={handleGoogleSignIn}
+                  className="w-full rounded-full border-white/10 bg-white text-[#272727] hover:bg-gray-100 hover:text-[#272727]"
+                >
+                  {isGoogleSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-xs font-bold">
+                        G
+                      </span>
+                      Continue with Google
+                    </>
+                  )}
+                </Button>
+
+                <div className="my-6 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-white/10" />
+                  <span className="text-xs uppercase text-gray-500">or</span>
+                  <div className="h-px flex-1 bg-white/10" />
+                </div>
                 
                 <form onSubmit={handleAuthSubmit} className="space-y-4">
                   {authError && (

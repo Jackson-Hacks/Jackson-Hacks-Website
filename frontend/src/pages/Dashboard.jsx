@@ -2,15 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, FileText, CheckCircle2, Clock, Zap } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { LogOut, FileText, CheckCircle2, Clock, Zap, ShieldCheck, Download, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
+
+const adminColumns = [
+  { key: 'created_at', label: 'Submitted' },
+  { key: 'status', label: 'Status' },
+  { key: 'full_name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'age', label: 'Age' },
+  { key: 'school', label: 'School' },
+  { key: 'grade', label: 'Grade' },
+  { key: 'experience_level', label: 'Experience' },
+  { key: 'dietary_restrictions', label: 'Dietary' },
+  { key: 'tshirt_size', label: 'Shirt' },
+  { key: 'why_attend', label: 'Why Attend' },
+  { key: 'project_idea', label: 'Project Idea' },
+  { key: 'heard_from', label: 'Heard From' },
+  { key: 'emergency_contact_name', label: 'Emergency Name' },
+  { key: 'emergency_contact_phone', label: 'Emergency Phone' },
+];
+
+const formatAdminValue = (application, key) => {
+  const value = application[key];
+
+  if (key === 'created_at' && value) {
+    return new Date(value).toLocaleString();
+  }
+
+  if (value === null || value === undefined || value === '') {
+    return '-';
+  }
+
+  return String(value);
+};
+
+const escapeCsvValue = (value) => {
+  const stringValue = String(value ?? '');
+  return `"${stringValue.replace(/"/g, '""')}"`;
+};
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, logout, isLoadingAuth } = useAuth();
   const [application, setApplication] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminApplications, setAdminApplications] = useState([]);
+  const [adminError, setAdminError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -44,7 +94,7 @@ export default function Dashboard() {
     const checkApplication = async () => {
       if (user?.id) {
         try {
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from('applications')
             .select('*')
             .eq('user_id', user.id)
@@ -53,8 +103,35 @@ export default function Dashboard() {
           if (data && data.length > 0) {
             setApplication(data[0]);
           }
+
+          const { data: adminRows, error: adminLookupError } = await supabase
+            .from('admin_users')
+            .select('user_id')
+            .eq('user_id', user.id)
+            .limit(1);
+
+          if (adminLookupError) {
+            console.error("Error checking admin access:", adminLookupError);
+          }
+
+          const hasAdminAccess = !!adminRows?.length;
+          setIsAdmin(hasAdminAccess);
+
+          if (hasAdminAccess) {
+            const { data: applications, error: applicationsError } = await supabase
+              .from('applications')
+              .select('*')
+              .order('created_at', { ascending: false });
+
+            if (applicationsError) {
+              throw applicationsError;
+            }
+
+            setAdminApplications(applications || []);
+          }
         } catch (error) {
           console.error("Error checking application status:", error);
+          setAdminError('Could not load admin applicant data.');
         }
       }
       setIsLoading(false);
@@ -68,6 +145,24 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const downloadApplicantCsv = () => {
+    const header = adminColumns.map((column) => escapeCsvValue(column.label)).join(',');
+    const rows = adminApplications.map((adminApplication) =>
+      adminColumns
+        .map((column) => escapeCsvValue(formatAdminValue(adminApplication, column.key)))
+        .join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'jackson-hacks-applications.csv';
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const welcomeName =
@@ -124,10 +219,18 @@ export default function Dashboard() {
           {/* Status Card */}
           <Card className="bg-gradient-to-br from-[#084F9A]/35 to-[#2072C7]/20 border-[#2072C7]/40 p-6">
             <div className="space-y-4">
-              <h2 className="text-2xl font-title flex items-center gap-2 text-white">
-                <Zap className="w-6 h-6 text-yellow-400" />
-                Application Status
-              </h2>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-2xl font-title flex items-center gap-2 text-white">
+                  <Zap className="w-6 h-6 text-yellow-400" />
+                  Application Status
+                </h2>
+                {isAdmin && (
+                  <Badge className="border-[#F68A42]/40 bg-[#F68A42]/20 text-[#F68A42] hover:bg-[#F68A42]/20">
+                    <ShieldCheck className="mr-1 h-3.5 w-3.5" />
+                    Admin
+                  </Badge>
+                )}
+              </div>
               {application ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-green-400">
@@ -151,6 +254,72 @@ export default function Dashboard() {
               )}
             </div>
           </Card>
+
+          {isAdmin && (
+            <Card className="bg-[#084F9A]/25 border-[#2072C7]/40 p-6 text-white">
+              <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-title flex items-center gap-2">
+                    <Users className="h-6 w-6 text-[#F68A42]" />
+                    Applicant Admin
+                  </h2>
+                  <p className="mt-2 text-sm text-slate-300">
+                    Viewing {adminApplications.length} submitted application{adminApplications.length === 1 ? '' : 's'}.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={downloadApplicantCsv}
+                  disabled={!adminApplications.length}
+                  className="bg-[#F68A42] text-[#272727] hover:bg-[#E06E0A]"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export CSV
+                </Button>
+              </div>
+
+              {adminError ? (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+                  {adminError}
+                </div>
+              ) : adminApplications.length ? (
+                <div className="rounded-xl border border-white/10 bg-[#272727]/50">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-white/10 hover:bg-transparent">
+                        {adminColumns.map((column) => (
+                          <TableHead key={column.key} className="min-w-[140px] text-slate-300">
+                            {column.label}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {adminApplications.map((adminApplication) => (
+                        <TableRow key={adminApplication.id} className="border-white/10 hover:bg-white/5">
+                          {adminColumns.map((column) => (
+                            <TableCell key={column.key} className="max-w-[260px] whitespace-normal text-slate-200">
+                              {column.key === 'status' ? (
+                                <Badge className="border-[#2072C7]/40 bg-[#2072C7]/20 capitalize text-[#F3F1F1] hover:bg-[#2072C7]/20">
+                                  {formatAdminValue(adminApplication, column.key)}
+                                </Badge>
+                              ) : (
+                                formatAdminValue(adminApplication, column.key)
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300">
+                  No applications have been submitted yet.
+                </div>
+              )}
+            </Card>
+          )}
 
           {/* Application Form Card */}
           <Card className="bg-[#084F9A]/25 border-[#2072C7]/40 p-6">
