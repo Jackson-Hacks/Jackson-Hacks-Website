@@ -17,7 +17,7 @@ export default function LocationSection() {
           whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
           viewport={isMobile ? undefined : { once: true }}
           transition={isMobile ? undefined : { duration: 0.7 }}
-          className="mb-8 max-w-3xl sm:mb-10 lg:mb-12"
+          className="mb-10 max-w-3xl sm:mb-12"
         >
           <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
             Event Details
