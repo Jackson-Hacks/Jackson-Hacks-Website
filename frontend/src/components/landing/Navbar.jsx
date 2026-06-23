@@ -37,23 +37,21 @@ export default function Navbar() {
         transition={isMobile ? undefined : { duration: 0.6 }}
         className={`fixed left-0 right-0 top-0 z-[70] transition-all duration-300 ${
           showNavSurface
-            ? 'border-b border-[#2072C7]/20 bg-[#272727]/90 backdrop-blur-xl'
+            ? 'border-b border-[#B8D8F5] bg-[#C5DFF7]/90 backdrop-blur-xl shadow-sm shadow-[#084F9A]/8'
             : 'bg-transparent'
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex h-16 items-center justify-between sm:h-20">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2 text-lg font-bold text-[#F3F1F1] sm:text-2xl">
+            <a href="#" className="flex items-center gap-2 text-lg font-bold sm:text-2xl">
               <img
                 src={pantherLogo}
                 alt="Jackson Hacks logo"
                 className="h-8 w-8 object-contain"
               />
-              <span className={showNavSurface ? "bg-gradient-to-r from-[#F68A42] to-[#2072C7] bg-clip-text text-transparent" : "text-[#F68A42]"}>
-                JACKSON
-              </span>
-              <span className="text-[#F3F1F1]">HACKS</span>
+              <span className="text-[#F68A42]">JACKSON</span>
+              <span className="text-[#1F2933]">HACKS</span>
             </a>
 
             {/* Desktop nav */}
@@ -62,7 +60,7 @@ export default function Navbar() {
                 <a
                   key={index}
                   href={link.href}
-                  className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                  className="text-[#52606D] hover:text-[#1F2933] transition-colors text-sm font-medium"
                 >
                   {link.label}
                 </a>

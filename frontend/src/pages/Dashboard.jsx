@@ -173,33 +173,33 @@ export default function Dashboard() {
 
   if (isLoadingAuth || isLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#272727]">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      <div className="fixed inset-0 flex items-center justify-center bg-[#EDF4FB]">
+        <div className="w-8 h-8 border-4 border-[#D7E4F5] border-t-[#2072C7] rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#272727] text-black font-description">
+    <div className="min-h-screen bg-gradient-to-b from-[#EDF4FB] to-[#F7F9FC] text-[#1F2933] font-description">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#084F9A] to-[#2072C7] border-b border-[#2072C7]/60">
+      <div className="border-b border-[#B8D8F5] bg-[#C5DFF7]/90 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-title text-white">Dashboard</h1>
-            <p className="text-[#F3F1F1]/85 mt-1">Welcome, {welcomeName}</p>
+            <h1 className="text-3xl font-title text-[#1F2933]">Dashboard</h1>
+            <p className="text-[#52606D] mt-1">Welcome, {welcomeName}</p>
           </div>
           <div className="flex items-center gap-3">
             <Button
               onClick={() => navigate('/')}
               variant="outline"
-              className="text-black hover:text-white border-white/30 hover:bg-white/10"
+              className="border-[#2072C7]/30 text-[#2072C7] hover:bg-[#2072C7]/10"
             >
               Back to Home
             </Button>
-            <Button 
+            <Button
               onClick={handleLogout}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-[#2072C7]/30 text-[#52606D] hover:bg-[#2072C7]/10"
             >
               <LogOut className="w-4 h-4" />
               Logout
@@ -217,15 +217,15 @@ export default function Dashboard() {
           className="space-y-8"
         >
           {/* Status Card */}
-          <Card className="bg-gradient-to-br from-[#084F9A]/35 to-[#2072C7]/20 border-[#2072C7]/40 p-6">
+          <Card className="bg-white border-[#D7E4F5] p-6 shadow-sm">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-2xl font-title flex items-center gap-2 text-white">
-                  <Zap className="w-6 h-6 text-yellow-400" />
+                <h2 className="text-2xl font-title flex items-center gap-2 text-[#1F2933]">
+                  <Zap className="w-6 h-6 text-[#F68A42]" />
                   Application Status
                 </h2>
                 {isAdmin && (
-                  <Badge className="border-[#F68A42]/40 bg-[#F68A42]/20 text-[#F68A42] hover:bg-[#F68A42]/20">
+                  <Badge className="border-[#F68A42]/40 bg-[#FFF4EC] text-[#F68A42] hover:bg-[#FFF4EC]">
                     <ShieldCheck className="mr-1 h-3.5 w-3.5" />
                     Admin
                   </Badge>
@@ -233,21 +233,21 @@ export default function Dashboard() {
               </div>
               {application ? (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-green-400">
+                  <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="w-5 h-5" />
                     <span className="text-lg font-semibold">Application Submitted</span>
                   </div>
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-[#52606D] text-sm">
                     Submitted on: {new Date(application.created_at).toLocaleDateString()}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-yellow-400">
+                  <div className="flex items-center gap-2 text-[#F68A42]">
                     <Clock className="w-5 h-5" />
                     <span className="text-lg font-semibold">No Application Yet</span>
                   </div>
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-[#52606D] text-sm">
                     Complete the application form to register for the hackathon
                   </p>
                 </div>
@@ -256,14 +256,14 @@ export default function Dashboard() {
           </Card>
 
           {isAdmin && (
-            <Card className="bg-[#084F9A]/25 border-[#2072C7]/40 p-6 text-white">
+            <Card className="bg-white border-[#D7E4F5] p-6 shadow-sm">
               <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-2xl font-title flex items-center gap-2">
+                  <h2 className="text-2xl font-title flex items-center gap-2 text-[#1F2933]">
                     <Users className="h-6 w-6 text-[#F68A42]" />
                     Applicant Admin
                   </h2>
-                  <p className="mt-2 text-sm text-slate-300">
+                  <p className="mt-2 text-sm text-[#52606D]">
                     Viewing {adminApplications.length} submitted application{adminApplications.length === 1 ? '' : 's'}.
                   </p>
                 </div>
@@ -271,7 +271,7 @@ export default function Dashboard() {
                   type="button"
                   onClick={downloadApplicantCsv}
                   disabled={!adminApplications.length}
-                  className="bg-[#F68A42] text-[#272727] hover:bg-[#E06E0A]"
+                  className="bg-[#F68A42] text-white hover:bg-[#E06E0A]"
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Export CSV
@@ -279,16 +279,16 @@ export default function Dashboard() {
               </div>
 
               {adminError ? (
-                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+                <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-600">
                   {adminError}
                 </div>
               ) : adminApplications.length ? (
-                <div className="rounded-xl border border-white/10 bg-[#272727]/50">
+                <div className="rounded-xl border border-[#D7E4F5] bg-[#F8FAFD]">
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-white/10 hover:bg-transparent">
+                      <TableRow className="border-[#D7E4F5] hover:bg-transparent">
                         {adminColumns.map((column) => (
-                          <TableHead key={column.key} className="min-w-[140px] text-slate-300">
+                          <TableHead key={column.key} className="min-w-[140px] text-[#52606D]">
                             {column.label}
                           </TableHead>
                         ))}
@@ -296,11 +296,11 @@ export default function Dashboard() {
                     </TableHeader>
                     <TableBody>
                       {adminApplications.map((adminApplication) => (
-                        <TableRow key={adminApplication.id} className="border-white/10 hover:bg-white/5">
+                        <TableRow key={adminApplication.id} className="border-[#D7E4F5] hover:bg-[#EEF4FB]">
                           {adminColumns.map((column) => (
-                            <TableCell key={column.key} className="max-w-[260px] whitespace-normal text-slate-200">
+                            <TableCell key={column.key} className="max-w-[260px] whitespace-normal text-[#1F2933]">
                               {column.key === 'status' ? (
-                                <Badge className="border-[#2072C7]/40 bg-[#2072C7]/20 capitalize text-[#F3F1F1] hover:bg-[#2072C7]/20">
+                                <Badge className="border-[#2072C7]/30 bg-[#EEF4FB] capitalize text-[#2072C7] hover:bg-[#EEF4FB]">
                                   {formatAdminValue(adminApplication, column.key)}
                                 </Badge>
                               ) : (
@@ -314,7 +314,7 @@ export default function Dashboard() {
                   </Table>
                 </div>
               ) : (
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300">
+                <div className="rounded-lg border border-[#D7E4F5] bg-[#F8FAFD] p-4 text-sm text-[#52606D]">
                   No applications have been submitted yet.
                 </div>
               )}
@@ -322,21 +322,21 @@ export default function Dashboard() {
           )}
 
           {/* Application Form Card */}
-          <Card className="bg-[#084F9A]/25 border-[#2072C7]/40 p-6">
+          <Card className="bg-white border-[#D7E4F5] p-6 shadow-sm">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-blue-400" />
-                <h3 className="text-xl font-title text-white">Complete Your Application</h3>
+                <FileText className="w-6 h-6 text-[#2072C7]" />
+                <h3 className="text-xl font-title text-[#1F2933]">Complete Your Application</h3>
               </div>
-              <p className="text-slate-300">
-                {application 
+              <p className="text-[#52606D]">
+                {application
                   ? "Review or update your application information"
                   : "Fill out the application form to complete your registration"
                 }
               </p>
-              <Button 
+              <Button
                 onClick={() => navigate('/Register')}
-                className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] w-full mt-4 font-semibold"
+                className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white w-full mt-4 font-semibold"
               >
                 {application ? 'View Application' : 'Start Application'}
               </Button>
@@ -344,9 +344,9 @@ export default function Dashboard() {
           </Card>
 
           {/* Info Card */}
-          <Card className="bg-[#084F9A]/25 border-[#2072C7]/40 p-6 text-white">
-            <h3 className="text-lg font-title mb-3">Next Steps</h3>
-            <ul className="space-y-2 text-slate-300">
+          <Card className="bg-white border-[#D7E4F5] p-6 shadow-sm">
+            <h3 className="text-lg font-title mb-3 text-[#1F2933]">Next Steps</h3>
+            <ul className="space-y-2 text-[#52606D]">
               <li className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-[#F68A42] flex items-center justify-center text-white text-sm flex-shrink-0 mt-0.5">1</div>
                 <span>Complete your application form with all required information</span>
@@ -361,20 +361,20 @@ export default function Dashboard() {
               </li>
             </ul>
 
-            <div className="mt-8 border-t border-white/15 pt-6">
-              <p className="text-base text-white font-semibold">Time until Hackathon</p>
+            <div className="mt-8 border-t border-[#D7E4F5] pt-6">
+              <p className="text-base text-[#1F2933] font-semibold">Time until Hackathon</p>
               <div className="mt-4 grid grid-cols-4 gap-3">
-                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
-                  <div className="text-2xl font-bold text-white">{timeLeft.days}d</div>
+                <div className="rounded-xl border border-[#D7E4F5] bg-[#EEF4FB] px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-[#2072C7]">{timeLeft.days}d</div>
                 </div>
-                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
-                  <div className="text-2xl font-bold text-white">{timeLeft.hours}h</div>
+                <div className="rounded-xl border border-[#D7E4F5] bg-[#EEF4FB] px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-[#2072C7]">{timeLeft.hours}h</div>
                 </div>
-                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
-                  <div className="text-2xl font-bold text-white">{timeLeft.minutes}m</div>
+                <div className="rounded-xl border border-[#D7E4F5] bg-[#EEF4FB] px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-[#2072C7]">{timeLeft.minutes}m</div>
                 </div>
-                <div className="rounded-xl border border-[#2072C7]/40 bg-[#084F9A]/30 px-3 py-3 text-center">
-                  <div className="text-2xl font-bold text-white">{timeLeft.seconds}s</div>
+                <div className="rounded-xl border border-[#D7E4F5] bg-[#EEF4FB] px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-[#2072C7]">{timeLeft.seconds}s</div>
                 </div>
               </div>
             </div>
