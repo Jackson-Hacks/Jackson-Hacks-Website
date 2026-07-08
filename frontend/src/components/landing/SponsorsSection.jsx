@@ -1,101 +1,100 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { FileText, Mail, Star } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Mail } from 'lucide-react';
+import squiggle2Orange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Orange.png';
+import pcbwayLogo from '@/assets/visuals/sponsorLogos/PCBway logo.png';
+import aopsLogo from '@/assets/visuals/sponsorLogos/AoPS_Main_Logo (1).png';
+import codeCraftersLogo from '@/assets/visuals/sponsorLogos/CodeCraftersBlack.png';
+import tplLogo from '@/assets/visuals/sponsorLogos/tpl-h-logo-full-colour-rgb.png';
+import wolframAlphaLogo from '@/assets/visuals/sponsorLogos/WolframAlphaLogoCropped.png';
 
-const tiers = [
-  { label: 'Gold', count: 2, size: 'h-16', opacity: 'opacity-30' },
-  { label: 'Silver', count: 3, size: 'h-12', opacity: 'opacity-25' },
-  { label: 'Bronze', count: 4, size: 'h-10', opacity: 'opacity-20' },
+// No tier labels — higher tiers are simply bigger logos, ordered big → small.
+const sponsorRows = [
+  {
+    chip: 'h-24 w-64 p-5 sm:h-28 sm:w-80 sm:p-6',
+    sponsors: [{ name: 'PCBWay', logo: pcbwayLogo, href: 'https://www.pcbway.com/' }],
+  },
+  {
+    chip: 'h-16 w-44 p-3 sm:h-20 sm:w-56 sm:p-4',
+    sponsors: [
+      { name: 'Art of Problem Solving', logo: aopsLogo, href: 'https://artofproblemsolving.com/' },
+      { name: 'CodeCrafters', logo: codeCraftersLogo, href: 'https://codecrafters.io/' },
+      { name: 'Toronto Public Library', logo: tplLogo, href: 'https://www.torontopubliclibrary.ca/' },
+      { name: 'Wolfram Alpha', logo: wolframAlphaLogo, href: 'https://www.wolframalpha.com/' },
+    ],
+  },
 ];
 
 export default function SponsorsSection() {
-  const isMobile = useIsMobile();
-
   return (
-    <section id="sponsors" className="relative overflow-hidden bg-[#F7F9FC] py-12 sm:py-16 lg:py-24">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/30 to-transparent" />
-      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(8,79,154,0.07),transparent_48%,rgba(246,138,66,0.06))]" />
+    <section id="sponsors" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(243,241,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(243,241,241,0.04)_1px,transparent_1px)] bg-[size:90px_90px]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/40 to-transparent" />
+      <img
+        src={squiggle2Orange}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[8%] right-[2%] hidden w-56 rotate-6 opacity-25 lg:block"
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8 }}
-          className="mb-10 max-w-3xl sm:mb-12"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7 }}
+          className="mb-10 max-w-3xl sm:mb-14"
         >
           <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
             Our Partners
           </span>
-          <h2 className="font-title text-3xl text-[#1F2933] sm:text-4xl md:text-6xl">
+          <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">
             Sponsors Make<br className="hidden sm:block" /> Jackson Hacks Possible
           </h2>
         </motion.div>
 
-        {/* Sponsor tier placeholders */}
-        <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.7, delay: 0.1 }}
-          className="mb-6 rounded-2xl border border-dashed border-[#D7E4F5] bg-white p-6 sm:p-8"
-        >
-          <div className="mb-4 flex items-center gap-2">
-            <Star size={16} className="text-[#F68A42]" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#697586]">Sponsor Logos Coming Soon</span>
-          </div>
-          <div className="space-y-6">
-            {tiers.map((tier) => (
-              <div key={tier.label}>
-                <p className="mb-3 text-xs font-medium uppercase tracking-widest text-[#697586]">{tier.label}</p>
-                <div className="flex flex-wrap items-center gap-4">
-                  {Array.from({ length: tier.count }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`${tier.size} w-32 rounded-xl border-2 border-dashed border-[#D7E4F5] bg-[#F8FAFD] ${tier.opacity}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        {/* Logo wall */}
+        <div className="flex flex-col items-center gap-6 sm:gap-8">
+          {sponsorRows.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+              {row.sponsors.map((sponsor, i) => (
+                <motion.a
+                  key={sponsor.name}
+                  href={sponsor.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={sponsor.name}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.55, delay: (rowIndex * 2 + i) * 0.08, ease: 'easeOut' }}
+                  className={`${row.chip} flex items-center justify-center rounded-2xl bg-[#F3F1F1] transition-transform hover:-rotate-1 hover:scale-105`}
+                >
+                  <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
+                </motion.a>
+              ))}
+            </div>
+          ))}
+        </div>
 
-        {/* Become a sponsor CTA */}
         <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
-          className="rounded-2xl border border-[#D7E4F5] bg-white p-6 shadow-xl shadow-[#084F9A]/8 sm:p-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="mt-12 flex flex-col items-center gap-3 text-center"
         >
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h3 className="font-title text-2xl text-[#1F2933] sm:text-3xl">Become a Sponsor</h3>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-[#52606D] sm:text-base">
-                Support the next generation of innovators. Connect with talented students, gain exposure in the tech community, and help shape the future of technology.
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                className="rounded-full bg-[#F68A42] px-6 py-5 text-white hover:bg-[#E06E0A]"
-              >
-                <FileText className="mr-2" size={18} />
-                Sponsorship Package
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full border-[#2072C7]/25 bg-[#EEF4FB] px-6 py-5 text-[#084F9A] hover:bg-[#2072C7] hover:text-white transition-colors"
-              >
-                <Mail className="mr-2" size={18} />
-                Contact Us
-              </Button>
-            </div>
-          </div>
+          <p className="text-sm text-[#B4BAC0] sm:text-base">Want to support the next generation of hackers?</p>
+          <a href="mailto:sponsor@hackathon.com">
+            <Button
+              size="lg"
+              className="rounded-full bg-[#F68A42] px-8 py-5 text-white hover:bg-[#E06E0A]"
+            >
+              <Mail className="mr-2" size={18} />
+              Contact Us
+            </Button>
+          </a>
         </motion.div>
       </div>
     </section>
