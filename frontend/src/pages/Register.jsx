@@ -87,14 +87,14 @@ export default function Register() {
 
   if (isLoadingAuth || isLoadingApp) {
     return (
-      <div className="min-h-screen bg-[#EDF4FB] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#D7E4F5] border-t-[#2072C7] rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#272727] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-white/15 border-t-[#2072C7] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C5DFF7] via-[#EDF4FB] to-[#F7F9FC] relative overflow-hidden">
+    <div className="min-h-screen bg-[#272727] relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2072C7]/10 rounded-full blur-[120px]" />
@@ -104,7 +104,7 @@ export default function Register() {
       {/* Back button */}
       <div className="absolute top-6 left-6 z-20">
         <Link to={createPageUrl('Home')}>
-          <Button variant="ghost" className="text-[#52606D] hover:text-[#1F2933] hover:bg-[#2072C7]/10">
+          <Button variant="ghost" className="text-[#B4BAC0] hover:text-[#F3F1F1] hover:bg-white/10">
             <ArrowLeft size={18} className="mr-2" />
             Back to Home
           </Button>
@@ -116,7 +116,7 @@ export default function Register() {
         <Button
           variant="outline"
           onClick={() => navigate(createPageUrl('Dashboard'))}
-          className="border-[#2072C7]/30 text-[#2072C7] hover:bg-[#2072C7]/10"
+          className="border-white/20 bg-transparent text-[#9CC4EA] hover:bg-white/10 hover:text-[#F3F1F1]"
         >
           Go to Dashboard
         </Button>
@@ -131,27 +131,27 @@ export default function Register() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center"
             >
-              <div className="inline-flex p-6 rounded-full bg-green-100 mb-8">
-                <PartyPopper className="w-16 h-16 text-green-500" />
+              <div className="inline-flex p-6 rounded-full bg-green-500/15 mb-8">
+                <PartyPopper className="w-16 h-16 text-green-400" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-[#1F2933] mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-[#F3F1F1] mb-4">
                 {applicationSubmitted ? 'Application Submitted!' : 'Already Applied!'}
               </h1>
-              <p className="text-xl text-[#52606D] mb-8 max-w-md mx-auto">
+              <p className="text-xl text-[#B4BAC0] mb-8 max-w-md mx-auto">
                 {applicationSubmitted
                   ? "Thank you for applying! We'll review your application and get back to you soon."
                   : "You've already submitted an application. We'll notify you once it's reviewed."}
               </p>
 
               {existingApplication && (
-                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white border border-[#D7E4F5] mb-8">
-                  <CheckCircle2 className="text-green-500" size={20} />
-                  <span className="text-[#1F2933]">Status: </span>
+                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-[#2C2C2C] border border-white/10 mb-8">
+                  <CheckCircle2 className="text-green-400" size={20} />
+                  <span className="text-[#F3F1F1]">Status: </span>
                   <span className={`font-semibold capitalize ${
-                    existingApplication.status === 'accepted' ? 'text-green-600' :
-                    existingApplication.status === 'rejected' ? 'text-red-500' :
-                    existingApplication.status === 'waitlisted' ? 'text-amber-500' :
-                    'text-[#2072C7]'
+                    existingApplication.status === 'accepted' ? 'text-green-400' :
+                    existingApplication.status === 'rejected' ? 'text-red-400' :
+                    existingApplication.status === 'waitlisted' ? 'text-amber-400' :
+                    'text-[#6EA8DF]'
                   }`}>
                     {existingApplication.status}
                   </span>
@@ -166,7 +166,7 @@ export default function Register() {
                       setApplicationSubmitted(false);
                       setIsEditingApplication(true);
                     }}
-                    className="bg-gradient-to-r from-[#2072C7] to-[#084F9A] hover:from-[#084F9A] hover:to-[#2072C7] text-white px-8 rounded-full"
+                    className="bg-[#2072C7] hover:bg-[#084F9A] text-white px-8 rounded-full"
                   >
                     Edit and Resubmit
                   </Button>
@@ -174,7 +174,7 @@ export default function Register() {
                 <Link to={createPageUrl('Dashboard')}>
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-8 rounded-full"
+                    className="bg-[#F68A42] hover:bg-[#E06E0A] text-white px-8 rounded-full"
                   >
                     Back to Dashboard
                   </Button>
@@ -190,21 +190,21 @@ export default function Register() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <div className="inline-flex p-4 rounded-full bg-[#EEF4FB] mb-6">
+              <div className="inline-flex p-4 rounded-full bg-[#F68A42]/15 mb-6">
                 <Sparkles className="w-8 h-8 text-[#F68A42]" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-[#1F2933] mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-[#F3F1F1] mb-4">
                 Apply to{' '}
-                <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
+                <span className="text-[#F68A42]">
                   Jackson Hacks
                 </span>
               </h1>
-              <p className="text-xl text-[#52606D] mb-10 max-w-md mx-auto">
+              <p className="text-xl text-[#B4BAC0] mb-10 max-w-md mx-auto">
                 Create an account or sign in to start your application
               </p>
 
-              <div className="p-8 rounded-2xl bg-white border border-[#D7E4F5] shadow-sm max-w-md mx-auto text-left">
-                <h2 className="text-xl font-semibold text-[#1F2933] mb-6 text-center">
+              <div className="p-8 rounded-2xl bg-[#2C2C2C] border border-white/10 max-w-md mx-auto text-left">
+                <h2 className="text-xl font-semibold text-[#F3F1F1] mb-6 text-center">
                   {isLogin ? 'Sign In' : 'Create Account'}
                 </h2>
 
@@ -213,13 +213,13 @@ export default function Register() {
                   variant="outline"
                   disabled={isAuthSubmitting || isGoogleSubmitting}
                   onClick={handleGoogleSignIn}
-                  className="w-full rounded-full border-[#D7E4F5] bg-white text-[#1F2933] hover:bg-[#F7F9FC]"
+                  className="w-full rounded-full border-white/15 bg-white/5 text-[#F3F1F1] hover:bg-white/10 hover:text-[#F3F1F1]"
                 >
                   {isGoogleSubmitting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#D7E4F5] text-xs font-bold">
+                      <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/20 text-xs font-bold">
                         G
                       </span>
                       Continue with Google
@@ -228,17 +228,17 @@ export default function Register() {
                 </Button>
 
                 <div className="my-6 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-[#D7E4F5]" />
-                  <span className="text-xs uppercase text-[#9AA5B1]">or</span>
-                  <div className="h-px flex-1 bg-[#D7E4F5]" />
+                  <div className="h-px flex-1 bg-white/10" />
+                  <span className="text-xs uppercase text-[#8A9199]">or</span>
+                  <div className="h-px flex-1 bg-white/10" />
                 </div>
 
                 <form onSubmit={handleAuthSubmit} className="space-y-4">
                   {authError && (
                     <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${
                       authError.includes("Account created")
-                        ? 'bg-green-50 border border-green-200 text-green-700'
-                        : 'bg-red-50 border border-red-200 text-red-600'
+                        ? 'bg-green-500/10 border border-green-500/30 text-green-300'
+                        : 'bg-red-500/10 border border-red-500/30 text-red-300'
                     }`}>
                       {authError.includes("Account created") ?
                         <CheckCircle2 size={16} className="mt-0.5 shrink-0" /> :
@@ -249,9 +249,9 @@ export default function Register() {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-[#52606D]">Email Address</Label>
+                    <Label htmlFor="email" className="text-[#B4BAC0]">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA5B1]" size={18} />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A9199]" size={18} />
                       <Input
                         id="email"
                         type="email"
@@ -259,15 +259,15 @@ export default function Register() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="pl-10 bg-white border-[#D7E4F5] text-[#1F2933] placeholder:text-[#9AA5B1] focus:border-[#2072C7]"
+                        className="pl-10 bg-white/5 border-white/10 text-[#F3F1F1] placeholder:text-[#8A9199] focus:border-[#2072C7]"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-[#52606D]">Password</Label>
+                    <Label htmlFor="password" className="text-[#B4BAC0]">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA5B1]" size={18} />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A9199]" size={18} />
                       <Input
                         id="password"
                         type="password"
@@ -275,7 +275,7 @@ export default function Register() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="pl-10 bg-white border-[#D7E4F5] text-[#1F2933] placeholder:text-[#9AA5B1] focus:border-[#2072C7]"
+                        className="pl-10 bg-white/5 border-white/10 text-[#F3F1F1] placeholder:text-[#8A9199] focus:border-[#2072C7]"
                       />
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export default function Register() {
                     type="submit"
                     disabled={isAuthSubmitting}
                     size="lg"
-                    className="w-full bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white rounded-full mt-4"
+                    className="w-full bg-[#F68A42] hover:bg-[#E06E0A] text-white rounded-full mt-4"
                   >
                     {isAuthSubmitting ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -300,7 +300,7 @@ export default function Register() {
                       setIsLogin(!isLogin);
                       setAuthError(null);
                     }}
-                    className="text-[#2072C7] hover:text-[#F68A42] text-sm transition-colors"
+                    className="text-[#6EA8DF] hover:text-[#F68A42] text-sm transition-colors"
                   >
                     {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
                   </button>
@@ -316,20 +316,20 @@ export default function Register() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-center mb-10">
-                <h1 className="text-4xl md:text-5xl font-bold text-[#1F2933] mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-[#F3F1F1] mb-4">
                   {isEditingApplication ? 'Edit Your ' : 'Apply to '}
-                  <span className="bg-gradient-to-r from-[#2072C7] to-[#F68A42] bg-clip-text text-transparent">
+                  <span className="text-[#F68A42]">
                     {isEditingApplication ? 'Application' : 'Jackson Hacks'}
                   </span>
                 </h1>
-                <p className="text-[#52606D]">
+                <p className="text-[#B4BAC0]">
                   {isEditingApplication
                     ? 'Update your answers and resubmit your application'
                     : 'Fill out the form below to submit your application'}
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl bg-white border border-[#D7E4F5] shadow-sm">
+              <div className="p-8 rounded-2xl bg-[#2C2C2C] border border-white/10">
                 <ApplicationForm
                   user={user}
                   existingApplication={existingApplication}

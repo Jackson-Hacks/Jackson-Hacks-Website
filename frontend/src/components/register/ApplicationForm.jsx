@@ -408,9 +408,9 @@ export default function ApplicationForm({ user, onSuccess, existingApplication =
                 />
                 <Label htmlFor="agree_to_terms" className="text-gray-300 text-sm leading-relaxed cursor-pointer">
                   I agree to the{' '}
-                  <a href="#" className="text-[#2072C7] hover:text-[#F68A42] hover:underline">Code of Conduct</a>
+                  <a href="#" className="text-[#6EA8DF] hover:text-[#F68A42] hover:underline">Code of Conduct</a>
                   {' '}and{' '}
-                  <a href="#" className="text-[#2072C7] hover:text-[#F68A42] hover:underline">Terms of Service</a>.
+                  <a href="#" className="text-[#6EA8DF] hover:text-[#F68A42] hover:underline">Terms of Service</a>.
                   I understand that my application will be reviewed and I will be notified via email.
                   <span className="text-red-400"> *</span>
                 </Label>
@@ -440,7 +440,7 @@ export default function ApplicationForm({ user, onSuccess, existingApplication =
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   currentStep >= step.id
-                    ? 'bg-gradient-to-r from-[#2072C7] to-[#084F9A] text-white'
+                    ? 'bg-[#2072C7] text-white'
                     : 'bg-white/5 text-gray-500'
                 }`}
               >
@@ -484,7 +484,7 @@ export default function ApplicationForm({ user, onSuccess, existingApplication =
           variant="outline"
           onClick={prevStep}
           disabled={currentStep === 1}
-          className="border-white/20 hover:bg-white/10 hover:text-white disabled:opacity-30 text-black"
+          className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white disabled:opacity-30"
         >
           <ArrowLeft size={18} className="mr-2" />
           Back
@@ -493,7 +493,7 @@ export default function ApplicationForm({ user, onSuccess, existingApplication =
         {currentStep < 4 ? (
           <Button
             onClick={nextStep}
-            className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white"
+            className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
           >
             Next
             <ArrowRight size={18} className="ml-2" />
@@ -502,7 +502,7 @@ export default function ApplicationForm({ user, onSuccess, existingApplication =
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white"
+            className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
           >
             {isSubmitting ? (
               <>

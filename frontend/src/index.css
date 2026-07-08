@@ -14,25 +14,25 @@
     --brand-orange-dark: #E06E0A;
     --brand-black: #272727;
     --brand-white: #F3F1F1;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 0 0% 15.3%;
+    --foreground: 0 0% 95.3%;
+    --card: 0 0% 17.3%;
+    --card-foreground: 0 0% 95.3%;
+    --popover: 0 0% 17.3%;
+    --popover-foreground: 0 0% 95.3%;
+    --primary: 0 0% 95.3%;
+    --primary-foreground: 0 0% 15.3%;
+    --secondary: 0 0% 21%;
+    --secondary-foreground: 0 0% 95.3%;
+    --muted: 0 0% 21%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 21%;
+    --accent-foreground: 0 0% 95.3%;
+    --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 0 0% 60%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -105,5 +105,29 @@
 
   .font-description {
     font-family: var(--font-body);
+  }
+
+  .animate-marquee {
+    animation: marquee 28s linear infinite;
+  }
+
+  .animate-marquee-reverse {
+    animation: marquee 34s linear infinite reverse;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse {
+    animation: none;
   }
 }

@@ -1,110 +1,119 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Megaphone, Palette, Handshake, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import catOrange from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
+import catBlue from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Blue.png';
+import squiggle2Blue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Blue.png';
+import blobOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/blobOrange.png';
 
-const teamMembers = [
-  {
-    name: 'Webdev',
-    role: 'Website, registration, judging tools, and demos',
-    icon: Code2,
-    accent: '#2072C7',
-    bg: 'bg-[#EEF4FB]',
-  },
-  {
-    name: 'Creative',
-    role: 'Brand, visuals, hacker experience, signage, and social assets',
-    icon: Palette,
-    accent: '#F68A42',
-    bg: 'bg-[#FFF4EC]',
-  },
-  {
-    name: 'Logistics',
-    role: 'Venue, food, check-in, and event flow',
-    icon: Users,
-    accent: '#0EA5E9',
-    bg: 'bg-[#EFF9FF]',
-  },
-  {
-    name: 'Marketing',
-    role: 'Social media, announcements, outreach, and community hype',
-    icon: Megaphone,
-    accent: '#8B5CF6',
-    bg: 'bg-[#F5F3FF]',
-  },
-  {
-    name: 'Sponsorship',
-    role: 'Sponsor relations, packages, partners, and event support',
-    icon: Handshake,
-    accent: '#10B981',
-    bg: 'bg-[#ECFDF5]',
-  },
+/*
+ * Placeholder organizers: a circular frame with the cat mascot inside.
+ * When real bios arrive, swap `photo: null` for an image URL and the
+ * circle becomes their picture.
+ */
+const organizers = [
+  { name: '???', role: 'Organizer', photo: null },
+  { name: '???', role: 'Organizer', photo: null },
+  { name: '???', role: 'Organizer', photo: null },
+  { name: '???', role: 'Organizer', photo: null },
+  { name: '???', role: 'Organizer', photo: null },
+];
+
+const catFrames = [
+  { cat: catOrange, ring: 'border-[#F68A42]/40', bg: 'bg-[#F68A42]/10' },
+  { cat: catBlue, ring: 'border-[#2072C7]/40', bg: 'bg-[#2072C7]/10' },
 ];
 
 export default function TeamSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section id="team" className="relative overflow-hidden bg-white py-12 sm:py-16 lg:py-24">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2072C7]/25 to-transparent" />
-      <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(246,138,66,0.05),transparent_44%,rgba(8,79,154,0.06))]" />
+    <section id="team" className="relative overflow-hidden bg-[#212121] py-12 sm:py-16 lg:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(243,241,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(243,241,241,0.04)_1px,transparent_1px)] bg-[size:90px_90px]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2072C7]/40 to-transparent" />
+      <img
+        src={squiggle2Blue}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[2%] top-[14%] hidden w-56 -rotate-6 opacity-25 lg:block"
+      />
+      <img
+        src={blobOrange}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[4%] right-[2%] hidden w-72 opacity-10 lg:block"
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.7 }}
           className="mb-10 max-w-3xl sm:mb-12"
         >
           <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#F68A42] sm:text-sm">
             The People Behind
           </span>
-          <h2 className="font-title text-3xl text-[#1F2933] sm:text-4xl md:text-6xl">Meet the Team</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#3F4D5A] sm:text-lg">
+          <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">Meet the Team</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#B4BAC0] sm:text-lg">
             A student-led crew handling the pieces that turn a school day into a polished hackathon.
           </p>
         </motion.div>
 
-        <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8, delay: 0.2 }}
-          className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
-        >
-          {teamMembers.map((member, index) => {
-            const Icon = member.icon;
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {organizers.map((organizer, index) => {
+            const frame = catFrames[index % 2];
             return (
               <motion.div
                 key={index}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: index * 0.06 }}
                 whileHover={isMobile ? undefined : { y: -6 }}
-                transition={{ duration: 0.2 }}
-                className="group relative overflow-hidden rounded-2xl border border-[#D7E4F5] bg-white shadow-sm transition-all duration-200 hover:border-transparent hover:shadow-lg hover:shadow-[#084F9A]/12"
+                className="group rounded-2xl border border-white/10 bg-[#2C2C2C] transition-colors hover:border-white/20"
               >
-                <div className="h-1 w-full" style={{ backgroundColor: member.accent }} />
-                <div className="p-5 sm:p-6">
-                  <div className={`mb-4 inline-flex rounded-xl p-3 ${member.bg}`} style={{ color: member.accent }}>
-                    <Icon size={22} />
+                <div className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
+                  <div
+                    className={`flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 ${frame.ring} ${frame.bg} sm:h-28 sm:w-28`}
+                  >
+                    {organizer.photo ? (
+                      <img
+                        src={organizer.photo}
+                        alt={organizer.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={frame.cat}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-14 object-contain transition-transform group-hover:scale-110 sm:w-16"
+                      />
+                    )}
                   </div>
-                  <h3 className="mb-2 font-title text-xl text-[#1F2933]">{member.name}</h3>
-                  <p className="text-sm leading-5 text-[#52606D]">{member.role}</p>
+                  <div>
+                    <h3 className="font-title text-lg text-[#F3F1F1]">{organizer.name}</h3>
+                    <p className="mt-1 text-xs uppercase tracking-widest text-[#8A9199]">{organizer.role}</p>
+                  </div>
                 </div>
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
 
         <motion.div
-          initial={false}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
-          viewport={isMobile ? undefined : { once: true }}
-          transition={isMobile ? undefined : { duration: 0.8, delay: 0.4 }}
-          className="rounded-2xl border border-[#D7E4F5] bg-[#F8FAFD] p-5 sm:p-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="rounded-2xl border border-white/10 bg-[#2C2C2C] p-5 sm:p-6"
         >
-          <p className="flex flex-col gap-3 text-sm leading-6 text-[#52606D] sm:flex-row sm:items-center sm:text-base">
+          <p className="flex flex-col gap-3 text-sm leading-6 text-[#B4BAC0] sm:flex-row sm:items-center sm:text-base">
             <Users size={20} className="shrink-0 text-[#F68A42]" />
-            Team bios and photos are coming soon. For now, each lane shows what the organizing team is actively covering.
+            The organizing team is hard at work behind the scenes. Faces and names coming soon!
           </p>
         </motion.div>
       </div>

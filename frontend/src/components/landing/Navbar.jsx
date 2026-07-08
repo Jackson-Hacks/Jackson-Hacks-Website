@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import pantherLogo from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
 
 const navLinks = [
+  { label: 'About', href: '#about' },
   { label: 'Location', href: '#location' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Sponsors', href: '#sponsors' },
@@ -37,21 +38,21 @@ export default function Navbar() {
         transition={isMobile ? undefined : { duration: 0.6 }}
         className={`fixed left-0 right-0 top-0 z-[70] transition-all duration-300 ${
           showNavSurface
-            ? 'border-b border-[#B8D8F5] bg-[#C5DFF7]/90 backdrop-blur-xl shadow-sm shadow-[#084F9A]/8'
+            ? 'border-b border-white/10 bg-[#1F1F1F]/90 backdrop-blur-xl'
             : 'bg-transparent'
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex h-16 items-center justify-between sm:h-20">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2 text-lg font-bold sm:text-2xl">
+            <a href="#" className="font-title flex items-center gap-2 text-lg font-bold sm:text-2xl">
               <img
                 src={pantherLogo}
                 alt="Jackson Hacks logo"
                 className="h-8 w-8 object-contain"
               />
               <span className="text-[#F68A42]">JACKSON</span>
-              <span className="text-[#1F2933]">HACKS</span>
+              <span className="text-[#F3F1F1]">HACKS</span>
             </a>
 
             {/* Desktop nav */}
@@ -60,7 +61,7 @@ export default function Navbar() {
                 <a
                   key={index}
                   href={link.href}
-                  className="text-[#52606D] hover:text-[#1F2933] transition-colors text-sm font-medium"
+                  className="text-[#B4BAC0] hover:text-[#F3F1F1] transition-colors text-sm font-medium"
                 >
                   {link.label}
                 </a>
@@ -70,7 +71,7 @@ export default function Navbar() {
                   <Link to={createPageUrl('Dashboard')}>
                     <Button 
                       size="sm"
-                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-6 rounded-full"
+                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white px-6 rounded-full"
                     >
                       <Zap size={16} className="mr-1" />
                       Dashboard
@@ -80,7 +81,7 @@ export default function Navbar() {
                   <Link to={createPageUrl('Register')}>
                     <Button 
                       size="sm"
-                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] hover:from-[#E06E0A] hover:to-[#F68A42] text-white px-6 rounded-full"
+                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white px-6 rounded-full"
                     >
                       <Zap size={16} className="mr-1" />
                       Apply
@@ -130,7 +131,7 @@ export default function Navbar() {
                   >
                     <Button 
                       size="lg"
-                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] text-white w-full mt-4 rounded-full"
+                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white w-full mt-4 rounded-full"
                     >
                       <Zap size={18} className="mr-2" />
                       Dashboard
@@ -143,7 +144,7 @@ export default function Navbar() {
                   >
                     <Button 
                       size="lg"
-                      className="bg-gradient-to-r from-[#F68A42] to-[#E06E0A] text-white w-full mt-4 rounded-full"
+                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white w-full mt-4 rounded-full"
                     >
                       <Zap size={18} className="mr-2" />
                       Apply Now
