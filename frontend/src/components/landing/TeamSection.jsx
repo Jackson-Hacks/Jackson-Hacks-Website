@@ -4,20 +4,20 @@ import { Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import catOrange from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
 import catBlue from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Blue.png';
-import squiggle2Blue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Blue.png';
-import blobOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/blobOrange.png';
+import squiggle2Blue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Blue.webp';
+import blobOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/blobOrange.webp';
 
 /*
- * Placeholder organizers: a circular frame with the cat mascot inside.
+ * Pending organizer profiles: a circular frame with the cat mascot inside.
  * When real bios arrive, swap `photo: null` for an image URL and the
  * circle becomes their picture.
  */
 const organizers = [
-  { name: '???', role: 'Organizer', photo: null },
-  { name: '???', role: 'Organizer', photo: null },
-  { name: '???', role: 'Organizer', photo: null },
-  { name: '???', role: 'Organizer', photo: null },
-  { name: '???', role: 'Organizer', photo: null },
+  { name: 'Coming soon', role: 'Organizer', photo: null },
+  { name: 'Coming soon', role: 'Organizer', photo: null },
+  { name: 'Coming soon', role: 'Organizer', photo: null },
+  { name: 'Coming soon', role: 'Organizer', photo: null },
+  { name: 'Coming soon', role: 'Organizer', photo: null },
 ];
 
 const catFrames = [
@@ -83,6 +83,8 @@ export default function TeamSection() {
                       <img
                         src={organizer.photo}
                         alt={organizer.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -90,6 +92,8 @@ export default function TeamSection() {
                         src={frame.cat}
                         alt=""
                         aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
                         className="w-14 object-contain transition-transform group-hover:scale-110 sm:w-16"
                       />
                     )}

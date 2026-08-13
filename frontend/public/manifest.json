@@ -1,0 +1,11 @@
+{
+  "name": "Jackson Hacks",
+  "short_name": "Jackson Hacks",
+  "description": "A one-day student hackathon to build, learn, connect, and innovate.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#272727",
+  "theme_color": "#272727",
+  "icons": [{ "src": "/favicon.png", "sizes": "any", "type": "image/png" }]
+}

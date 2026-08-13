@@ -10,6 +10,7 @@ export default function CursorGlow() {
   const glowRef = useRef(null);
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
     const move = (e) => {
       if (glowRef.current) {
         glowRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;

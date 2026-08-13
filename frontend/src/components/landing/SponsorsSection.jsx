@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
-import squiggle2Orange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Orange.png';
+import { EVENT } from '@/config/event';
+import squiggle2Orange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Orange.webp';
 import pcbwayLogo from '@/assets/visuals/sponsorLogos/PCBway logo.png';
 import aopsLogo from '@/assets/visuals/sponsorLogos/AoPS_Main_Logo (1).png';
 import codeCraftersLogo from '@/assets/visuals/sponsorLogos/CodeCraftersBlack.png';
@@ -71,7 +71,7 @@ export default function SponsorsSection() {
                   transition={{ duration: 0.55, delay: (rowIndex * 2 + i) * 0.08, ease: 'easeOut' }}
                   className={`${row.chip} flex items-center justify-center rounded-2xl bg-[#F3F1F1] transition-transform hover:-rotate-1 hover:scale-105`}
                 >
-                  <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
+                  <img src={sponsor.logo} alt={sponsor.name} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
                 </motion.a>
               ))}
             </div>
@@ -86,14 +86,13 @@ export default function SponsorsSection() {
           className="mt-12 flex flex-col items-center gap-3 text-center"
         >
           <p className="text-sm text-[#B4BAC0] sm:text-base">Want to support the next generation of hackers?</p>
-          <a href="mailto:sponsor@hackathon.com">
-            <Button
-              size="lg"
-              className="rounded-full bg-[#F68A42] px-8 py-5 text-white hover:bg-[#E06E0A]"
-            >
-              <Mail className="mr-2" size={18} />
-              Contact Us
-            </Button>
+          <a
+            href={EVENT.contactMailto}
+            aria-label={`Email ${EVENT.contactEmail} about sponsorship`}
+            className="inline-flex items-center rounded-full bg-[#F68A42] px-8 py-3 text-base font-medium text-white"
+          >
+            <Mail className="mr-2" size={18} />
+            Contact Us
           </a>
         </motion.div>
       </div>

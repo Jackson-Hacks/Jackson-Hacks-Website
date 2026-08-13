@@ -1,16 +1,9 @@
 import React from 'react';
-import pawprintBlack from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintBlack.png';
-import pawprintWhite from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintWhite.png';
+import pawprintBlack from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintBlack.webp';
+import pawprintWhite from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintWhite.webp';
+import { EVENT_MARQUEE_ITEMS } from '@/config/event';
 
-const items = [
-  'Jackson Hacks',
-  'November 21, 2026',
-  '24 Hours',
-  'A. Y. Jackson SS',
-  '200+ Hackers',
-  '$5K+ In Prizes',
-  'Free Food & Swag',
-];
+const items = EVENT_MARQUEE_ITEMS;
 
 const variants = {
   orange: { bar: 'bg-[#F68A42] text-[#272727]', paw: pawprintBlack },

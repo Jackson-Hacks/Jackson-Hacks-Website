@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import cubesBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesBlue.png';
-import squiggle2White from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2White.png';
+import { EVENT } from '@/config/event';
+import cubesBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesBlue.webp';
+import squiggle2White from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2White.webp';
 
 const faqs = [
   {
@@ -41,44 +42,46 @@ const faqs = [
 ];
 
 function FAQItem({ faq, index, isOpen, onToggle }) {
+  const triggerId = `faq-trigger-${index}`;
+  const panelId = `faq-panel-${index}`;
   return (
-    <div
-      className={`group cursor-pointer rounded-2xl border bg-[#2C2C2C] transition-all duration-200 ${
+    <div className={`group rounded-2xl border bg-[#2C2C2C] transition-all duration-200 ${
         isOpen
           ? 'border-[#F68A42]/50'
           : 'border-white/10 hover:border-[#2072C7]/60'
-      }`}
-      onClick={onToggle}
-    >
-      <div className="flex items-start gap-4 p-5 sm:p-6">
+      }`}>
+      <button id={triggerId} type="button" aria-expanded={isOpen} aria-controls={panelId} onClick={onToggle} className="flex w-full cursor-pointer items-start gap-4 rounded-2xl p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F68A42] sm:p-6">
         <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
           isOpen ? 'bg-[#F68A42] text-white' : 'bg-white/10 text-[#6EA8DF]'
         }`}>
           {String(index + 1).padStart(2, '0')}
         </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold text-[#F3F1F1] sm:text-base">{faq.question}</h3>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center justify-between gap-3">
+            <span className="text-sm font-semibold text-[#F3F1F1] sm:text-base">{faq.question}</span>
             <ChevronDown
               size={18}
               className={`shrink-0 text-[#8A9199] transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#F68A42]' : 'group-hover:text-[#6EA8DF]'}`}
             />
-          </div>
+          </span>
           <AnimatePresence initial={false}>
             {isOpen && (
-              <motion.div
+              <motion.span
+                id={panelId}
+                role="region"
+                aria-labelledby={triggerId}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.22, ease: 'easeInOut' }}
-                className="overflow-hidden"
+                className="block overflow-hidden"
               >
-                <p className="mt-3 text-sm leading-6 text-[#B4BAC0] sm:text-base">{faq.answer}</p>
-              </motion.div>
+                <span className="mt-3 block text-sm leading-6 text-[#B4BAC0] sm:text-base">{faq.answer}</span>
+              </motion.span>
             )}
           </AnimatePresence>
-        </div>
-      </div>
+        </span>
+      </button>
     </div>
   );
 }
@@ -174,8 +177,8 @@ export default function FAQSection() {
         >
           <p className="text-sm text-[#B4BAC0] sm:text-base">
             Still have questions?{' '}
-            <a href="mailto:hello@hackathon.com" className="font-semibold text-[#F68A42] underline underline-offset-4 hover:text-[#6EA8DF] transition-colors">
-              Reach out to us
+            <a href={EVENT.contactMailto} className="font-semibold text-[#F68A42] underline underline-offset-4 transition-colors hover:text-[#6EA8DF]">
+              {EVENT.contactEmail}
             </a>
           </p>
         </motion.div>

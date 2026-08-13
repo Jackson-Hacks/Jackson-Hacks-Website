@@ -1,7 +1,9 @@
+// @ts-nocheck -- Thin DOM primitive wrapper; public props are intentionally passthrough.
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/** @type {any} */
 const Input = React.forwardRef(({ className, type, ...props }, ref) => {
   return (
     (<input
@@ -16,4 +18,6 @@ const Input = React.forwardRef(({ className, type, ...props }, ref) => {
 })
 Input.displayName = "Input"
 
-export { Input }
+const PublicInput = /** @type {any} */ (Input)
+
+export { PublicInput as Input }

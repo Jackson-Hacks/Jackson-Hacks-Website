@@ -23,11 +23,12 @@ const badgeVariants = cva(
   }
 )
 
-function Badge({
+/** @type {any} */
+const Badge = ({
   className,
   variant,
   ...props
-}) {
+}) => {
   return (<div className={cn(badgeVariants({ variant }), className)} {...props} />);
 }
 

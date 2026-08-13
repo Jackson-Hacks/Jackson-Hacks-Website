@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import MarqueeBanner from '@/components/landing/MarqueeBanner';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,23 +18,24 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { EVENT } from '@/config/event';
 import { useIsMobile } from '@/hooks/use-mobile';
-import cuteLogo from '@/assets/visuals/cuteLogoClearBackground.png';
-import squiggleGradient from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleGradient.png';
-import squiggle2Gradient from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Gradient.png';
-import squiggleBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleBlue.png';
-import squiggleOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleOrange.png';
-import cubesOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesOrange.png';
-import cubesBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesBlue.png';
-import cubesWhite from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesWhite.png';
-import blobBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/blobBlue.png';
-import pawprintGradient from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintGradient.png';
-import pawprintWhite from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintWhite.png';
+import cuteLogo from '@/assets/visuals/cuteLogoClearBackground.webp';
+import squiggleGradient from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleGradient.webp';
+import squiggle2Gradient from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggle2Gradient.webp';
+import squiggleBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleBlue.webp';
+import squiggleOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleOrange.webp';
+import cubesOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesOrange.webp';
+import cubesBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesBlue.webp';
+import cubesWhite from '@/assets/visuals/drive-download-20260424T030637Z-3-001/cubesWhite.webp';
+import blobBlue from '@/assets/visuals/drive-download-20260424T030637Z-3-001/blobBlue.webp';
+import pawprintGradient from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintGradient.webp';
+import pawprintWhite from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintWhite.webp';
 
 const branchNodes = [
   {
     title: 'Build Projects',
-    description: 'Create innovative tech projects from scratch in just 24 hours with your team.',
+    description: 'Create innovative tech projects from scratch during the event with your team.',
     icon: Code2,
     accent: 'blue',
   },
@@ -118,7 +119,7 @@ const featurePanels = [
 ];
 
 // Content pops as its panel passes through the middle of the screen
-function Panel({ index, progress, decor, children }) {
+function Panel({ index, progress, decor = null, children }) {
   const center = index / 4;
   const scale = useTransform(progress, [center - 0.25, center, center + 0.25], [0.88, 1, 0.88]);
   const opacity = useTransform(progress, [center - 0.25, center, center + 0.25], [0.3, 1, 0.3]);
@@ -244,7 +245,7 @@ function AboutHorizontal() {
                 What is Jackson Hacks?
               </h2>
               <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#B4BAC0] sm:text-xl sm:leading-8">
-                Jackson Hacks is a 24-hour hackathon where students come together to build creative
+                Jackson Hacks is a one-day hackathon where students come together to build creative
                 tech projects, learn from workshops, meet new people, and turn ideas into something real.
               </p>
               <div className="mt-10 flex items-center justify-center gap-3 text-sm uppercase tracking-widest text-[#8A9199]">
@@ -310,15 +311,15 @@ function AboutHorizontal() {
                 className="w-96 sm:w-[38rem]"
               />
               <p className="font-title text-3xl text-[#F3F1F1] sm:text-4xl">Sounds fun?</p>
-              <Link to={createPageUrl('Register')}>
-                <Button
+              <Button asChild
                   size="lg"
                   className="rounded-full bg-[#F68A42] px-10 py-6 text-lg font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A] hover:scale-105"
                 >
+                <Link to={createPageUrl('Register')}>
                   <Zap className="mr-2" size={20} />
                   Apply Now
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </Panel>
         </motion.div>
@@ -339,7 +340,7 @@ function AboutVertical() {
           </span>
           <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl">What is Jackson Hacks?</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#B4BAC0] sm:text-lg">
-            Jackson Hacks is a 24-hour hackathon where students come together to build creative
+            Jackson Hacks is a one-day hackathon where students come together to build creative
             tech projects, learn from workshops, meet new people, and turn ideas into something real.
           </p>
         </div>
@@ -363,6 +364,7 @@ function AboutVertical() {
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
   // Doodads drift at different rates as you scroll for a parallax feel
   const squiggleY = useTransform(scrollY, [0, 800], [0, 90]);
@@ -471,11 +473,11 @@ export default function HeroSection() {
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5">
               <CalendarDays size={15} className="text-[#F68A42]" />
-              November 21st, 2026
+              {EVENT.dateLabel}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5">
               <MapPin size={15} className="text-[#F68A42]" />
-              A. Y. Jackson SS
+              {EVENT.venueShort}
             </span>
           </motion.div>
 
@@ -485,24 +487,24 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.5 }}
             className="flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
-            <Link to={createPageUrl('Register')}>
-              <Button
+            <Button asChild
                 size="lg"
                 className="rounded-full bg-[#F68A42] px-10 py-6 text-lg font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A] hover:scale-105"
               >
+              <Link to={createPageUrl('Register')}>
                 <Zap className="mr-2" size={20} />
                 Apply Now
-              </Button>
-            </Link>
-            <a href="#about">
-              <Button
+              </Link>
+            </Button>
+            <Button asChild
                 size="lg"
                 variant="outline"
                 className="rounded-full border-white/25 bg-transparent px-8 py-6 text-lg text-[#F3F1F1] hover:bg-white/10 hover:text-[#F3F1F1]"
               >
+              <a href="#about">
                 Learn More
-              </Button>
-            </a>
+              </a>
+            </Button>
           </motion.div>
 
           <motion.div
@@ -512,9 +514,9 @@ export default function HeroSection() {
             className="mt-6 grid w-full max-w-2xl grid-cols-3 gap-8"
           >
             {[
-              { value: '24', label: 'Hours' },
-              { value: '200+', label: 'Hackers' },
-              { value: '$5K+', label: 'In Prizes' },
+              { value: EVENT.timeLabel, label: 'Event schedule' },
+              { value: 'Free', label: 'To attend' },
+              { value: '5K+', label: 'In prizes' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="font-title text-3xl font-bold text-[#6EA8DF] md:text-4xl">{stat.value}</div>
@@ -543,7 +545,7 @@ export default function HeroSection() {
       <MarqueeBanner />
 
       {/* What is Jackson Hacks: scrolling down slides the whole screen sideways */}
-      {isMobile ? <AboutVertical /> : <AboutHorizontal />}
+      {isMobile || prefersReducedMotion ? <AboutVertical /> : <AboutHorizontal />}
     </>
   );
 }

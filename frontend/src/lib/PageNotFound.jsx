@@ -1,9 +1,15 @@
 import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { reportOperationalEvent } from '@/lib/operationalMonitoring';
 
 
 export default function PageNotFound({}) {
     const location = useLocation();
     const pageName = location.pathname.substring(1);
+
+    useEffect(() => {
+        reportOperationalEvent('route_not_found');
+    }, []);
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-[#272727]">

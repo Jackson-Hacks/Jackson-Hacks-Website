@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '../ui/button.jsx';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { useAuth } from '@/lib/AuthContext';
+import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import pantherLogo from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.png';
+import { useAuth } from '@/lib/AuthContext';
+import { createPageUrl } from '@/utils';
+import pantherLogo from '@/assets/visuals/drive-download-20260424T030625Z-3-001/JH_Icons_Orange.webp';
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -20,142 +20,59 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated, isLoadingAuth } = useAuth();
   const isMobile = useIsMobile();
+  const menuRef = useRef(null);
+  const toggleRef = useRef(null);
   const showNavSurface = isMobile || isScrolled || isMobileMenuOpen;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    menuRef.current?.querySelector('a, button')?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        toggleRef.current?.focus();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...menuRef.current.querySelectorAll('a, button')];
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  const destination = isAuthenticated ? createPageUrl('Dashboard') : createPageUrl('Register');
+  const actionLabel = isAuthenticated ? 'Dashboard' : 'Apply';
+
   return (
     <>
-      <motion.nav
-        initial={false}
-        animate={{ y: 0 }}
-        transition={isMobile ? undefined : { duration: 0.6 }}
-        className={`fixed left-0 right-0 top-0 z-[70] transition-all duration-300 ${
-          showNavSurface
-            ? 'border-b border-white/10 bg-[#1F1F1F]/90 backdrop-blur-xl'
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex h-16 items-center justify-between sm:h-20">
-            {/* Logo */}
-            <a href="#" className="font-title flex items-center gap-2 text-lg font-bold sm:text-2xl">
-              <img
-                src={pantherLogo}
-                alt="Jackson Hacks logo"
-                className="h-8 w-8 object-contain"
-              />
-              <span className="text-[#F68A42]">JACKSON</span>
-              <span className="text-[#F3F1F1]">HACKS</span>
-            </a>
-
-            {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.href}
-                  className="text-[#B4BAC0] hover:text-[#F3F1F1] transition-colors text-sm font-medium"
-                >
-                  {link.label}
-                </a>
-              ))}
-              {!isLoadingAuth && (
-                isAuthenticated ? (
-                  <Link to={createPageUrl('Dashboard')}>
-                    <Button 
-                      size="sm"
-                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white px-6 rounded-full"
-                    >
-                      <Zap size={16} className="mr-1" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link to={createPageUrl('Register')}>
-                    <Button 
-                      size="sm"
-                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white px-6 rounded-full"
-                    >
-                      <Zap size={16} className="mr-1" />
-                      Apply
-                    </Button>
-                  </Link>
-                )
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-              className="rounded-full border border-[#F3F1F1]/15 bg-[#084F9A]/55 p-2 text-[#F3F1F1] shadow-lg shadow-black/20 md:hidden"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
+      <motion.nav aria-label="Primary navigation" initial={false} animate={{ y: 0 }} transition={isMobile ? undefined : { duration: 0.6 }} className={`fixed inset-x-0 top-0 z-[70] transition-all duration-300 ${showNavSurface ? 'border-b border-white/10 bg-[#1F1F1F]/90 backdrop-blur-xl' : 'bg-transparent'}`}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6"><div className="flex h-16 items-center justify-between sm:h-20">
+          <Link to="/" aria-label="Jackson Hacks home" className="flex items-center gap-2 font-title text-lg font-bold sm:text-2xl"><img src={pantherLogo} alt="" className="h-8 w-8 object-contain" /><span className="text-[#F68A42]">JACKSON</span><span className="text-[#F3F1F1]">HACKS</span></Link>
+          <div className="hidden items-center gap-8 md:flex">{navLinks.map((link) => <a key={link.href} href={link.href} className="text-sm font-medium text-[#B4BAC0] transition-colors hover:text-[#F3F1F1]">{link.label}</a>)}{!isLoadingAuth && <Button asChild size="sm" className="rounded-full bg-[#F68A42] px-6 text-white hover:bg-[#E06E0A]"><Link to={destination}><Zap /> {actionLabel}</Link></Button>}</div>
+          <button ref={toggleRef} type="button" onClick={() => setIsMobileMenuOpen((open) => !open)} aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={isMobileMenuOpen} aria-controls="mobile-navigation" className="rounded-full border border-[#F3F1F1]/15 bg-[#084F9A]/55 p-2 text-[#F3F1F1] shadow-lg shadow-black/20 md:hidden">{isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
+        </div></div>
       </motion.nav>
-
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-[60] bg-[#272727]/98 px-6 pt-24 backdrop-blur-xl md:hidden"
-          >
-            <div className="flex flex-col gap-6">
-              {navLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-2xl text-white font-medium py-2"
-                >
-                  {link.label}
-                </a>
-              ))}
-              {!isLoadingAuth && (
-                isAuthenticated ? (
-                  <Link 
-                    to={createPageUrl('Dashboard')}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Button 
-                      size="lg"
-                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white w-full mt-4 rounded-full"
-                    >
-                      <Zap size={18} className="mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link 
-                    to={createPageUrl('Register')}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Button 
-                      size="lg"
-                      className="bg-[#F68A42] hover:bg-[#E06E0A] text-white w-full mt-4 rounded-full"
-                    >
-                      <Zap size={18} className="mr-2" />
-                      Apply Now
-                    </Button>
-                  </Link>
-                )
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <AnimatePresence>{isMobileMenuOpen && <motion.div id="mobile-navigation" ref={menuRef} role="dialog" aria-modal="true" aria-label="Navigation menu" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="fixed inset-0 z-[60] bg-[#272727]/98 px-6 pt-24 backdrop-blur-xl md:hidden"><div className="flex flex-col gap-6">{navLinks.map((link) => <a key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)} className="py-2 text-2xl font-medium text-white">{link.label}</a>)}{!isLoadingAuth && <Button asChild size="lg" className="mt-4 w-full rounded-full bg-[#F68A42] text-white hover:bg-[#E06E0A]"><Link to={destination} onClick={() => setIsMobileMenuOpen(false)}><Zap /> {actionLabel}</Link></Button>}</div></motion.div>}</AnimatePresence>
     </>
   );
 }

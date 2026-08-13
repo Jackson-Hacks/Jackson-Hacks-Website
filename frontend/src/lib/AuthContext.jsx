@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signIn = async (email, password) => {
+    setAuthError(null);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signUp = async (email, password) => {
+    setAuthError(null);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -84,6 +86,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
+    setAuthError(null);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -94,9 +97,18 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const navigateToLogin = () => {
-    // This can now be handled by the UI showing the login form
-    console.log("Navigation to login requested");
+  const requestPasswordReset = async (email) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/Register?recovery=1',
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const updatePassword = async (password) => {
+    const { data, error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    return data;
   };
 
   return (
@@ -104,16 +116,13 @@ export const AuthProvider = ({ children }) => {
       user, 
       isAuthenticated, 
       isLoadingAuth,
-      // Leaving these dummy values so we don't break consumers right away
-      isLoadingPublicSettings: false,
-      appPublicSettings: {},
       authError,
       logout,
       signIn,
       signUp,
       signInWithGoogle,
-      navigateToLogin,
-      checkAppState: () => {}
+      requestPasswordReset,
+      updatePassword,
     }}>
       {children}
     </AuthContext.Provider>

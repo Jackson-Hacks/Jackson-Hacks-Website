@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CalendarDays, Clock3, MapPin, Navigation } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import pawprintGradient from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintGradient.png';
-import squiggleOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleOrange.png';
+import { EVENT } from '@/config/event';
+import pawprintGradient from '@/assets/visuals/drive-download-20260424T030657Z-3-001/pawprintGradient.webp';
+import squiggleOrange from '@/assets/visuals/drive-download-20260424T030637Z-3-001/squiggleOrange.webp';
 
 export default function LocationSection() {
   const isMobile = useIsMobile();
@@ -38,7 +39,7 @@ export default function LocationSection() {
           </span>
           <h2 className="font-title text-3xl text-[#F3F1F1] sm:text-4xl md:text-6xl">Location</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#B4BAC0] sm:text-lg">
-            Join us at A. Y. Jackson Secondary School for a full day of building, workshops, food, and demos.
+            Join us at {EVENT.venue} for a full day of building, workshops, food, and demos.
           </p>
         </motion.div>
 
@@ -54,19 +55,19 @@ export default function LocationSection() {
               <MapPin size={24} />
             </div>
 
-            <h3 className="font-title text-2xl text-[#F3F1F1] sm:text-3xl">A. Y. Jackson SS</h3>
-            <p className="mt-2 text-sm text-[#B4BAC0] sm:text-base">50 Francine Dr, North York, ON</p>
+            <h3 className="font-title text-2xl text-[#F3F1F1] sm:text-3xl">{EVENT.venueShort}</h3>
+            <p className="mt-2 text-sm text-[#B4BAC0] sm:text-base">{EVENT.address}</p>
 
             <div className="mt-7 grid gap-3 text-[#F3F1F1] sm:grid-cols-3 lg:grid-cols-1">
               <div className="rounded-xl border border-white/10 bg-[#262626] p-4">
                 <CalendarDays size={19} className="mb-3 text-[#F68A42]" />
                 <span className="block text-xs uppercase tracking-widest text-[#8A9199]">Date</span>
-                <span className="mt-1 block text-sm font-medium sm:text-base">Nov. 21, 2026</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">{EVENT.shortDateLabel}</span>
               </div>
               <div className="rounded-xl border border-white/10 bg-[#262626] p-4">
                 <Clock3 size={19} className="mb-3 text-[#F68A42]" />
                 <span className="block text-xs uppercase tracking-widest text-[#8A9199]">Time</span>
-                <span className="mt-1 block text-sm font-medium sm:text-base">8 AM - 10 PM</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">{EVENT.timeLabel} · {EVENT.timeZoneLabel}</span>
               </div>
               <div className="rounded-xl border border-white/10 bg-[#262626] p-4">
                 <Navigation size={19} className="mb-3 text-[#F68A42]" />
@@ -95,7 +96,7 @@ export default function LocationSection() {
             </div>
 
             <a
-              href="https://maps.google.com/?q=A.+Y.+Jackson+SS"
+              href={EVENT.mapUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-[#F68A42] px-5 py-2.5 text-sm font-semibold text-[#272727] transition-colors hover:bg-[#E06E0A]"
