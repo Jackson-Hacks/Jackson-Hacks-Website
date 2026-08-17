@@ -118,8 +118,16 @@ BEGIN
 
   SELECT * INTO v_random_application
   FROM public.get_random_unreviewed_application(v_cycle.id);
-  ASSERT v_random_application.id IN (v_application.id, v_second_application.id),
+  ASSERT v_random_application.id IS NOT NULL
+    AND v_random_application.cycle_id = v_cycle.id
+    AND v_random_application.user_id <> v_admin_id,
     'random review mode did not return an unrated application';
+  SELECT count(*) INTO v_review_count
+  FROM public.application_reviews
+  WHERE application_id = v_random_application.id
+    AND reviewer_id = v_admin_id;
+  ASSERT v_review_count = 0,
+    'random review mode returned an application already rated by this reviewer';
 
   v_review := public.save_application_review(
     v_application.id,
