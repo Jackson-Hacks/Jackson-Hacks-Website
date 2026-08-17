@@ -46,8 +46,9 @@ export function validateReviewScores(scores) {
   return Object.fromEntries(
     REVIEW_CATEGORIES.flatMap(({ key, label }) => {
       const value = Number(scores[key]);
-      return scores[key] === '' || !Number.isInteger(value) || value < 0 || value > 10
-        ? [[key, `${label} must be a whole number from 0 to 10`]]
+      const hasAtMostOneDecimal = /^\d(?:\.\d)?$/.test(String(scores[key]));
+      return scores[key] === '' || !Number.isFinite(value) || !hasAtMostOneDecimal || value < 0 || value > 5
+        ? [[key, `${label} must be a number from 0 to 5 with at most one decimal place`]]
         : [];
     }),
   );
@@ -55,7 +56,8 @@ export function validateReviewScores(scores) {
 
 export function getReviewTotal(scores) {
   if (Object.keys(validateReviewScores(scores)).length) return null;
-  return REVIEW_CATEGORIES.reduce((total, { key }) => total + Number(scores[key]), 0);
+  const total = REVIEW_CATEGORIES.reduce((sum, { key }) => sum + Number(scores[key]), 0);
+  return Math.round(total * 10) / 10;
 }
 
 export function summarizeReviews(reviews) {

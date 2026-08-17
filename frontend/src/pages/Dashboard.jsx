@@ -16,6 +16,7 @@ import {
   Star,
   Unlock,
   Users,
+  X,
   Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -61,25 +62,24 @@ import { createCsv } from "@/lib/csv";
 import { supabase } from "@/lib/supabaseClient";
 
 const PAGE_SIZE = 10;
-const reviewDetailFields = [
+const applicantDetailFields = [
+  { label: "Email", value: (application) => application.email, sensitive: true },
+  { label: "Phone", value: (application) => application.phone, sensitive: true },
+  { label: "Age", value: (application) => application.age, sensitive: true },
   { label: "School", value: (application) => application.school },
   { label: "Grade", value: (application) => application.grade },
   { label: "Coding experience", value: (application) => application.experience_level },
-  { label: "Application response", value: (application) => application.why_attend },
-];
-const identityDetailFields = [
-  { label: "Email", value: (application) => application.email },
-  { label: "Phone", value: (application) => application.phone },
-  { label: "Age", value: (application) => application.age },
-  { label: "Gender", value: (application) => formatGenderIdentity(application.gender_identity, application.gender_self_description) },
-  { label: "Pronouns", value: (application) => application.pronouns },
-  { label: "Race / ethnicity", value: (application) => formatRaceEthnicity(application.race_ethnicity) },
-  { label: "First-generation student", value: (application) => formatFirstGeneration(application.first_generation) },
-  { label: "T-shirt", value: (application) => application.tshirt_size },
-  { label: "Dietary information", value: (application) => application.dietary_restrictions },
+  { label: "Gender", value: (application) => formatGenderIdentity(application.gender_identity, application.gender_self_description), sensitive: true },
+  { label: "Pronouns", value: (application) => application.pronouns, sensitive: true },
+  { label: "Race / ethnicity", value: (application) => formatRaceEthnicity(application.race_ethnicity), sensitive: true },
+  { label: "First-generation student", value: (application) => formatFirstGeneration(application.first_generation), sensitive: true },
+  { label: "T-shirt size", value: (application) => application.tshirt_size },
+  { label: "Dietary information", value: (application) => application.dietary_restrictions, sensitive: true },
   { label: "Heard from", value: (application) => application.heard_from },
-  { label: "Emergency contact", value: (application) => application.emergency_contact_name },
-  { label: "Emergency phone", value: (application) => application.emergency_contact_phone },
+  { label: "Emergency contact", value: (application) => application.emergency_contact_name, sensitive: true },
+  { label: "Emergency phone", value: (application) => application.emergency_contact_phone, sensitive: true },
+  { label: "Submitted", value: (application) => new Date(application.submitted_at || application.created_at).toLocaleString() },
+  { label: "Revision", value: (application) => application.revision_number || 1 },
 ];
 
 const csvColumns = [
@@ -130,7 +130,7 @@ export default function Dashboard() {
   const [reviewFilter, setReviewFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [blindReview, setBlindReview] = useState(true);
+  const [blindReview, setBlindReview] = useState(false);
   const [randomReviewMode, setRandomReviewMode] = useState(false);
   const [reviewScores, setReviewScores] = useState({ ...EMPTY_REVIEW_SCORES });
   const [reviewErrors, setReviewErrors] = useState({});
@@ -263,6 +263,23 @@ export default function Dashboard() {
 
   useEffect(() => setPage(1), [search, reviewFilter, blindReview]);
 
+  useEffect(() => {
+    if (!selectedApplication) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setSelectedApplication(null);
+        setRandomReviewMode(false);
+      }
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [selectedApplication]);
+
   const handleLogout = async () => {
     await logout(false);
     navigate("/");
@@ -314,6 +331,7 @@ export default function Dashboard() {
       if (!randomApplication) {
         setAdminError("You have rated every available application.");
         setRandomReviewMode(false);
+        setSelectedApplication(null);
         return false;
       }
       openApplication(randomApplication);
@@ -335,6 +353,11 @@ export default function Dashboard() {
     }
     setRandomReviewMode(true);
     await openRandomUnreviewed();
+  };
+
+  const closeReview = () => {
+    setSelectedApplication(null);
+    setRandomReviewMode(false);
   };
 
   const updateReviewScore = (key, value) => {
@@ -560,7 +583,7 @@ export default function Dashboard() {
                   <Users className="text-[#F68A42]" /> Applicant Admin
                 </h2>
                 <p className="mt-2 text-sm text-[#B4BAC0]">
-                  Score applications across five categories for a total of 50.
+                  Score applications across five categories for a total of 25.
                   Blind review hides identity and demographic information.
                 </p>
               </div>
@@ -665,12 +688,12 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="p-3">
-                        {myReview ? `${myReview.total_score} / 50` : "Unrated"}
+                        {myReview ? `${myReview.total_score} / 25` : "Unrated"}
                       </td>
                       <td className="p-3">
                         {summary.average === null
                           ? "—"
-                          : `${summary.average} / 50 (${summary.count})`}
+                          : `${summary.average} / 25 (${summary.count})`}
                       </td>
                       <td className="p-3 text-[#B4BAC0]">
                         {new Date(
@@ -735,79 +758,111 @@ export default function Dashboard() {
             </div>
 
             {selectedApplication && (
-              <section
-                className="mt-6 rounded-xl border border-[#2072C7]/30 bg-[#262626] p-4 sm:p-6"
-                aria-labelledby="application-review-title"
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-2 backdrop-blur-sm sm:p-5"
+                onMouseDown={(event) => {
+                  if (event.target === event.currentTarget) closeReview();
+                }}
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3
-                      id="application-review-title"
-                      className="font-title text-2xl"
-                    >
-                      {blindReview
-                        ? getAnonymousApplicantLabel(selectedApplication)
-                        : selectedApplication.full_name}
-                    </h3>
-                    <p className="mt-1 text-sm text-[#B4BAC0]">
-                      Revision {selectedApplication.revision_number || 1} · {" "}
-                      {summarizeReviews(reviewsByApplication.get(selectedApplication.id) || []).count} review(s)
-                    </p>
+                <section
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="application-review-title"
+                  className="max-h-[96vh] w-full max-w-7xl overflow-y-auto rounded-2xl border border-[#2072C7]/40 bg-[#242424] p-4 shadow-2xl sm:p-6"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-4">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 id="application-review-title" className="font-title text-2xl sm:text-3xl">
+                          Application review
+                        </h3>
+                        {randomReviewMode && (
+                          <Badge className="border-[#2072C7]/40 bg-[#2072C7]/15 text-[#9CC4EA]">
+                            <Shuffle className="mr-1" size={14} /> Random mode
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm text-[#B4BAC0]">
+                        {summarizeReviews(reviewsByApplication.get(selectedApplication.id) || []).count} completed review(s)
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        aria-pressed={blindReview}
+                        onClick={() => setBlindReview((value) => !value)}
+                        className="border-white/15 bg-transparent text-white hover:bg-white/10"
+                      >
+                        {blindReview ? <EyeOff /> : <Eye />}
+                        {blindReview ? "Show identity" : "Hide identity"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        aria-label="Close application review"
+                        onClick={closeReview}
+                        className="text-[#B4BAC0] hover:text-white"
+                      >
+                        <X />
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setSelectedApplication(null)}
-                    className="text-[#B4BAC0] hover:text-white"
-                  >
-                    Close
-                  </Button>
-                </div>
-                <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {reviewDetailFields.map(({ label, value }) => (
-                    <div
-                      key={label}
-                      className={`rounded-lg border border-white/10 p-3 ${label === "Application response" ? "sm:col-span-2" : ""}`}
-                    >
-                      <dt className="text-xs uppercase tracking-wide text-[#8A9199]">
-                        {label}
-                      </dt>
-                      <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
-                        {value(selectedApplication) || "—"}
-                      </dd>
-                    </div>
-                  ))}
-                  {!blindReview && identityDetailFields.map(({ label, value }) => (
-                    <div key={label} className="rounded-lg border border-white/10 p-3">
-                      <dt className="text-xs uppercase tracking-wide text-[#8A9199]">{label}</dt>
-                      <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
-                        {value(selectedApplication) || "—"}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                {blindReview && (
-                  <p className="mt-3 flex items-center gap-2 text-xs text-[#8A9199]">
-                    <EyeOff size={14} /> Name, contact details, age, and demographic survey answers are hidden.
-                  </p>
-                )}
-                <div className="mt-6 border-t border-white/10 pt-5">
+
+                  <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(300px,0.9fr)_minmax(0,1.35fr)]">
+                    <aside className="rounded-xl border border-white/10 bg-white/[0.025] p-4" aria-label="Applicant details">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F68A42]">Applicant details</p>
+                      <h4 className="mt-2 break-words font-title text-2xl">
+                        {blindReview ? getAnonymousApplicantLabel(selectedApplication) : selectedApplication.full_name}
+                      </h4>
+                      {blindReview && (
+                        <p className="mt-2 flex items-center gap-2 text-xs text-[#8A9199]">
+                          <EyeOff size={14} /> Personal and demographic details are hidden.
+                        </p>
+                      )}
+                      <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                        {applicantDetailFields.map(({ label, value, sensitive }) => (
+                          <div key={label} className="min-w-0 rounded-lg border border-white/10 bg-black/10 p-3">
+                            <dt className="text-xs uppercase tracking-wide text-[#8A9199]">{label}</dt>
+                            <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
+                              {blindReview && sensitive ? "Hidden" : value(selectedApplication) || "—"}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </aside>
+
+                    <article className="rounded-xl border border-[#2072C7]/30 bg-[#2072C7]/[0.07] p-5" aria-label="Applicant response">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9CC4EA]">Applicant response</p>
+                      <h4 className="mt-2 font-title text-xl">Why do you want to attend Jackson Hacks?</h4>
+                      <p className="mt-5 whitespace-pre-wrap break-words text-base leading-7 text-[#F3F1F1]">
+                        {selectedApplication.why_attend || "No response provided."}
+                      </p>
+                    </article>
+                  </div>
+
+                  <div className="mt-6 border-t border-white/10 pt-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h4 className="flex items-center gap-2 font-semibold"><Star className="text-[#F68A42]" /> Review rubric</h4>
-                      <p className="mt-1 text-sm text-[#8A9199]">Five categories worth 10 points each.</p>
+                      <p className="mt-1 text-sm text-[#8A9199]">Five categories worth 5 points each. Scores may use one decimal place.</p>
                     </div>
                     <div className="rounded-lg bg-[#2072C7]/15 px-4 py-2 text-lg font-semibold text-[#9CC4EA]">
-                      {getReviewTotal(reviewScores) ?? "—"} / 50
+                      {getReviewTotal(reviewScores) ?? "—"} / 25
                     </div>
                   </div>
+                  {adminError && (
+                    <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300" role="alert">
+                      {adminError}
+                    </p>
+                  )}
                   {applicationWindow.canEdit ? (
                     <p className="mt-2 text-sm text-amber-300">
                       Close submissions before reviewers can score applications.
                     </p>
                   ) : (
                     <div className="mt-4 space-y-4">
-                      <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                         {REVIEW_CATEGORIES.map((category) => (
                           <div key={category.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                             <div className="flex items-start justify-between gap-3">
@@ -821,13 +876,13 @@ export default function Dashboard() {
                                 id={`score-${category.key}`}
                                 type="number"
                                 min="0"
-                                max="10"
-                                step="1"
+                                max="5"
+                                step="0.1"
                                 value={reviewScores[category.key]}
                                 onChange={(event) => updateReviewScore(category.key, event.target.value)}
                                 aria-invalid={Boolean(reviewErrors[category.key])}
                                 aria-describedby={reviewErrors[category.key] ? `score-${category.key}-error` : undefined}
-                                className="w-20 border-white/10 bg-white/5 text-center text-white"
+                                className="w-24 border-white/10 bg-white/5 text-center text-white"
                               />
                             </div>
                             {reviewErrors[category.key] && (
@@ -848,19 +903,25 @@ export default function Dashboard() {
                         onChange={(event) => setReviewNotes(event.target.value)}
                         className="border-white/10 bg-white/5 text-white"
                       />
-                      <Button
-                        type="button"
-                        onClick={saveReview}
-                        disabled={isSavingReview}
-                        className="bg-[#2072C7] text-white hover:bg-[#084F9A]"
-                      >
-                        {isSavingReview && <Loader2 className="animate-spin" />} {" "}
-                        {randomReviewMode ? "Save & review another" : "Save review"}
-                      </Button>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Button type="button" variant="outline" onClick={closeReview} className="border-white/15 bg-transparent text-white">
+                          Cancel
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={saveReview}
+                          disabled={isSavingReview}
+                          className="bg-[#2072C7] text-white hover:bg-[#084F9A]"
+                        >
+                          {isSavingReview && <Loader2 className="animate-spin" />} {" "}
+                          {randomReviewMode ? "Save & review another" : "Save review"}
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
-              </section>
+                </section>
+              </div>
             )}
           </Card>
         )}

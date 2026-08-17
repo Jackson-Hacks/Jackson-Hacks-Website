@@ -34,7 +34,7 @@ Direct visits to `/Register` and `/Dashboard` require the host’s SPA fallback 
 - Applicants save through `save_application`; direct INSERT/UPDATE permissions are revoked.
 - The database clock and application-cycle row enforce opening and closing times.
 - The form has one scored long-answer response plus a demographic survey; demographic answers are hidden in blind review mode.
-- Reviewers score five 0–10 categories for a total out of 50, with one scorecard per reviewer and application.
+- Reviewers score five 0–5 categories (one decimal allowed) for a total out of 25, with one scorecard per reviewer and application.
 - Random review mode selects an application the current reviewer has not scored and excludes the reviewer's own application.
 - Scoring opens only after submissions close. If submissions are reopened and an applicant edits, prior scorecards for that application are invalidated.
 - Legacy administrative statuses remain available for applicant communication, but they are separate from reviewer scoring.

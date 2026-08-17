@@ -106,12 +106,12 @@ CREATE TABLE application_reviews (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
   reviewer_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  motivation_score SMALLINT NOT NULL CHECK (motivation_score BETWEEN 0 AND 10),
-  learning_score SMALLINT NOT NULL CHECK (learning_score BETWEEN 0 AND 10),
-  creativity_score SMALLINT NOT NULL CHECK (creativity_score BETWEEN 0 AND 10),
-  collaboration_score SMALLINT NOT NULL CHECK (collaboration_score BETWEEN 0 AND 10),
-  response_score SMALLINT NOT NULL CHECK (response_score BETWEEN 0 AND 10),
-  total_score SMALLINT GENERATED ALWAYS AS (
+  motivation_score NUMERIC(2,1) NOT NULL CHECK (motivation_score BETWEEN 0 AND 5),
+  learning_score NUMERIC(2,1) NOT NULL CHECK (learning_score BETWEEN 0 AND 5),
+  creativity_score NUMERIC(2,1) NOT NULL CHECK (creativity_score BETWEEN 0 AND 5),
+  collaboration_score NUMERIC(2,1) NOT NULL CHECK (collaboration_score BETWEEN 0 AND 5),
+  response_score NUMERIC(2,1) NOT NULL CHECK (response_score BETWEEN 0 AND 5),
+  total_score NUMERIC(3,1) GENERATED ALWAYS AS (
     motivation_score + learning_score + creativity_score +
     collaboration_score + response_score
   ) STORED,
@@ -477,30 +477,30 @@ DECLARE
   v_application public.applications%ROWTYPE;
   v_cycle public.application_cycles%ROWTYPE;
   v_review public.application_reviews%ROWTYPE;
-  v_motivation SMALLINT;
-  v_learning SMALLINT;
-  v_creativity SMALLINT;
-  v_collaboration SMALLINT;
-  v_response SMALLINT;
+  v_motivation NUMERIC(2,1);
+  v_learning NUMERIC(2,1);
+  v_creativity NUMERIC(2,1);
+  v_collaboration NUMERIC(2,1);
+  v_response NUMERIC(2,1);
 BEGIN
   IF auth.uid() IS NULL OR NOT public.is_admin() THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'admin_required';
   END IF;
 
-  IF COALESCE(p_scores->>'motivation', '') !~ '^([0-9]|10)$'
-    OR COALESCE(p_scores->>'learning', '') !~ '^([0-9]|10)$'
-    OR COALESCE(p_scores->>'creativity', '') !~ '^([0-9]|10)$'
-    OR COALESCE(p_scores->>'collaboration', '') !~ '^([0-9]|10)$'
-    OR COALESCE(p_scores->>'response', '') !~ '^([0-9]|10)$'
+  IF COALESCE(p_scores->>'motivation', '') !~ '^([0-4](\.[0-9])?|5(\.0)?)$'
+    OR COALESCE(p_scores->>'learning', '') !~ '^([0-4](\.[0-9])?|5(\.0)?)$'
+    OR COALESCE(p_scores->>'creativity', '') !~ '^([0-4](\.[0-9])?|5(\.0)?)$'
+    OR COALESCE(p_scores->>'collaboration', '') !~ '^([0-4](\.[0-9])?|5(\.0)?)$'
+    OR COALESCE(p_scores->>'response', '') !~ '^([0-4](\.[0-9])?|5(\.0)?)$'
     OR char_length(COALESCE(p_internal_notes, '')) > 2000 THEN
     RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'invalid_review';
   END IF;
 
-  v_motivation := (p_scores->>'motivation')::SMALLINT;
-  v_learning := (p_scores->>'learning')::SMALLINT;
-  v_creativity := (p_scores->>'creativity')::SMALLINT;
-  v_collaboration := (p_scores->>'collaboration')::SMALLINT;
-  v_response := (p_scores->>'response')::SMALLINT;
+  v_motivation := (p_scores->>'motivation')::NUMERIC(2,1);
+  v_learning := (p_scores->>'learning')::NUMERIC(2,1);
+  v_creativity := (p_scores->>'creativity')::NUMERIC(2,1);
+  v_collaboration := (p_scores->>'collaboration')::NUMERIC(2,1);
+  v_response := (p_scores->>'response')::NUMERIC(2,1);
 
   SELECT * INTO v_application
   FROM public.applications

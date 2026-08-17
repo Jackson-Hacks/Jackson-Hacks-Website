@@ -42,12 +42,13 @@ test('status mapping returns applicant-facing labels and safe unknown fallback',
   assert.equal(getApplicationStatusDetails('unexpected').label, 'Unknown');
 });
 
-test('review rubric validates five ten-point categories and summarizes totals', () => {
-  const scores = { motivation: '9', learning: '8', creativity: '7', collaboration: '9', response: '8' };
+test('review rubric validates five decimal five-point categories and summarizes totals', () => {
+  const scores = { motivation: '4.5', learning: '4', creativity: '3.5', collaboration: '4.5', response: '4' };
   assert.deepEqual(validateReviewScores(scores), {});
-  assert.equal(getReviewTotal(scores), 41);
-  assert.equal(validateReviewScores({ ...scores, response: '11' }).response, 'Response quality must be a whole number from 0 to 10');
-  assert.deepEqual(summarizeReviews([{ total_score: 41 }, { total_score: 45 }]), { count: 2, average: 43 });
+  assert.equal(getReviewTotal(scores), 20.5);
+  assert.equal(validateReviewScores({ ...scores, response: '5.1' }).response, 'Response quality must be a number from 0 to 5 with at most one decimal place');
+  assert.ok(validateReviewScores({ ...scores, response: '4.25' }).response);
+  assert.deepEqual(summarizeReviews([{ total_score: 20.5 }, { total_score: 22.5 }]), { count: 2, average: 21.5 });
   assert.equal(getAnonymousApplicantLabel({ id: '12345678-abcd-efab-cdef-123456789abc' }), 'Applicant 123456');
 });
 

@@ -61,7 +61,7 @@ BEGIN
   BEGIN
     PERFORM public.save_application_review(
       v_application.id,
-      '{"motivation":8,"learning":8,"creativity":8,"collaboration":8,"response":8}'::JSONB
+      '{"motivation":4,"learning":4,"creativity":4,"collaboration":4,"response":4}'::JSONB
     );
     RAISE EXCEPTION 'non-admin unexpectedly saved a review';
   EXCEPTION WHEN OTHERS THEN
@@ -131,10 +131,10 @@ BEGIN
 
   v_review := public.save_application_review(
     v_application.id,
-    '{"motivation":9,"learning":8,"creativity":7,"collaboration":9,"response":8}'::JSONB,
+    '{"motivation":4.5,"learning":4,"creativity":3.5,"collaboration":4.5,"response":4}'::JSONB,
     'Strong learning mindset.'
   );
-  ASSERT v_review.total_score = 41, 'review total was not calculated out of 50';
+  ASSERT v_review.total_score = 20.5, 'review total was not calculated out of 25';
   ASSERT v_review.reviewer_id = v_admin_id, 'reviewer identity was not recorded';
 
   SELECT * INTO v_random_application
