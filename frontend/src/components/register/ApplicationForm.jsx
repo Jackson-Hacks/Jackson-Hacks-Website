@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { 
-  User, Mail, Phone, School, 
+  User, Mail, Phone, School, Users,
   MessageSquare, AlertCircle,
   ArrowLeft, ArrowRight, Check, Loader2
 } from 'lucide-react';
@@ -27,12 +27,18 @@ import {
   normalizeApplicationData,
   validateApplicationStep,
 } from '@/lib/applicationValidation';
+import {
+  FIRST_GENERATION_OPTIONS,
+  GENDER_OPTIONS,
+  RACE_ETHNICITY_OPTIONS,
+} from '@/lib/applicationDemographics';
 
 const steps = [
   { id: 1, title: 'Personal Info', icon: User },
   { id: 2, title: 'School & Experience', icon: School },
-  { id: 3, title: 'Questions', icon: MessageSquare },
-  { id: 4, title: 'Final Details', icon: Check },
+  { id: 3, title: 'Written Response', icon: MessageSquare },
+  { id: 4, title: 'Demographics', icon: Users },
+  { id: 5, title: 'Final Details', icon: Check },
 ];
 
 export default function ApplicationForm({
@@ -48,13 +54,17 @@ export default function ApplicationForm({
     email: application?.email || user?.email || '',
     phone: application?.phone || '',
     age: application?.age ? String(application.age) : '',
+    gender_identity: application?.gender_identity || '',
+    gender_self_description: application?.gender_self_description || '',
+    pronouns: application?.pronouns || '',
+    race_ethnicity: Array.isArray(application?.race_ethnicity) ? application.race_ethnicity : [],
+    first_generation: application?.first_generation || '',
     school: application?.school || '',
     grade: application?.grade || '',
     experience_level: application?.experience_level || '',
     dietary_restrictions: application?.dietary_restrictions || '',
     tshirt_size: application?.tshirt_size || '',
     why_attend: application?.why_attend || '',
-    project_idea: application?.project_idea || '',
     heard_from: application?.heard_from || '',
     emergency_contact_name: application?.emergency_contact_name || '',
     emergency_contact_phone: application?.emergency_contact_phone || '',
@@ -80,6 +90,20 @@ export default function ApplicationForm({
     }
   };
 
+  const toggleRaceEthnicity = (value, checked) => {
+    const current = Array.isArray(formData.race_ethnicity) ? formData.race_ethnicity : [];
+    if (!checked) {
+      updateField('race_ethnicity', current.filter((item) => item !== value));
+      return;
+    }
+    updateField(
+      'race_ethnicity',
+      value === 'prefer_not_to_say'
+        ? [value]
+        : [...current.filter((item) => item !== 'prefer_not_to_say' && item !== value), value],
+    );
+  };
+
   const validateStep = (step) => {
     const newErrors = validateApplicationStep(formData, step);
     setErrors(newErrors);
@@ -92,7 +116,7 @@ export default function ApplicationForm({
 
   const nextStep = () => {
     if (readOnly || validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4));
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
   };
 
@@ -103,7 +127,7 @@ export default function ApplicationForm({
   const handleSubmit = async (event) => {
     event?.preventDefault();
     if (readOnly) return;
-    if (!validateStep(4)) return;
+    if (!validateStep(5)) return;
     
     setIsSubmitting(true);
     
@@ -185,41 +209,20 @@ export default function ApplicationForm({
               {errors.email && <p id="email-error" className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="phone" className="text-white mb-2 block">Phone</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    maxLength={APPLICATION_LIMITS.phone}
-                    disabled={readOnly}
-                    value={formData.phone}
-                    onChange={(e) => updateField('phone', e.target.value)}
-                    className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
-                    placeholder="(123) 456-7890"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="age" className="text-white mb-2 block">
-                  Age <span className="text-red-400">*</span>
-                </Label>
+            <div>
+              <Label htmlFor="phone" className="text-white mb-2 block">Phone</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                 <Input
-                  id="age"
-                  type="number"
-                  min="5"
-                  max="120"
-                  aria-invalid={Boolean(errors.age)}
-                  aria-describedby={errors.age ? 'age-error' : undefined}
+                  id="phone"
+                  type="tel"
+                  maxLength={APPLICATION_LIMITS.phone}
                   disabled={readOnly}
-                  value={formData.age}
-                  onChange={(e) => updateField('age', e.target.value)}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
-                  placeholder="17"
+                  value={formData.phone}
+                  onChange={(e) => updateField('phone', e.target.value)}
+                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
+                  placeholder="(123) 456-7890"
                 />
-                {errors.age && <p id="age-error" className="text-red-400 text-sm mt-1">{errors.age}</p>}
               </div>
             </div>
           </motion.div>
@@ -303,7 +306,9 @@ export default function ApplicationForm({
           >
             <div>
               <Label htmlFor="why_attend" className="text-white mb-2 block">
-                Why do you want to attend? <span className="text-red-400">*</span>
+                Tell us why you want to attend Jackson Hacks, what you hope to
+                learn or build, and how you would contribute to the community.{' '}
+                <span className="text-red-400">*</span>
               </Label>
               <Textarea
                 id="why_attend"
@@ -313,25 +318,10 @@ export default function ApplicationForm({
                 disabled={readOnly}
                 value={formData.why_attend}
                 onChange={(e) => updateField('why_attend', e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7] min-h-[120px]"
-                placeholder="Tell us what excites you about this hackathon..."
+                className="min-h-[220px] bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
+                placeholder="Share one thoughtful response covering your motivation, goals, and what you would bring to the event..."
               />
               {errors.why_attend && <p id="why_attend-error" className="text-red-400 text-sm mt-1">{errors.why_attend}</p>}
-            </div>
-
-            <div>
-              <Label htmlFor="project_idea" className="text-white mb-2 block">
-                Any project ideas you'd like to work on?
-              </Label>
-              <Textarea
-                id="project_idea"
-                maxLength={APPLICATION_LIMITS.project_idea}
-                disabled={readOnly}
-                value={formData.project_idea}
-                onChange={(e) => updateField('project_idea', e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7] min-h-[100px]"
-                placeholder="Share any ideas you have in mind (optional)..."
-              />
             </div>
 
             <div>
@@ -356,6 +346,149 @@ export default function ApplicationForm({
         );
 
       case 4:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="rounded-xl border border-[#2072C7]/30 bg-[#084F9A]/20 p-4">
+              <h3 className="font-semibold text-white">Demographic survey</h3>
+              <p className="mt-1 text-sm text-[#B4BAC0]">
+                Age is required for eligibility. The other answers are optional and help us
+                understand who we are reaching. Reviewers can hide identifying and demographic
+                information while scoring applications.
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="age" className="text-white mb-2 block">
+                Age <span className="text-red-400">*</span>
+              </Label>
+              <Input
+                id="age"
+                type="number"
+                min="5"
+                max="120"
+                aria-invalid={Boolean(errors.age)}
+                aria-describedby={errors.age ? 'age-error' : undefined}
+                disabled={readOnly}
+                value={formData.age}
+                onChange={(e) => updateField('age', e.target.value)}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
+                placeholder="17"
+              />
+              {errors.age && <p id="age-error" className="text-red-400 text-sm mt-1">{errors.age}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="gender_identity" className="text-white mb-2 block">Gender identity</Label>
+              <Select
+                disabled={readOnly}
+                value={formData.gender_identity}
+                onValueChange={(value) => updateField('gender_identity', value)}
+              >
+                <SelectTrigger id="gender_identity" className="bg-white/5 border-white/10 text-white">
+                  <SelectValue placeholder="Select an option (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GENDER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.gender_identity === 'self_describe' && (
+              <div>
+                <Label htmlFor="gender_self_description" className="text-white mb-2 block">
+                  How do you describe your gender identity? <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="gender_self_description"
+                  disabled={readOnly}
+                  maxLength={APPLICATION_LIMITS.gender_self_description}
+                  aria-invalid={Boolean(errors.gender_self_description)}
+                  aria-describedby={errors.gender_self_description ? 'gender_self_description-error' : undefined}
+                  value={formData.gender_self_description}
+                  onChange={(event) => updateField('gender_self_description', event.target.value)}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+                {errors.gender_self_description && (
+                  <p id="gender_self_description-error" className="mt-1 text-sm text-red-400">
+                    {errors.gender_self_description}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="pronouns" className="text-white mb-2 block">Pronouns</Label>
+              <Input
+                id="pronouns"
+                disabled={readOnly}
+                maxLength={APPLICATION_LIMITS.pronouns}
+                aria-invalid={Boolean(errors.pronouns)}
+                aria-describedby={errors.pronouns ? 'pronouns-error' : undefined}
+                value={formData.pronouns}
+                onChange={(event) => updateField('pronouns', event.target.value)}
+                className="bg-white/5 border-white/10 text-white"
+                placeholder="e.g. she/her, he/him, they/them"
+              />
+              {errors.pronouns && <p id="pronouns-error" className="mt-1 text-sm text-red-400">{errors.pronouns}</p>}
+            </div>
+
+            <fieldset aria-describedby={errors.race_ethnicity ? 'race_ethnicity-error' : undefined}>
+              <legend className="mb-2 text-white">Race / ethnicity <span className="text-sm text-gray-400">(select all that apply)</span></legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {RACE_ETHNICITY_OPTIONS.map((option) => {
+                  const checked = formData.race_ethnicity.includes(option.value);
+                  return (
+                    <Label
+                      key={option.value}
+                      htmlFor={`race-${option.value}`}
+                      className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-gray-200"
+                    >
+                      <Checkbox
+                        id={`race-${option.value}`}
+                        disabled={readOnly}
+                        checked={checked}
+                        onCheckedChange={(nextChecked) => toggleRaceEthnicity(option.value, nextChecked === true)}
+                      />
+                      {option.label}
+                    </Label>
+                  );
+                })}
+              </div>
+              {errors.race_ethnicity && (
+                <p id="race_ethnicity-error" className="mt-2 text-sm text-red-400">{errors.race_ethnicity}</p>
+              )}
+            </fieldset>
+
+            <div>
+              <Label htmlFor="first_generation" className="text-white mb-2 block">
+                Would you be a first-generation college or university student?
+              </Label>
+              <Select
+                disabled={readOnly}
+                value={formData.first_generation}
+                onValueChange={(value) => updateField('first_generation', value)}
+              >
+                <SelectTrigger id="first_generation" className="bg-white/5 border-white/10 text-white">
+                  <SelectValue placeholder="Select an option (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FIRST_GENERATION_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </motion.div>
+        );
+
+      case 5:
         return (
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -536,7 +669,7 @@ export default function ApplicationForm({
           Back
         </Button>
 
-        {currentStep < 4 ? (
+        {currentStep < steps.length ? (
           <Button
             type="button"
             onClick={nextStep}

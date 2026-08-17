@@ -4,7 +4,7 @@
 
 1. Export or snapshot the current Supabase schema and verify the most recent database backup.
 2. Run the frontend `npm run check` gate and PostgreSQL integration suite.
-3. Apply migrations to staging and test signup, login, submit, edit, close, decision, export, and RLS denial flows.
+3. Apply migrations to staging and test signup, login, submit, edit, demographics, close, blind review, scoring, random assignment, export, and RLS denial flows.
 4. Deploy staging and hard-refresh `/`, `/Register`, `/Dashboard`, and an unknown route.
 5. Verify OAuth redirect URLs, responsive layouts, keyboard operation, reduced motion, CSP, and monitoring.
 6. Obtain organizer sign-off before applying the migration and frontend build to production.
@@ -37,6 +37,6 @@ Operational monitoring accepts only allowlisted event names, environment, route 
 
 - Privacy notice, consent language, retention/deletion date, and minor-participant process
 - Support expectations and incident owner
-- Eligibility, guardian consent, acceptance schedule, and edit-after-decision policy
+- Eligibility, guardian consent, acceptance schedule, demographic-data use, reviewer rubric, and score-to-decision policy
 - Confirmed duration/capacity/prize claims and sponsor/logo approvals
 - Production host and Supabase owners

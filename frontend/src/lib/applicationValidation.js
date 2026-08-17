@@ -2,11 +2,12 @@ export const APPLICATION_LIMITS = Object.freeze({
   full_name: 120,
   email: 320,
   phone: 40,
+  gender_self_description: 120,
+  pronouns: 80,
   school: 160,
   grade: 32,
   dietary_restrictions: 500,
   why_attend: 2000,
-  project_idea: 2000,
   heard_from: 120,
   emergency_contact_name: 120,
   emergency_contact_phone: 40,
@@ -24,9 +25,6 @@ export function validateApplicationStep(formData, step) {
     else if (value('full_name').length > APPLICATION_LIMITS.full_name) errors.full_name = 'Name is too long';
     if (!value('email')) errors.email = 'Email is required';
     else if (!EMAIL_PATTERN.test(value('email'))) errors.email = 'Enter a valid email address';
-    const age = Number(value('age'));
-    if (!value('age')) errors.age = 'Age is required';
-    else if (!Number.isInteger(age) || age < 5 || age > 120) errors.age = 'Enter a valid age';
     if (value('phone').length > APPLICATION_LIMITS.phone) errors.phone = 'Phone number is too long';
   }
 
@@ -41,10 +39,31 @@ export function validateApplicationStep(formData, step) {
     if (!value('why_attend')) errors.why_attend = 'Please tell us why you want to attend';
     else if (value('why_attend').length < 10) errors.why_attend = 'Please provide at least 10 characters';
     else if (value('why_attend').length > APPLICATION_LIMITS.why_attend) errors.why_attend = 'Answer is too long';
-    if (value('project_idea').length > APPLICATION_LIMITS.project_idea) errors.project_idea = 'Answer is too long';
   }
 
   if (step === 4) {
+    const age = Number(value('age'));
+    if (!value('age')) errors.age = 'Age is required';
+    else if (!Number.isInteger(age) || age < 5 || age > 120) errors.age = 'Enter a valid age';
+    if (
+      formData.gender_identity === 'self_describe'
+      && !value('gender_self_description')
+    ) {
+      errors.gender_self_description = 'Please describe your gender identity';
+    }
+    if (value('gender_self_description').length > APPLICATION_LIMITS.gender_self_description) {
+      errors.gender_self_description = 'Answer is too long';
+    }
+    if (value('pronouns').length > APPLICATION_LIMITS.pronouns) {
+      errors.pronouns = 'Pronouns are too long';
+    }
+    const raceValues = Array.isArray(formData.race_ethnicity) ? formData.race_ethnicity : [];
+    if (raceValues.includes('prefer_not_to_say') && raceValues.length > 1) {
+      errors.race_ethnicity = '“Prefer not to answer” cannot be combined with other choices';
+    }
+  }
+
+  if (step === 5) {
     const emergencyName = value('emergency_contact_name');
     const emergencyPhone = value('emergency_contact_phone');
     if (emergencyName && !emergencyPhone) errors.emergency_contact_phone = 'Add a phone number for this contact';

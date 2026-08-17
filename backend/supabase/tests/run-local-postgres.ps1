@@ -37,9 +37,11 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -c $legacyApplicant
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260807_application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260810_application_security_and_indexes.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260807_application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260810_application_security_and_indexes.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
 
   Write-Host 'Fresh schema, legacy migration, database behavior, and migration idempotency tests passed.'
 }

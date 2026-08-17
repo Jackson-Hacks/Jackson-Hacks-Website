@@ -33,8 +33,11 @@ Direct visits to `/Register` and `/Dashboard` require the host’s SPA fallback 
 - One application is allowed per user and event cycle.
 - Applicants save through `save_application`; direct INSERT/UPDATE permissions are revoked.
 - The database clock and application-cycle row enforce opening and closing times.
-- Applicant edits never modify an administrative review status.
-- Admin decisions use `set_application_status` and create audit events.
+- The form has one scored long-answer response plus a demographic survey; demographic answers are hidden in blind review mode.
+- Reviewers score five 0–10 categories for a total out of 50, with one scorecard per reviewer and application.
+- Random review mode selects an application the current reviewer has not scored and excludes the reviewer's own application.
+- Scoring opens only after submissions close. If submissions are reopened and an applicant edits, prior scorecards for that application are invalidated.
+- Legacy administrative statuses remain available for applicant communication, but they are separate from reviewer scoring.
 - CSV exports contain a reduced column set, neutralize spreadsheet formulas, and create an export audit event.
 
 Dashboard is intentionally public at present for UI testing. Database RLS still prevents logged-out visitors from reading applicant data. Protect the route before production once the testing exception is removed.

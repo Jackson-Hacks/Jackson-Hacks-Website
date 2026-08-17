@@ -4,12 +4,16 @@ import {
   CheckCircle2,
   Clock,
   Download,
+  Eye,
+  EyeOff,
   FileText,
   Loader2,
   LockKeyhole,
   LogOut,
   Search,
   ShieldCheck,
+  Shuffle,
+  Star,
   Unlock,
   Users,
   Zap,
@@ -37,30 +41,45 @@ import {
   getApplicationWindowState,
 } from "@/lib/applicationWindow";
 import {
-  APPLICATION_STATUSES,
   getApplicationStatusDetails,
 } from "@/lib/applicationStatus";
+import {
+  formatFirstGeneration,
+  formatGenderIdentity,
+  formatRaceEthnicity,
+} from "@/lib/applicationDemographics";
+import {
+  EMPTY_REVIEW_SCORES,
+  getAnonymousApplicantLabel,
+  getReviewTotal,
+  REVIEW_CATEGORIES,
+  scoresFromReview,
+  summarizeReviews,
+  validateReviewScores,
+} from "@/lib/applicationReview";
 import { createCsv } from "@/lib/csv";
 import { supabase } from "@/lib/supabaseClient";
 
 const PAGE_SIZE = 10;
-const decisionStatuses = APPLICATION_STATUSES.filter(
-  (status) => status !== "withdrawn",
-);
-const detailFields = [
-  ["Email", "email"],
-  ["Phone", "phone"],
-  ["Age", "age"],
-  ["School", "school"],
-  ["Grade", "grade"],
-  ["Experience", "experience_level"],
-  ["T-shirt", "tshirt_size"],
-  ["Dietary information", "dietary_restrictions"],
-  ["Why attend", "why_attend"],
-  ["Project idea", "project_idea"],
-  ["Heard from", "heard_from"],
-  ["Emergency contact", "emergency_contact_name"],
-  ["Emergency phone", "emergency_contact_phone"],
+const reviewDetailFields = [
+  { label: "School", value: (application) => application.school },
+  { label: "Grade", value: (application) => application.grade },
+  { label: "Coding experience", value: (application) => application.experience_level },
+  { label: "Application response", value: (application) => application.why_attend },
+];
+const identityDetailFields = [
+  { label: "Email", value: (application) => application.email },
+  { label: "Phone", value: (application) => application.phone },
+  { label: "Age", value: (application) => application.age },
+  { label: "Gender", value: (application) => formatGenderIdentity(application.gender_identity, application.gender_self_description) },
+  { label: "Pronouns", value: (application) => application.pronouns },
+  { label: "Race / ethnicity", value: (application) => formatRaceEthnicity(application.race_ethnicity) },
+  { label: "First-generation student", value: (application) => formatFirstGeneration(application.first_generation) },
+  { label: "T-shirt", value: (application) => application.tshirt_size },
+  { label: "Dietary information", value: (application) => application.dietary_restrictions },
+  { label: "Heard from", value: (application) => application.heard_from },
+  { label: "Emergency contact", value: (application) => application.emergency_contact_name },
+  { label: "Emergency phone", value: (application) => application.emergency_contact_phone },
 ];
 
 const csvColumns = [
@@ -100,6 +119,7 @@ export default function Dashboard() {
   const [application, setApplication] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminApplications, setAdminApplications] = useState([]);
+  const [adminReviews, setAdminReviews] = useState([]);
   const [adminError, setAdminError] = useState(null);
   const [applicationCycle, setApplicationCycle] = useState(null);
   const [windowError, setWindowError] = useState(null);
@@ -107,13 +127,16 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(getCountdown);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [reviewFilter, setReviewFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [statusHistory, setStatusHistory] = useState([]);
-  const [decisionStatus, setDecisionStatus] = useState("under_review");
-  const [decisionNote, setDecisionNote] = useState("");
-  const [isSavingDecision, setIsSavingDecision] = useState(false);
+  const [blindReview, setBlindReview] = useState(true);
+  const [randomReviewMode, setRandomReviewMode] = useState(false);
+  const [reviewScores, setReviewScores] = useState({ ...EMPTY_REVIEW_SCORES });
+  const [reviewErrors, setReviewErrors] = useState({});
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [isSavingReview, setIsSavingReview] = useState(false);
+  const [isLoadingRandom, setIsLoadingRandom] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
@@ -153,14 +176,22 @@ export default function Dashboard() {
         const hasAdminAccess = Boolean(adminRows?.length);
         setIsAdmin(hasAdminAccess);
         if (hasAdminAccess) {
-          const { data: applications, error: applicationsError } =
-            await supabase
+          const [applicationsResult, reviewsResult] = await Promise.all([
+            supabase
               .from("applications")
               .select("*")
               .eq("cycle_id", cycle.id)
-              .order("submitted_at", { ascending: false });
-          if (applicationsError) throw applicationsError;
-          setAdminApplications(applications || []);
+              .order("submitted_at", { ascending: false }),
+            supabase.from("application_reviews").select("*"),
+          ]);
+          if (applicationsResult.error) throw applicationsResult.error;
+          if (reviewsResult.error) throw reviewsResult.error;
+          const applications = applicationsResult.data || [];
+          const applicationIds = new Set(applications.map((item) => item.id));
+          setAdminApplications(applications);
+          setAdminReviews(
+            (reviewsResult.data || []).filter((review) => applicationIds.has(review.application_id)),
+          );
         }
       } catch (error) {
         console.error("Error loading dashboard:", error);
@@ -189,21 +220,38 @@ export default function Dashboard() {
 
   const applicationWindow = getApplicationWindowState(applicationCycle);
   const statusDetails = getApplicationStatusDetails(application?.status);
+  const reviewsByApplication = useMemo(() => {
+    const grouped = new Map();
+    adminReviews.forEach((review) => {
+      const reviews = grouped.get(review.application_id) || [];
+      reviews.push(review);
+      grouped.set(review.application_id, reviews);
+    });
+    return grouped;
+  }, [adminReviews]);
   const filteredApplications = useMemo(() => {
     const query = search.trim().toLowerCase();
     return adminApplications.filter((item) => {
-      const matchesStatus =
-        statusFilter === "all" || item.status === statusFilter;
+      const myReview = (reviewsByApplication.get(item.id) || []).find(
+        (review) => review.reviewer_id === user?.id,
+      );
+      const matchesReview =
+        reviewFilter === "all"
+        || (reviewFilter === "rated" && myReview)
+        || (reviewFilter === "unrated" && !myReview);
+      const searchableValues = blindReview
+        ? [item.school, item.grade, item.experience_level]
+        : [item.full_name, item.email, item.school, item.grade, item.experience_level];
       const matchesSearch =
         !query ||
-        [item.full_name, item.email, item.school, item.grade].some((value) =>
+        searchableValues.some((value) =>
           String(value || "")
             .toLowerCase()
             .includes(query),
         );
-      return matchesStatus && matchesSearch;
+      return matchesReview && matchesSearch;
     });
-  }, [adminApplications, search, statusFilter]);
+  }, [adminApplications, blindReview, reviewFilter, reviewsByApplication, search, user?.id]);
   const pageCount = Math.max(
     1,
     Math.ceil(filteredApplications.length / PAGE_SIZE),
@@ -213,7 +261,7 @@ export default function Dashboard() {
     page * PAGE_SIZE,
   );
 
-  useEffect(() => setPage(1), [search, statusFilter]);
+  useEffect(() => setPage(1), [search, reviewFilter, blindReview]);
 
   const handleLogout = async () => {
     await logout(false);
@@ -242,57 +290,92 @@ export default function Dashboard() {
     }
   };
 
-  const openApplication = async (item) => {
+  const openApplication = (item) => {
     setSelectedApplication(item);
-    setDecisionStatus(
-      item.status === "submitted" ? "under_review" : item.status,
+    const existingReview = (reviewsByApplication.get(item.id) || []).find(
+      (review) => review.reviewer_id === user?.id,
     );
-    setDecisionNote("");
-    const { data, error } = await supabase
-      .from("application_status_events")
-      .select("*")
-      .eq("application_id", item.id)
-      .order("created_at", { ascending: false });
-    if (error) {
-      setAdminError("Status history could not be loaded.");
-      setStatusHistory([]);
-    } else {
-      setStatusHistory(data || []);
+    setReviewScores(scoresFromReview(existingReview));
+    setReviewNotes(existingReview?.internal_notes || "");
+    setReviewErrors({});
+  };
+
+  const openRandomUnreviewed = async () => {
+    if (!applicationCycle || applicationWindow.canEdit) return false;
+    setIsLoadingRandom(true);
+    setAdminError(null);
+    try {
+      const { data, error } = await supabase.rpc(
+        "get_random_unreviewed_application",
+        { p_cycle_id: applicationCycle.id },
+      );
+      if (error) throw error;
+      const randomApplication = Array.isArray(data) ? data[0] : data;
+      if (!randomApplication) {
+        setAdminError("You have rated every available application.");
+        setRandomReviewMode(false);
+        return false;
+      }
+      openApplication(randomApplication);
+      return true;
+    } catch (error) {
+      console.error("Error loading a random application:", error);
+      setAdminError("A random unrated application could not be loaded.");
+      setRandomReviewMode(false);
+      return false;
+    } finally {
+      setIsLoadingRandom(false);
     }
   };
 
-  const saveDecision = async () => {
-    if (!selectedApplication || applicationWindow.canEdit) return;
-    const label = getApplicationStatusDetails(decisionStatus).label;
-    if (
-      !window.confirm(
-        `Change ${selectedApplication.full_name}'s application to “${label}”?`,
-      )
-    )
+  const toggleRandomReviewMode = async () => {
+    if (randomReviewMode) {
+      setRandomReviewMode(false);
       return;
-    setIsSavingDecision(true);
+    }
+    setRandomReviewMode(true);
+    await openRandomUnreviewed();
+  };
+
+  const updateReviewScore = (key, value) => {
+    setReviewScores((scores) => ({ ...scores, [key]: value }));
+    setReviewErrors((errors) => ({ ...errors, [key]: null }));
+  };
+
+  const saveReview = async () => {
+    if (!selectedApplication || applicationWindow.canEdit) return;
+    const errors = validateReviewScores(reviewScores);
+    setReviewErrors(errors);
+    if (Object.keys(errors).length) return;
+    setIsSavingReview(true);
     setAdminError(null);
     try {
-      const { data, error } = await supabase.rpc("set_application_status", {
+      const { data, error } = await supabase.rpc("save_application_review", {
         p_application_id: selectedApplication.id,
-        p_status: decisionStatus,
-        p_note: decisionNote.trim() || null,
+        p_scores: Object.fromEntries(
+          Object.entries(reviewScores).map(([key, value]) => [key, Number(value)]),
+        ),
+        p_internal_notes: reviewNotes.trim() || null,
       });
       if (error) throw error;
-      const saved = Array.isArray(data) ? data[0] : data;
-      setSelectedApplication(saved);
-      setAdminApplications((items) =>
-        items.map((item) => (item.id === saved.id ? saved : item)),
+      const savedReview = Array.isArray(data) ? data[0] : data;
+      setAdminReviews((reviews) =>
+        reviews.some((review) => review.id === savedReview.id)
+          ? reviews.map((review) => (review.id === savedReview.id ? savedReview : review))
+          : [...reviews, savedReview],
       );
-      if (application?.id === saved.id) setApplication(saved);
-      await openApplication(saved);
+      if (randomReviewMode) {
+        await openRandomUnreviewed();
+      }
     } catch (error) {
-      console.error("Error saving decision:", error);
+      console.error("Error saving application review:", error);
       setAdminError(
-        "The decision could not be saved. Confirm submissions are closed and try again.",
+        error?.message?.includes("cannot_review_own_application")
+          ? "You cannot rate your own application."
+          : "The review could not be saved. Confirm submissions are closed and try again.",
       );
     } finally {
-      setIsSavingDecision(false);
+      setIsSavingReview(false);
     }
   };
 
@@ -477,23 +560,41 @@ export default function Dashboard() {
                   <Users className="text-[#F68A42]" /> Applicant Admin
                 </h2>
                 <p className="mt-2 text-sm text-[#B4BAC0]">
-                  Search and review one application at a time. Exports exclude
-                  essays, dietary details, phone numbers, and emergency
-                  contacts.
+                  Score applications across five categories for a total of 50.
+                  Blind review hides identity and demographic information.
                 </p>
               </div>
-              <Button
-                onClick={downloadApplicantCsv}
-                disabled={!filteredApplications.length || isExporting}
-                className="bg-[#F68A42] text-white hover:bg-[#E06E0A]"
-              >
-                {isExporting ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <Download />
-                )}{" "}
-                Export filtered CSV
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-pressed={blindReview}
+                  onClick={() => setBlindReview((value) => !value)}
+                  className="border-white/15 bg-transparent text-white hover:bg-white/10"
+                >
+                  {blindReview ? <EyeOff /> : <Eye />}
+                  {blindReview ? "Blind review on" : "Identities visible"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-pressed={randomReviewMode}
+                  onClick={toggleRandomReviewMode}
+                  disabled={applicationWindow.canEdit || isLoadingRandom}
+                  className="border-[#2072C7]/40 bg-[#2072C7]/10 text-[#9CC4EA] hover:bg-[#2072C7]/20"
+                >
+                  {isLoadingRandom ? <Loader2 className="animate-spin" /> : <Shuffle />}
+                  {randomReviewMode ? "Stop random mode" : "Start random review"}
+                </Button>
+                <Button
+                  onClick={downloadApplicantCsv}
+                  disabled={!filteredApplications.length || isExporting}
+                  className="bg-[#F68A42] text-white hover:bg-[#E06E0A]"
+                >
+                  {isExporting ? <Loader2 className="animate-spin" /> : <Download />}{" "}
+                  Export filtered CSV
+                </Button>
+              </div>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_220px]">
               <Label className="relative">
@@ -502,24 +603,21 @@ export default function Dashboard() {
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search name, email, school, or grade"
+                  placeholder={blindReview ? "Search school, grade, or experience" : "Search name, email, school, or grade"}
                   className="border-white/10 bg-white/5 pl-10 text-white"
                 />
               </Label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={reviewFilter} onValueChange={setReviewFilter}>
                 <SelectTrigger
-                  aria-label="Filter by status"
+                  aria-label="Filter by my review status"
                   className="border-white/10 bg-white/5 text-white"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All statuses</SelectItem>
-                  {APPLICATION_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {getApplicationStatusDetails(status).label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">All applications</SelectItem>
+                  <SelectItem value="unrated">Unrated by me</SelectItem>
+                  <SelectItem value="rated">Rated by me</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -532,12 +630,13 @@ export default function Dashboard() {
               </p>
             )}
             <div className="mt-5 overflow-x-auto rounded-xl border border-white/10">
-              <table className="w-full min-w-[700px] text-left text-sm">
+              <table className="w-full min-w-[820px] text-left text-sm">
                 <thead className="bg-white/5 text-[#B4BAC0]">
                   <tr>
                     <th className="p-3">Applicant</th>
                     <th className="p-3">School</th>
-                    <th className="p-3">Status</th>
+                    <th className="p-3">My score</th>
+                    <th className="p-3">Average</th>
                     <th className="p-3">Submitted</th>
                     <th className="p-3">
                       <span className="sr-only">Action</span>
@@ -545,15 +644,19 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleApplications.map((item) => (
+                  {visibleApplications.map((item) => {
+                    const reviews = reviewsByApplication.get(item.id) || [];
+                    const myReview = reviews.find((review) => review.reviewer_id === user?.id);
+                    const summary = summarizeReviews(reviews);
+                    return (
                     <tr key={item.id} className="border-t border-white/10">
                       <td className="p-3">
                         <span className="block font-semibold">
-                          {item.full_name}
+                          {blindReview ? getAnonymousApplicantLabel(item) : item.full_name}
                         </span>
-                        <span className="text-xs text-[#8A9199]">
-                          {item.email}
-                        </span>
+                        {!blindReview && (
+                          <span className="text-xs text-[#8A9199]">{item.email}</span>
+                        )}
                       </td>
                       <td className="p-3">
                         {item.school}
@@ -562,9 +665,12 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="p-3">
-                        <Badge className="bg-[#2072C7]/15 text-[#9CC4EA]">
-                          {getApplicationStatusDetails(item.status).label}
-                        </Badge>
+                        {myReview ? `${myReview.total_score} / 50` : "Unrated"}
+                      </td>
+                      <td className="p-3">
+                        {summary.average === null
+                          ? "—"
+                          : `${summary.average} / 50 (${summary.count})`}
                       </td>
                       <td className="p-3 text-[#B4BAC0]">
                         {new Date(
@@ -576,17 +682,19 @@ export default function Dashboard() {
                           type="button"
                           variant="outline"
                           onClick={() => openApplication(item)}
+                          disabled={item.user_id === user?.id}
                           className="border-white/15 bg-transparent text-white hover:bg-white/10"
                         >
-                          Review
+                          {item.user_id === user?.id ? "Your application" : myReview ? "Edit score" : "Review"}
                         </Button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                   {!visibleApplications.length && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="p-6 text-center text-[#B4BAC0]"
                       >
                         No matching applications.
@@ -637,14 +745,13 @@ export default function Dashboard() {
                       id="application-review-title"
                       className="font-title text-2xl"
                     >
-                      {selectedApplication.full_name}
+                      {blindReview
+                        ? getAnonymousApplicantLabel(selectedApplication)
+                        : selectedApplication.full_name}
                     </h3>
                     <p className="mt-1 text-sm text-[#B4BAC0]">
-                      Revision {selectedApplication.revision_number || 1} ·{" "}
-                      {
-                        getApplicationStatusDetails(selectedApplication.status)
-                          .label
-                      }
+                      Revision {selectedApplication.revision_number || 1} · {" "}
+                      {summarizeReviews(reviewsByApplication.get(selectedApplication.id) || []).count} review(s)
                     </p>
                   </div>
                   <Button
@@ -657,108 +764,100 @@ export default function Dashboard() {
                   </Button>
                 </div>
                 <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {detailFields.map(([label, key]) => (
+                  {reviewDetailFields.map(({ label, value }) => (
                     <div
-                      key={key}
-                      className="rounded-lg border border-white/10 p-3"
+                      key={label}
+                      className={`rounded-lg border border-white/10 p-3 ${label === "Application response" ? "sm:col-span-2" : ""}`}
                     >
                       <dt className="text-xs uppercase tracking-wide text-[#8A9199]">
                         {label}
                       </dt>
                       <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
-                        {selectedApplication[key] || "—"}
+                        {value(selectedApplication) || "—"}
+                      </dd>
+                    </div>
+                  ))}
+                  {!blindReview && identityDetailFields.map(({ label, value }) => (
+                    <div key={label} className="rounded-lg border border-white/10 p-3">
+                      <dt className="text-xs uppercase tracking-wide text-[#8A9199]">{label}</dt>
+                      <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
+                        {value(selectedApplication) || "—"}
                       </dd>
                     </div>
                   ))}
                 </dl>
+                {blindReview && (
+                  <p className="mt-3 flex items-center gap-2 text-xs text-[#8A9199]">
+                    <EyeOff size={14} /> Name, contact details, age, and demographic survey answers are hidden.
+                  </p>
+                )}
                 <div className="mt-6 border-t border-white/10 pt-5">
-                  <h4 className="font-semibold">Decision</h4>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h4 className="flex items-center gap-2 font-semibold"><Star className="text-[#F68A42]" /> Review rubric</h4>
+                      <p className="mt-1 text-sm text-[#8A9199]">Five categories worth 10 points each.</p>
+                    </div>
+                    <div className="rounded-lg bg-[#2072C7]/15 px-4 py-2 text-lg font-semibold text-[#9CC4EA]">
+                      {getReviewTotal(reviewScores) ?? "—"} / 50
+                    </div>
+                  </div>
                   {applicationWindow.canEdit ? (
                     <p className="mt-2 text-sm text-amber-300">
-                      Close submissions before changing review decisions.
+                      Close submissions before reviewers can score applications.
                     </p>
                   ) : (
-                    <div className="mt-3 grid gap-3">
-                      <Select
-                        value={decisionStatus}
-                        onValueChange={setDecisionStatus}
-                      >
-                        <SelectTrigger
-                          aria-label="New decision status"
-                          className="border-white/10 bg-white/5 text-white"
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {decisionStatuses.map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {getApplicationStatusDetails(status).label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Label
-                        htmlFor="decision-note"
-                        className="text-sm text-[#B4BAC0]"
-                      >
-                        Internal audit note (optional)
+                    <div className="mt-4 space-y-4">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {REVIEW_CATEGORIES.map((category) => (
+                          <div key={category.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <Label htmlFor={`score-${category.key}`} className="font-semibold text-white">
+                                  {category.label}
+                                </Label>
+                                <p className="mt-1 text-xs text-[#8A9199]">{category.description}</p>
+                              </div>
+                              <Input
+                                id={`score-${category.key}`}
+                                type="number"
+                                min="0"
+                                max="10"
+                                step="1"
+                                value={reviewScores[category.key]}
+                                onChange={(event) => updateReviewScore(category.key, event.target.value)}
+                                aria-invalid={Boolean(reviewErrors[category.key])}
+                                aria-describedby={reviewErrors[category.key] ? `score-${category.key}-error` : undefined}
+                                className="w-20 border-white/10 bg-white/5 text-center text-white"
+                              />
+                            </div>
+                            {reviewErrors[category.key] && (
+                              <p id={`score-${category.key}-error`} className="mt-2 text-xs text-red-400">
+                                {reviewErrors[category.key]}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <Label htmlFor="review-notes" className="text-sm text-[#B4BAC0]">
+                        Internal reviewer notes (optional)
                       </Label>
                       <Textarea
-                        id="decision-note"
-                        value={decisionNote}
-                        maxLength={1000}
-                        onChange={(event) =>
-                          setDecisionNote(event.target.value)
-                        }
+                        id="review-notes"
+                        value={reviewNotes}
+                        maxLength={2000}
+                        onChange={(event) => setReviewNotes(event.target.value)}
                         className="border-white/10 bg-white/5 text-white"
                       />
                       <Button
                         type="button"
-                        onClick={saveDecision}
-                        disabled={isSavingDecision}
+                        onClick={saveReview}
+                        disabled={isSavingReview}
                         className="bg-[#2072C7] text-white hover:bg-[#084F9A]"
                       >
-                        {isSavingDecision && (
-                          <Loader2 className="animate-spin" />
-                        )}{" "}
-                        Save decision
+                        {isSavingReview && <Loader2 className="animate-spin" />} {" "}
+                        {randomReviewMode ? "Save & review another" : "Save review"}
                       </Button>
                     </div>
-                  )}
-                </div>
-                <div className="mt-6 border-t border-white/10 pt-5">
-                  <h4 className="font-semibold">Decision history</h4>
-                  {statusHistory.length ? (
-                    <ol className="mt-3 space-y-3">
-                      {statusHistory.map((event) => (
-                        <li
-                          key={event.id}
-                          className="rounded-lg border border-white/10 p-3 text-sm"
-                        >
-                          <span className="font-semibold">
-                            {
-                              getApplicationStatusDetails(event.previous_status)
-                                .label
-                            }{" "}
-                            →{" "}
-                            {
-                              getApplicationStatusDetails(event.new_status)
-                                .label
-                            }
-                          </span>
-                          <span className="ml-2 text-[#8A9199]">
-                            {new Date(event.created_at).toLocaleString()}
-                          </span>
-                          {event.note && (
-                            <p className="mt-1 text-[#B4BAC0]">{event.note}</p>
-                          )}
-                        </li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <p className="mt-2 text-sm text-[#8A9199]">
-                      No decision changes recorded.
-                    </p>
                   )}
                 </div>
               </section>
