@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -270,8 +271,6 @@ export default function ApplicationForm({
                   <SelectItem value="10">Grade 10</SelectItem>
                   <SelectItem value="11">Grade 11</SelectItem>
                   <SelectItem value="12">Grade 12</SelectItem>
-                  <SelectItem value="university">University</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               {errors.grade && <p id="grade-error" className="text-red-400 text-sm mt-1">{errors.grade}</p>}
@@ -357,9 +356,12 @@ export default function ApplicationForm({
               <h3 className="font-semibold text-white">Demographic survey</h3>
               <p className="mt-1 text-sm text-[#B4BAC0]">
                 Age is required for eligibility. The other answers are optional and help us
-                understand who we are reaching. Reviewers can hide identifying and demographic
-                information while scoring applications.
+                understand who we are reaching. Optional demographic answers are not used for
+                admission scoring and are not shown to reviewers.
               </p>
+              <Link to="/privacy" target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-[#9CC4EA] underline hover:text-white">
+                Read the Privacy Notice
+              </Link>
             </div>
 
             <div>
@@ -577,12 +579,19 @@ export default function ApplicationForm({
                   onCheckedChange={(checked) => updateField('agree_to_terms', checked)}
                   className="mt-1 border-[#2072C7] data-[state=checked]:bg-[#084F9A]"
                 />
-                <Label htmlFor="agree_to_terms" className="text-gray-300 text-sm leading-relaxed cursor-pointer">
-                  I agree to the{' '}
-                  application declaration. I confirm that the information I provided is accurate and
-                  understand that my application will be reviewed and that I may be contacted by email.
-                  <span className="text-red-400"> *</span>
-                </Label>
+                <div className="text-sm leading-relaxed text-gray-300">
+                  <Label htmlFor="agree_to_terms" className="cursor-pointer text-sm leading-relaxed text-gray-300">
+                    I confirm that my information is accurate, agree to the Terms and Code of Conduct,
+                    and acknowledge the Privacy Notice.<span className="text-red-400"> *</span>
+                  </Label>
+                  <p className="mt-2 text-xs text-[#9CA3AF]">
+                    Review the{' '}
+                    <Link to="/terms" target="_blank" rel="noreferrer" className="text-[#9CC4EA] underline hover:text-white">Terms</Link>,{' '}
+                    <Link to="/code-of-conduct" target="_blank" rel="noreferrer" className="text-[#9CC4EA] underline hover:text-white">Code of Conduct</Link>, and{' '}
+                    <Link to="/privacy" target="_blank" rel="noreferrer" className="text-[#9CC4EA] underline hover:text-white">Privacy Notice</Link>.
+                    Accepted participants must complete a separate waiver before attending.
+                  </p>
+                </div>
               </div>
               {errors.agree_to_terms && (
                 <p id="agree_to_terms-error" className="text-red-400 text-sm mt-2 flex items-center gap-1">

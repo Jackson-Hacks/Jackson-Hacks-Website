@@ -45,11 +45,6 @@ import {
   getApplicationStatusDetails,
 } from "@/lib/applicationStatus";
 import {
-  formatFirstGeneration,
-  formatGenderIdentity,
-  formatRaceEthnicity,
-} from "@/lib/applicationDemographics";
-import {
   EMPTY_REVIEW_SCORES,
   getAnonymousApplicantLabel,
   getReviewTotal,
@@ -65,19 +60,11 @@ const PAGE_SIZE = 10;
 const applicantDetailFields = [
   { label: "Email", value: (application) => application.email, sensitive: true },
   { label: "Phone", value: (application) => application.phone, sensitive: true },
-  { label: "Age", value: (application) => application.age, sensitive: true },
   { label: "School", value: (application) => application.school },
   { label: "Grade", value: (application) => application.grade },
   { label: "Coding experience", value: (application) => application.experience_level },
-  { label: "Gender", value: (application) => formatGenderIdentity(application.gender_identity, application.gender_self_description), sensitive: true },
-  { label: "Pronouns", value: (application) => application.pronouns, sensitive: true },
-  { label: "Race / ethnicity", value: (application) => formatRaceEthnicity(application.race_ethnicity), sensitive: true },
-  { label: "First-generation student", value: (application) => formatFirstGeneration(application.first_generation), sensitive: true },
   { label: "T-shirt size", value: (application) => application.tshirt_size },
-  { label: "Dietary information", value: (application) => application.dietary_restrictions, sensitive: true },
   { label: "Heard from", value: (application) => application.heard_from },
-  { label: "Emergency contact", value: (application) => application.emergency_contact_name, sensitive: true },
-  { label: "Emergency phone", value: (application) => application.emergency_contact_phone, sensitive: true },
   { label: "Submitted", value: (application) => new Date(application.submitted_at || application.created_at).toLocaleString() },
   { label: "Revision", value: (application) => application.revision_number || 1 },
 ];
@@ -584,7 +571,7 @@ export default function Dashboard() {
                 </h2>
                 <p className="mt-2 text-sm text-[#B4BAC0]">
                   Score applications across five categories for a total of 25.
-                  Blind review hides identity and demographic information.
+                  Optional demographic answers are excluded from the review screen. Blind review also hides identity.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -817,7 +804,7 @@ export default function Dashboard() {
                       </h4>
                       {blindReview && (
                         <p className="mt-2 flex items-center gap-2 text-xs text-[#8A9199]">
-                          <EyeOff size={14} /> Personal and demographic details are hidden.
+                          <EyeOff size={14} /> Identity details are hidden. Demographics are always excluded.
                         </p>
                       )}
                       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">

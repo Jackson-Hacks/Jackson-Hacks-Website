@@ -32,6 +32,7 @@ export function validateApplicationStep(formData, step) {
     if (!value('school')) errors.school = 'School is required';
     else if (value('school').length > APPLICATION_LIMITS.school) errors.school = 'School name is too long';
     if (!value('grade')) errors.grade = 'Grade is required';
+    else if (!['9', '10', '11', '12'].includes(value('grade'))) errors.grade = 'Applicants must be in Grade 9 to 12';
     if (!value('experience_level')) errors.experience_level = 'Experience level is required';
   }
 
@@ -69,7 +70,7 @@ export function validateApplicationStep(formData, step) {
     if (emergencyName && !emergencyPhone) errors.emergency_contact_phone = 'Add a phone number for this contact';
     if (emergencyPhone && !emergencyName) errors.emergency_contact_name = 'Add a name for this contact';
     if (value('dietary_restrictions').length > APPLICATION_LIMITS.dietary_restrictions) errors.dietary_restrictions = 'Answer is too long';
-    if (!formData.agree_to_terms) errors.agree_to_terms = 'You must confirm the application declaration';
+    if (!formData.agree_to_terms) errors.agree_to_terms = 'You must accept the Terms and Code of Conduct and acknowledge the Privacy Notice';
   }
 
   return errors;

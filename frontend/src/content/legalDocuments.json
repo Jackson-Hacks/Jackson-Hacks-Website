@@ -1,0 +1,517 @@
+{
+  "version": "2026-08-19",
+  "lastUpdated": "August 19, 2026",
+  "documents": [
+    {
+      "slug": "terms",
+      "navLabel": "Terms",
+      "title": "Terms and Conditions",
+      "summary": "Rules for using the Jackson Hacks website, applying to the event, and participating in Jackson Hacks 2026.",
+      "pdf": "/documents/jackson-hacks-terms-and-conditions.pdf",
+      "sections": [
+        {
+          "heading": "1. About Jackson Hacks",
+          "paragraphs": [
+            "Jackson Hacks is a student club operating through A. Y. Jackson Secondary School and subject to applicable school and Toronto District School Board policies. These Terms apply to the Jackson Hacks website, accounts, applications, project submissions, judging, and the in-person event scheduled for November 21, 2026 from 8:00 a.m. to 10:00 p.m. Eastern Time at A. Y. Jackson Secondary School, 50 Francine Drive, North York, Ontario.",
+            "In these Terms, Event means Jackson Hacks 2026 and its related activities. Organizers means the authorized Jackson Hacks student organizers and supervising personnel acting for the Event."
+          ]
+        },
+        {
+          "heading": "2. Acceptance",
+          "paragraphs": [
+            "By creating an account, submitting an application, submitting a project, or attending the Event, you agree to these Terms and the Code of Conduct and acknowledge the Privacy Notice. If you are under 18, a parent or legal guardian must also complete the required participant waiver before you may attend.",
+            "The application checkbox does not replace the participant waiver, guardian permission, media release, or any school-required form."
+          ]
+        },
+        {
+          "heading": "3. Eligibility",
+          "paragraphs": [
+            "Applicants must be currently enrolled in Grade 9, 10, 11, or 12, or an equivalent high-school program, when the Event takes place. Applicants may live anywhere, but they are responsible for confirming that they can lawfully travel to and attend the Event in Toronto.",
+            "The Event is free to attend. No purchase or payment is required to apply, participate, or be eligible for a prize. Applicants must provide accurate information and may be asked to confirm their identity, age, school enrollment, eligibility, or guardian permission."
+          ]
+        },
+        {
+          "heading": "4. Accounts and applications",
+          "paragraphs": [
+            "Each person may use one account and submit one application for the Event cycle unless an Organizer gives written permission otherwise. Account credentials may not be shared, and applicants must promptly report suspected unauthorized access.",
+            "Submitting an application does not guarantee admission. Decisions may consider eligibility, application scoring, capacity, safety, conflicts of interest, and whether information is accurate. Applicants may edit their submission until applications are closed by the Organizers. If applications are reopened and an applicant edits a previously reviewed submission, prior reviews may be invalidated."
+          ]
+        },
+        {
+          "heading": "5. Demographic survey and application review",
+          "paragraphs": [
+            "Age is required to assess eligibility. Other demographic questions, including gender identity, pronouns, race or ethnicity, and first-generation status, are optional. Optional demographic answers are not used to calculate application scores or make admission decisions and are not displayed to reviewers while they score applications.",
+            "Authorized administrators may access demographic information only for the purposes described in the Privacy Notice, including aggregate inclusion and outreach reporting. Internal scores, reviewer notes, deliberations, and reviewer identities are confidential. Application decisions are final except where the Organizers identify a material technical error, conflict of interest, eligibility issue, or procedural problem."
+          ]
+        },
+        {
+          "heading": "6. Communications",
+          "paragraphs": [
+            "Jackson Hacks may send account-security, application, consent, attendance, schedule, safety, judging, and prize messages to the contact information provided. Applicants are responsible for monitoring their email and responding by stated deadlines. Applying does not subscribe a person to unrelated marketing messages."
+          ]
+        },
+        {
+          "heading": "7. Participants under 18",
+          "paragraphs": [
+            "A participant under 18 must provide a completed parent or guardian waiver before attending. Separate school-required permission, emergency, medical, dismissal, or media forms may also apply. Admission may be conditional and may be cancelled if required forms are not submitted by the stated deadline."
+          ]
+        },
+        {
+          "heading": "8. Attendance, departure, and transportation",
+          "paragraphs": [
+            "Jackson Hacks does not provide transportation, accommodation, or travel documents. Participants are responsible for arriving and departing safely and for their own travel costs.",
+            "Participants may leave before the Event ends. Participants under 18 must sign out. A minor may leave unaccompanied only if advance parent or guardian permission authorizes it. Re-entry is subject to venue and security rules."
+          ]
+        },
+        {
+          "heading": "9. Safety, food, and personal property",
+          "paragraphs": [
+            "Participants must follow venue rules and all reasonable safety directions. Jackson Hacks does not provide a hardware hub, soldering equipment, or transportation. Unsafe equipment, open flames, weapons, alcohol, illegal drugs, and activities that create unreasonable risk are prohibited.",
+            "Food may be provided by third-party vendors. The Organizers will make reasonable efforts to communicate known ingredients and dietary options but cannot guarantee an allergen-free environment or prevent cross-contact. Participants with allergies or medical needs are responsible for taking appropriate precautions and carrying necessary medication.",
+            "Participants are responsible for their devices and belongings. Lost, stolen, or damaged property should be reported promptly, but recovery is not guaranteed."
+          ]
+        },
+        {
+          "heading": "10. Conduct",
+          "paragraphs": [
+            "All applicants, participants, volunteers, mentors, judges, sponsors, and guests must follow the Jackson Hacks Code of Conduct. Harassment, discrimination, bullying, retaliation, violence, deliberate disruption, academic dishonesty, and unauthorized access to systems or information are prohibited.",
+            "The Organizers may warn, restrict, remove, disqualify, or report a person when reasonably necessary to protect safety, fairness, property, or the Event."
+          ]
+        },
+        {
+          "heading": "11. Teams and project rules",
+          "paragraphs": [
+            "Projects may be created by one to four participants. Substantive project work must be created during the Event. Pre-event planning, publicly available open-source software, libraries, APIs, datasets, and artificial-intelligence tools may be used if their use is lawful, permitted by applicable licenses, and clearly disclosed to judges.",
+            "Participants must not submit work they do not have the right to use, malicious software, unlawfully obtained data, exposed credentials, or content that violates another person's rights."
+          ]
+        },
+        {
+          "heading": "12. Ownership and permission to evaluate projects",
+          "paragraphs": [
+            "Participants retain ownership of their original work. Team members are responsible for agreeing among themselves about ownership and continued use.",
+            "Each participant grants Jackson Hacks a non-exclusive, royalty-free permission to access, evaluate, display, and demonstrate the submitted project for Event administration, judging, documentation, and Event promotion. This permission does not transfer ownership of the project. Confidential information is shared at the participant's own discretion and should not be included in a public demonstration."
+          ]
+        },
+        {
+          "heading": "13. Judging and prizes",
+          "paragraphs": [
+            "Prizes are governed by the Official Prize Rules published before project submissions open. Those rules will state the number, description, approximate value, currency, eligibility requirements, judging process, and distribution conditions. If these Terms conflict with the Official Prize Rules about prizes, the Official Prize Rules control.",
+            "Judges' decisions are final except where the Organizers identify a calculation error, conflict of interest, eligibility problem, or other material procedural issue."
+          ]
+        },
+        {
+          "heading": "14. Required photography and media permission",
+          "paragraphs": [
+            "The Event will be photographed and recorded. Agreement to the Event's media release is a condition of in-person attendance. Participants may appear in photographs, video, audio, livestreams, interviews, project demonstrations, and other Event documentation used to report on or promote Jackson Hacks, the school community, or future Jackson Hacks events.",
+            "A participant under 18 must have a parent or guardian authorize the media release. The separate participant waiver and media release explains the permitted uses. Project ownership remains with participants."
+          ]
+        },
+        {
+          "heading": "15. Event changes",
+          "paragraphs": [
+            "The Organizers may change the schedule, activities, speakers, judges, sponsors, venue arrangements, capacity, or prize schedule when reasonably necessary. The Event may be postponed, relocated, moved online, shortened, or cancelled because of safety, venue, legal, technical, weather, public-health, or other circumstances outside reasonable control. Reasonable efforts will be made to notify affected participants."
+          ]
+        },
+        {
+          "heading": "16. Privacy and security",
+          "paragraphs": [
+            "Personal information is handled as described in the Privacy Notice. Application information is not public and is limited to authorized people and service providers who need it for the stated purposes.",
+            "Users must not bypass access controls, probe or exploit the website, access another person's information, upload malware, automate account creation, disrupt services, or publicly disclose a suspected vulnerability before giving Jackson Hacks a reasonable opportunity to investigate. Security concerns should be reported privately to ayjacksonhacks@gmail.com."
+          ]
+        },
+        {
+          "heading": "17. Third-party services",
+          "paragraphs": [
+            "The website may use third-party hosting, authentication, database, email, analytics, and other operational services. It may also link to sponsor or partner websites. Third parties have their own terms and privacy practices, and a link or logo does not mean Jackson Hacks controls their services."
+          ]
+        },
+        {
+          "heading": "18. Disclaimers and limitation of liability",
+          "paragraphs": [
+            "Jackson Hacks will take reasonable steps to operate the website and Event safely and reliably but cannot guarantee uninterrupted service, admission, project success, employment opportunities, or receipt of a prize.",
+            "To the maximum extent permitted by law, Jackson Hacks and its Organizers are not responsible for indirect, incidental, special, or consequential losses arising from the website, an application decision, an Event change, or participation. Nothing in these Terms limits a right or responsibility that applicable law does not permit the parties to exclude. In-person risks and required permissions are addressed in the separate participant waiver."
+          ]
+        },
+        {
+          "heading": "19. Suspension and disqualification",
+          "paragraphs": [
+            "An account, application, invitation, participation privilege, project, score, or prize may be suspended or revoked for ineligibility, material misrepresentation, duplicate or fraudulent accounts, unsafe behaviour, cheating, security abuse, or violation of these Terms, the Code of Conduct, school policy, venue rules, or law. When appropriate and practical, the affected person will be given an opportunity to clarify the situation."
+          ]
+        },
+        {
+          "heading": "20. Changes, governing law, and contact",
+          "paragraphs": [
+            "These Terms are governed by the laws of Ontario and the applicable federal laws of Canada. If a provision is unenforceable, the remaining provisions continue to apply.",
+            "Material changes will be posted with an updated version date, and reasonable efforts will be made to notify affected applicants or participants. A later change will not be applied solely to unfairly disqualify an applicant or remove an already-earned prize.",
+            "Questions may be sent to the Jackson Hacks organizing team at ayjacksonhacks@gmail.com."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "privacy",
+      "navLabel": "Privacy",
+      "title": "Privacy Notice",
+      "summary": "How Jackson Hacks collects, uses, shares, safeguards, and deletes personal information.",
+      "pdf": "/documents/jackson-hacks-privacy-notice.pdf",
+      "sections": [
+        {
+          "heading": "1. Scope and accountability",
+          "paragraphs": [
+            "This Privacy Notice applies to the Jackson Hacks website, account system, applications, reviews, attendance administration, judging, and Event communications. Jackson Hacks is a student club operating through A. Y. Jackson Secondary School and subject to applicable school and TDSB privacy requirements.",
+            "Questions, access requests, correction requests, deletion requests, or privacy concerns may be sent to ayjacksonhacks@gmail.com."
+          ]
+        },
+        {
+          "heading": "2. Information collected",
+          "paragraphs": [
+            "Depending on how a person uses the website, Jackson Hacks may collect account identifiers, name, email, phone number, age, school, grade, experience level, written application responses, dietary information, shirt size, emergency contact details, application status, review records, project information, waiver status, communications, and basic security or technical logs.",
+            "The application may also request optional demographic information, including gender identity, pronouns, race or ethnicity, and first-generation status."
+          ]
+        },
+        {
+          "heading": "3. Purposes",
+          "paragraphs": [
+            "Information is used to create and secure accounts; determine eligibility; receive, review, and administer applications; communicate decisions; plan capacity, meals, accessibility, and shirts; administer guardian permission and emergency processes; operate check-in; judge projects; distribute prizes; enforce safety and conduct rules; investigate incidents; secure the website; and improve future Events."
+          ]
+        },
+        {
+          "heading": "4. Demographic survey",
+          "paragraphs": [
+            "Age is required for eligibility. All other demographic questions are optional. Declining to answer an optional demographic question does not make an application incomplete.",
+            "Optional demographic information is not used to calculate application scores or make admission decisions and is not displayed to reviewers while they score applications. Authorized administrators may use it for aggregate inclusion, reach, and outreach reporting. Public reports will use grouped information and will not intentionally identify individuals."
+          ]
+        },
+        {
+          "heading": "5. Consent and participants under 18",
+          "paragraphs": [
+            "Jackson Hacks presents collection purposes in language intended to be understandable to high-school students. A parent or guardian must complete required Event forms for a participant under 18. Optional information may be withheld unless it is later required for an accommodation, emergency process, or another clearly stated purpose."
+          ]
+        },
+        {
+          "heading": "6. Application reviewers and administrators",
+          "paragraphs": [
+            "Authorized reviewers receive only the application information needed for scoring and do not receive optional demographic responses. Authorized administrators may access additional information when needed for eligibility, communications, inclusion reporting, safety, food, accommodations, incident response, or Event operations.",
+            "Reviewer scores, notes, deliberations, and identities are confidential internal records."
+          ]
+        },
+        {
+          "heading": "7. Service providers",
+          "paragraphs": [
+            "Jackson Hacks uses service providers for functions such as hosting, authentication, database storage, email delivery, monitoring, and security. Providers may process information on Jackson Hacks' behalf and may operate systems outside Ontario or Canada, where information can be subject to local law.",
+            "Service providers receive only the information reasonably needed to perform their functions and are not authorized by Jackson Hacks to use application information for their own marketing."
+          ]
+        },
+        {
+          "heading": "8. Other disclosures",
+          "paragraphs": [
+            "Personal information is not sold. It is not shared with sponsors, mentors, judges, or other organizations for their independent marketing without separate notice and any required consent.",
+            "Information may be disclosed when reasonably necessary to respond to an emergency, protect a person from a serious safety risk, investigate fraud or misconduct, secure systems, comply with law, or work with authorized school personnel."
+          ]
+        },
+        {
+          "heading": "9. Retention and deletion",
+          "paragraphs": [
+            "Application answers, optional demographics, emergency contacts, reviewer scores, and unnecessary account information are scheduled for deletion or de-identification within 90 days after the Event. Information connected to a safety incident, security investigation, prize, legal obligation, or active dispute may be kept longer only as reasonably necessary.",
+            "Signed waivers and school-required forms follow the retention period approved by A. Y. Jackson Secondary School or TDSB and are not covered by the automatic 90-day deletion commitment until that period is confirmed. Aggregate statistics that no longer identify a person may be retained."
+          ]
+        },
+        {
+          "heading": "10. Security",
+          "paragraphs": [
+            "Jackson Hacks uses access controls, private storage, authenticated accounts, database permissions, and other reasonable safeguards appropriate to the information. No internet service can guarantee absolute security. Suspected unauthorized access or disclosure should be reported immediately to ayjacksonhacks@gmail.com."
+          ]
+        },
+        {
+          "heading": "11. Website data",
+          "paragraphs": [
+            "The website may use essential cookies or local storage to maintain authentication and security. Technical records may include timestamps, browser or device information, approximate network information, and error or security events. Non-essential analytics or advertising technologies will require an updated notice and any required choice or consent."
+          ]
+        },
+        {
+          "heading": "12. Access, correction, and deletion requests",
+          "paragraphs": [
+            "Applicants can edit their application while submissions remain open. A person may also request access to, correction of, or deletion of their information by contacting ayjacksonhacks@gmail.com. Identity may need to be verified before a request is completed. Some information may be retained where required for safety, security, legal, or school-record obligations."
+          ]
+        },
+        {
+          "heading": "13. Photography and recordings",
+          "paragraphs": [
+            "The Event will be photographed and recorded. Attendance requires the separate media release, including parent or guardian authorization for participants under 18. Media use, duration, and permitted purposes are described in that release."
+          ]
+        },
+        {
+          "heading": "14. Updates",
+          "paragraphs": [
+            "This Notice may be updated when practices, services, school requirements, or law change. The current version date will be displayed, and material changes affecting submitted applications or confirmed participants will be communicated where reasonably practical."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "code-of-conduct",
+      "navLabel": "Code of Conduct",
+      "title": "Code of Conduct",
+      "summary": "Behaviour and safety expectations for everyone involved with Jackson Hacks.",
+      "pdf": "/documents/jackson-hacks-code-of-conduct.pdf",
+      "sections": [
+        {
+          "heading": "1. Purpose and scope",
+          "paragraphs": [
+            "Jackson Hacks is committed to a welcoming, safe, inclusive, and educational environment. This Code applies to applicants, participants, Organizers, volunteers, mentors, judges, sponsors, guests, and school personnel during the application process, online communications, project work, judging, and all Event spaces."
+          ]
+        },
+        {
+          "heading": "2. Expected behaviour",
+          "bullets": [
+            "Treat others with respect, patience, and consideration.",
+            "Welcome participants of different backgrounds and experience levels.",
+            "Ask for consent before physical contact or sharing another person's information.",
+            "Give constructive feedback about work rather than attacking a person.",
+            "Follow safety directions, venue rules, and reasonable Organizer instructions.",
+            "Respect personal space, accessibility needs, pronouns, belongings, and boundaries.",
+            "Report safety or conduct concerns promptly and cooperate honestly with investigations."
+          ]
+        },
+        {
+          "heading": "3. Protected grounds and inclusion",
+          "paragraphs": [
+            "Harassment or discrimination based on age, ancestry, citizenship, colour, creed, disability, ethnic origin, family status, gender expression, gender identity, marital status, place of origin, race, sex, sexual orientation, or any other ground protected by applicable law or school policy is prohibited."
+          ]
+        },
+        {
+          "heading": "4. Prohibited behaviour",
+          "bullets": [
+            "Harassment, bullying, intimidation, stalking, threats, or unwanted sexual attention.",
+            "Discriminatory comments, slurs, demeaning imagery, deliberate misgendering, or exclusionary conduct.",
+            "Violence, dangerous behaviour, weapons, alcohol, illegal drugs, or encouraging another person to take unreasonable risks.",
+            "Theft, vandalism, tampering with equipment, or deliberate disruption of the Event.",
+            "Plagiarism, misrepresenting project work, manipulating judging, or interfering with another team.",
+            "Publishing another person's private information or recording them outside the authorized Event media process.",
+            "Retaliating against someone who reports a concern or assists an investigation."
+          ]
+        },
+        {
+          "heading": "5. Digital systems and cybersecurity",
+          "paragraphs": [
+            "Participants may not access accounts, networks, devices, databases, applications, or personal information without explicit authorization. Malware, credential theft, denial-of-service activity, destructive testing, automated account creation, and testing against real users or production systems are prohibited.",
+            "A suspected vulnerability must be reported privately to ayjacksonhacks@gmail.com. Good-faith reports do not authorize access to personal information, disruption, or testing outside an expressly approved environment."
+          ]
+        },
+        {
+          "heading": "6. Project integrity",
+          "paragraphs": [
+            "Projects must be created during the Event by teams of one to four participants. Open-source components and artificial-intelligence tools are allowed when used lawfully and disclosed. Teams must credit meaningful third-party code, assets, datasets, and tools and must not claim another person's work as their own."
+          ]
+        },
+        {
+          "heading": "7. Reporting",
+          "paragraphs": [
+            "During the Event, concerns may be reported to an Organizer or supervising school staff member. Before or after the Event, reports may be sent to ayjacksonhacks@gmail.com. In an immediate emergency, contact 911 and alert venue staff.",
+            "Reports will be handled as privately as reasonably possible, but information may be shared with authorized people when needed to investigate, protect safety, comply with school policy, or meet a legal obligation. Anonymous reports may be considered, although limited information can make investigation difficult."
+          ]
+        },
+        {
+          "heading": "8. Response and consequences",
+          "paragraphs": [
+            "Depending on seriousness and context, consequences may include a reminder, warning, separation from another person, removal from an activity, restricted system access, project disqualification, removal from the Event, loss of prizes, parent or guardian contact, school discipline referral, or contact with emergency services or law enforcement.",
+            "Organizers will prioritize immediate safety and may take temporary protective action before an investigation is complete. When appropriate and safe, the affected person will have an opportunity to provide relevant information."
+          ]
+        },
+        {
+          "heading": "9. No retaliation",
+          "paragraphs": [
+            "Retaliation against a person for making a good-faith report, requesting help, participating in an investigation, or declining inappropriate conduct is prohibited and may result in separate consequences. Knowingly false or malicious reports may also violate this Code."
+          ]
+        },
+        {
+          "heading": "10. Questions",
+          "paragraphs": [
+            "Questions about this Code or requests for accessibility or safety arrangements may be sent to ayjacksonhacks@gmail.com."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "waiver",
+      "navLabel": "Waiver",
+      "title": "Participant Waiver and Required Media Release",
+      "summary": "The blank attendance form for accepted participants and their parent or guardian when the participant is under 18.",
+      "pdf": "/documents/jackson-hacks-participant-waiver.pdf",
+      "status": "This form is completed only after acceptance. School or TDSB forms may also be required.",
+      "sections": [
+        {
+          "heading": "1. Participant and Event",
+          "paragraphs": [
+            "I request permission to participate in Jackson Hacks 2026 on November 21, 2026 from 8:00 a.m. to 10:00 p.m. Eastern Time at A. Y. Jackson Secondary School, 50 Francine Drive, North York, Ontario. I have reviewed the Terms and Conditions, Privacy Notice, Code of Conduct, and applicable Prize Rules."
+          ]
+        },
+        {
+          "heading": "2. Eligibility and accurate information",
+          "paragraphs": [
+            "I confirm that the participant is currently enrolled in Grade 9, 10, 11, or 12, or an equivalent high-school program, and that information supplied to Jackson Hacks is accurate. I understand that material misrepresentation or failure to follow Event rules can result in removal or disqualification."
+          ]
+        },
+        {
+          "heading": "3. Ordinary Event risks",
+          "paragraphs": [
+            "I understand that participation may involve ordinary risks associated with a busy public event, including slips or falls, illness, food reactions, crowds, travel arranged independently by the participant, use of personal electronic devices, loss or damage to belongings, fatigue, and the actions of other participants or third-party vendors.",
+            "Jackson Hacks does not provide transportation, a hardware hub, soldering equipment, or other hazardous tools. Participants may not bring or use unsafe equipment without written approval and supervision."
+          ]
+        },
+        {
+          "heading": "4. Safety and conduct agreement",
+          "paragraphs": [
+            "The participant agrees to follow the Code of Conduct, venue rules, school policies, and reasonable directions from Organizers and supervising personnel; to avoid unreasonable risks; and to report hazards, injuries, harassment, or emergencies promptly. Weapons, alcohol, illegal drugs, violence, and unsafe activities are prohibited."
+          ]
+        },
+        {
+          "heading": "5. Food, allergies, and medical needs",
+          "paragraphs": [
+            "Food may be prepared or served by third parties. Jackson Hacks will make reasonable efforts to communicate dietary options but cannot guarantee an allergen-free environment or prevent cross-contact. The participant is responsible for reviewing available ingredient information, asking questions, carrying required medication, and taking appropriate precautions.",
+            "In an emergency, I authorize Organizers or supervising personnel to contact emergency services and seek reasonably necessary care when the participant cannot provide instructions. I understand that Jackson Hacks does not provide medical advice and that the participant or guardian remains responsible for medical costs to the extent permitted by law."
+          ]
+        },
+        {
+          "heading": "6. Departure and transportation",
+          "paragraphs": [
+            "Jackson Hacks does not provide transportation. Participants arrange their own arrival and departure. A participant under 18 must sign out before leaving and may leave unaccompanied only when advance guardian permission below authorizes it."
+          ]
+        },
+        {
+          "heading": "7. Required media release",
+          "paragraphs": [
+            "I understand that photography, video, audio, livestreams, interviews, and project demonstrations are part of the Event and that agreement to this media release is required for in-person attendance.",
+            "I grant Jackson Hacks and authorized school personnel a non-exclusive, royalty-free permission to record and use the participant's name, likeness, voice, interview statements, and images of the participant and their project for Event documentation, reports, school-community communications, websites, social media, print materials, and promotion of Jackson Hacks or future Jackson Hacks events. This permission is worldwide and continues after the Event, but it does not transfer ownership of the participant's project or authorize materially deceptive, defamatory, or unlawful use.",
+            "I understand that published material may remain available after removal is requested because of archives, third-party sharing, or printed copies. Requests concerning future use may be sent to ayjacksonhacks@gmail.com."
+          ]
+        },
+        {
+          "heading": "8. Project ownership and confidentiality",
+          "paragraphs": [
+            "Participants retain ownership of their original project work and permit access, display, demonstration, and judging as described in the Terms. The Event is collaborative and public-facing. Participants should not disclose confidential information, credentials, private personal information, or material they do not have the right to share."
+          ]
+        },
+        {
+          "heading": "9. Assumption of risk and limited release",
+          "paragraphs": [
+            "I voluntarily accept the ordinary and inherent risks described in this form. To the maximum extent permitted by Ontario law, I release the Jackson Hacks Organizers, supervising personnel, volunteers, mentors, judges, and Event service providers from claims arising solely from those ordinary and inherent risks, except to the extent caused by gross negligence, wilful misconduct, or a responsibility that law does not permit to be excluded.",
+            "I accept responsibility for damage or injury caused by the participant's intentional misconduct, unlawful conduct, or reckless disregard of clear safety instructions, subject to applicable law."
+          ]
+        },
+        {
+          "heading": "10. Acknowledgement",
+          "paragraphs": [
+            "I have read and understood this form, had an opportunity to ask questions, and sign it voluntarily. I understand that a participant under 18 cannot attend without the parent or guardian authorization below. This form does not replace any additional form required by A. Y. Jackson Secondary School or TDSB."
+          ]
+        }
+      ],
+      "formFields": [
+        "Participant full legal name",
+        "Participant date of birth",
+        "Participant email",
+        "Participant phone",
+        "Emergency contact name",
+        "Emergency contact relationship",
+        "Emergency contact phone",
+        "Known allergies, dietary restrictions, or medical information the participant chooses to provide",
+        "Participant signature",
+        "Participant signature date",
+        "Parent or guardian full legal name (required if participant is under 18)",
+        "Parent or guardian email",
+        "Parent or guardian phone",
+        "Permission for the minor to leave unaccompanied: Yes / No",
+        "Parent or guardian signature",
+        "Parent or guardian signature date"
+      ]
+    },
+    {
+      "slug": "prizes",
+      "navLabel": "Prize Rules",
+      "title": "Official Prize Rules",
+      "summary": "Eligibility, project, judging, and prize-distribution rules for Jackson Hacks 2026.",
+      "pdf": "/documents/jackson-hacks-official-prize-rules.pdf",
+      "status": "Prize schedule pending. The number, description, and approximate value of each prize will be published here before project submissions open.",
+      "sections": [
+        {
+          "heading": "1. No purchase required",
+          "paragraphs": [
+            "No purchase or payment is required to enter or win. Applying to and attending Jackson Hacks is free. The project competition is skill-based."
+          ]
+        },
+        {
+          "heading": "2. Eligibility",
+          "paragraphs": [
+            "Entrants must be accepted Jackson Hacks 2026 participants, currently enrolled in Grade 9, 10, 11, or 12 or an equivalent high-school program, and in compliance with the Terms and Conditions, Code of Conduct, participant waiver, and these Rules.",
+            "Organizers, judges, and people directly involved in selecting winners may not compete. A judge must disclose and avoid scoring a team where a personal, school, financial, mentoring, or other relationship could reasonably create a conflict of interest."
+          ]
+        },
+        {
+          "heading": "3. Teams",
+          "paragraphs": [
+            "A project may be entered by one to four eligible participants. Each participant may compete on only one team unless the Organizers authorize a documented exception before submissions close. Teams are responsible for deciding how a team prize will be shared."
+          ]
+        },
+        {
+          "heading": "4. Project period and permitted resources",
+          "paragraphs": [
+            "Substantive project work must be created during the Event. Pre-event planning and learning are allowed, but a team may not present a substantially completed pre-existing project as Event work.",
+            "Open-source software, libraries, APIs, datasets, templates, hardware owned by participants, and artificial-intelligence tools are allowed when used lawfully. Teams must clearly disclose meaningful third-party and AI assistance to judges and comply with applicable licenses and terms."
+          ]
+        },
+        {
+          "heading": "5. Submission requirements",
+          "paragraphs": [
+            "A submission must be received through the official Event process by the announced deadline and must include the requested project name, team members, description, demonstration or presentation, and disclosures. Late or incomplete submissions may be declined unless a documented Event-wide technical issue justifies an extension."
+          ]
+        },
+        {
+          "heading": "6. Originality, rights, and safety",
+          "paragraphs": [
+            "Teams must have the right to use all submitted material. Projects must not contain malware, stolen credentials, unlawfully obtained data, undisclosed personal information, infringing content, or functionality intended to harm people or systems. The Organizers may restrict an unsafe demonstration while still allowing a safe recorded or simulated presentation."
+          ]
+        },
+        {
+          "heading": "7. Judging",
+          "paragraphs": [
+            "Eligible projects will be judged on published criteria that may include innovation, technical implementation, design, usefulness, and presentation. The Organizers will publish scoring weights, tie-breaking procedures, category eligibility, and any sponsor-specific criteria before project submissions open.",
+            "Judges may inspect a demonstration, ask questions, review disclosed tools and resources, and verify eligibility. Judges' decisions are final except for a calculation error, conflict of interest, eligibility problem, or other material procedural issue confirmed by the Organizers."
+          ]
+        },
+        {
+          "heading": "8. Prize schedule",
+          "paragraphs": [
+            "Before project submissions open, Jackson Hacks will add a Prize Schedule to these Rules stating the number of prizes, description of each prize, approximate retail value and currency, applicable category or region, and any material condition affecting eligibility or the chance of winning.",
+            "A general marketing statement such as '5K+ in prizes' does not replace the final Prize Schedule. If the final schedule differs from earlier promotional material, the final schedule published before entry controls and the change will be communicated clearly."
+          ]
+        },
+        {
+          "heading": "9. Winner verification and delivery",
+          "paragraphs": [
+            "Potential winners must confirm identity, eligibility, team membership, disclosures, and any required guardian authorization. A prize may be forfeited if a potential winner is ineligible, does not respond by a reasonable stated deadline, refuses required verification, or violated the governing rules.",
+            "Prizes will be distributed within a reasonable period after verification. Any substitution will have a reasonably comparable value unless circumstances outside the Organizers' control make that impractical and applicable law permits another resolution."
+          ]
+        },
+        {
+          "heading": "10. Team prizes and taxes",
+          "paragraphs": [
+            "A prize awarded to a team may be delivered to the team collectively or divided as stated in the Prize Schedule. Jackson Hacks is not responsible for private ownership or allocation disputes among team members. Winners are responsible for personal tax or reporting obligations, if any."
+          ]
+        },
+        {
+          "heading": "11. Disqualification",
+          "paragraphs": [
+            "A participant, team, submission, score, or prize may be disqualified for ineligibility, material misrepresentation, plagiarism, undisclosed pre-existing work, manipulation, conflict-of-interest abuse, harassment, unsafe conduct, security abuse, or violation of the Terms, Code of Conduct, waiver, or these Rules."
+          ]
+        },
+        {
+          "heading": "12. Changes and contact",
+          "paragraphs": [
+            "The Organizers may make reasonable changes needed to address safety, fairness, technical failures, unavailable prizes, law, or circumstances outside their control. A material change will be communicated and will not be used solely to unfairly remove an already-earned prize.",
+            "Questions about prizes or these Rules may be sent to ayjacksonhacks@gmail.com."
+          ]
+        }
+      ]
+    }
+  ]
+}

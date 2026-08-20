@@ -11,10 +11,18 @@ const socialLinks = [
 ];
 
 const quickLinks = [
-  { label: 'Location', href: '#location' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Sponsors', href: '#sponsors' },
-  { label: 'Team', href: '#team' },
+  { label: 'Location', href: '/#location' },
+  { label: 'FAQ', href: '/#faq' },
+  { label: 'Sponsors', href: '/#sponsors' },
+  { label: 'Team', href: '/#team' },
+];
+
+const legalLinks = [
+  { label: 'Terms', to: '/terms' },
+  { label: 'Privacy', to: '/privacy' },
+  { label: 'Code of Conduct', to: '/code-of-conduct' },
+  { label: 'Waiver', to: '/waiver' },
+  { label: 'Prize Rules', to: '/prizes' },
 ];
 
 export default function Footer() {
@@ -22,7 +30,7 @@ export default function Footer() {
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#1E1E1E]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(243,241,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(243,241,241,0.04)_1px,transparent_1px)] bg-[size:90px_90px]" />
       <div className="relative mx-auto max-w-7xl px-6 py-10 sm:py-12 lg:py-14">
-        <div className="grid gap-10 md:grid-cols-[1.25fr_0.75fr_1fr] lg:gap-14">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_0.9fr_1fr] lg:gap-12">
           <div>
             <h2 className="mb-4 font-title text-2xl">
               <span className="text-[#F68A42]">JACKSON</span>{' '}
@@ -64,6 +72,19 @@ export default function Footer() {
                   Apply
                 </Link>
               </li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Legal documents">
+            <h3 className="mb-4 font-title text-[#F3F1F1]">Legal</h3>
+            <ul className="space-y-3 text-sm">
+              {legalLinks.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-[#B4BAC0] transition-colors hover:text-[#F68A42]">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 

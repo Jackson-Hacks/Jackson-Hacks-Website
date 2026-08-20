@@ -18,6 +18,22 @@ test('registration and public dashboard direct routes render', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
 
+test('legal documents are public and provide matching PDF downloads', async ({ page }) => {
+  const documents = [
+    ['/terms', 'Terms and Conditions', 'jackson-hacks-terms-and-conditions.pdf'],
+    ['/privacy', 'Privacy Notice', 'jackson-hacks-privacy-notice.pdf'],
+    ['/code-of-conduct', 'Code of Conduct', 'jackson-hacks-code-of-conduct.pdf'],
+    ['/waiver', 'Participant Waiver and Required Media Release', 'jackson-hacks-participant-waiver.pdf'],
+    ['/prizes', 'Official Prize Rules', 'jackson-hacks-official-prize-rules.pdf'],
+  ];
+
+  for (const [route, heading, filename] of documents) {
+    await page.goto(route);
+    await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Download PDF' })).toHaveAttribute('href', `/documents/${filename}`);
+  }
+});
+
 test('mobile menu traps focus and closes with Escape', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'));
   await page.goto('/');
@@ -39,7 +55,7 @@ test('unknown route has a working recovery action', async ({ page }) => {
 test('core public routes do not overflow common narrow viewports', async ({ page }) => {
   for (const width of [320, 360, 390, 430]) {
     await page.setViewportSize({ width, height: 800 });
-    for (const route of ['/', '/Register', '/Dashboard']) {
+    for (const route of ['/', '/Register', '/Dashboard', '/terms']) {
       await page.goto(route);
       const overflow = await page.evaluate(() =>
         document.documentElement.scrollWidth - document.documentElement.clientWidth,
