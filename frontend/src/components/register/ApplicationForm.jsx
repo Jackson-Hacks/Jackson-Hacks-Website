@@ -30,7 +30,6 @@ import {
   validateApplicationStep,
 } from '@/lib/applicationValidation';
 import {
-  FIRST_GENERATION_OPTIONS,
   GENDER_OPTIONS,
   RACE_ETHNICITY_OPTIONS,
 } from '@/lib/applicationDemographics';
@@ -65,7 +64,6 @@ const buildInitialFormData = (user, application = null, draft = null) => {
     gender_self_description: savedData?.gender_self_description || '',
     pronouns: savedData?.pronouns || '',
     race_ethnicity: Array.isArray(savedData?.race_ethnicity) ? savedData.race_ethnicity : [],
-    first_generation: savedData?.first_generation || '',
     school: savedData?.school || '',
     grade: hasCustomGrade ? 'other' : savedGrade,
     grade_other: savedData?.grade_other || (hasCustomGrade ? savedGrade : ''),
@@ -99,6 +97,10 @@ export default function ApplicationForm({
     buildInitialFormData(user, existingApplication, initialDraft),
   );
   const initializedSourceKey = useRef(null);
+  const previousStep = useRef(currentStep);
+  const stepContentRef = useRef(null);
+  const stepTransitionLocked = useRef(false);
+  const [isChangingStep, setIsChangingStep] = useState(false);
   const sourceKey = existingApplication
     ? `application:${existingApplication.id}:${existingApplication.updated_at || existingApplication.revision_number || ''}`
     : initialDraft
@@ -112,6 +114,21 @@ export default function ApplicationForm({
     setCurrentStep(getInitialStep(existingApplication, initialDraft));
     setErrors({});
   }, [existingApplication, initialDraft, sourceKey, user]);
+
+  useEffect(() => {
+    if (previousStep.current === currentStep) return undefined;
+    previousStep.current = currentStep;
+    const frame = window.requestAnimationFrame(() => {
+      const stepContent = stepContentRef.current;
+      if (!stepContent) return;
+      stepContent.focus({ preventScroll: true });
+      stepContent.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentStep]);
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -154,13 +171,24 @@ export default function ApplicationForm({
   };
 
   const nextStep = () => {
+    if (stepTransitionLocked.current) return;
     if (readOnly || validateStep(currentStep)) {
+      stepTransitionLocked.current = true;
+      setIsChangingStep(true);
       setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
   };
 
   const prevStep = () => {
+    if (stepTransitionLocked.current || currentStep === 1) return;
+    stepTransitionLocked.current = true;
+    setIsChangingStep(true);
     setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  const finishStepTransition = () => {
+    stepTransitionLocked.current = false;
+    setIsChangingStep(false);
   };
 
   const handleSubmit = async (event) => {
@@ -217,6 +245,7 @@ export default function ApplicationForm({
       case 1:
         return (
           <motion.div
+            key="application-step-1"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -287,6 +316,7 @@ export default function ApplicationForm({
       case 2:
         return (
           <motion.div
+            key="application-step-2"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -375,6 +405,7 @@ export default function ApplicationForm({
       case 3:
         return (
           <motion.div
+            key="application-step-3"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -424,6 +455,7 @@ export default function ApplicationForm({
       case 4:
         return (
           <motion.div
+            key="application-step-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -544,32 +576,13 @@ export default function ApplicationForm({
                 <p id="race_ethnicity-error" className="mt-2 text-sm text-red-400">{errors.race_ethnicity}</p>
               )}
             </fieldset>
-
-            <div>
-              <Label htmlFor="first_generation" className="text-white mb-2 block">
-                Would you be a first-generation college or university student?
-              </Label>
-              <Select
-                disabled={readOnly}
-                value={formData.first_generation}
-                onValueChange={(value) => updateField('first_generation', value)}
-              >
-                <SelectTrigger id="first_generation" className="bg-white/5 border-white/10 text-white">
-                  <SelectValue placeholder="Select an option (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FIRST_GENERATION_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </motion.div>
         );
 
       case 5:
         return (
           <motion.div
+            key="application-step-5"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -730,9 +743,11 @@ export default function ApplicationForm({
       </p>
 
       {/* Form content */}
-      <AnimatePresence mode="wait">
-        {renderStepContent()}
-      </AnimatePresence>
+      <div ref={stepContentRef} tabIndex={-1} className="scroll-mt-6 outline-none">
+        <AnimatePresence mode="wait" onExitComplete={finishStepTransition}>
+          {renderStepContent()}
+        </AnimatePresence>
+      </div>
 
       {/* Submit error message */}
       {errors.submit && (
@@ -748,7 +763,7 @@ export default function ApplicationForm({
           type="button"
           variant="outline"
           onClick={prevStep}
-          disabled={currentStep === 1}
+          disabled={currentStep === 1 || isChangingStep}
           className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white disabled:opacity-30"
         >
           <ArrowLeft size={18} className="mr-2" />
@@ -761,7 +776,7 @@ export default function ApplicationForm({
               type="button"
               variant="outline"
               onClick={handleSaveDraft}
-              disabled={isSavingDraft || isSubmitting}
+              disabled={isSavingDraft || isSubmitting || isChangingStep}
               className="border-[#2072C7]/60 bg-[#084F9A]/20 text-[#9CC4EA] hover:bg-[#084F9A]/40 hover:text-white"
             >
               {isSavingDraft ? (
@@ -777,7 +792,7 @@ export default function ApplicationForm({
             <Button
               type="button"
               onClick={nextStep}
-              disabled={isSavingDraft}
+              disabled={isSavingDraft || isChangingStep}
               className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
             >
               Next
@@ -795,7 +810,7 @@ export default function ApplicationForm({
           ) : (
             <Button
               type="submit"
-              disabled={isSubmitting || isSavingDraft}
+              disabled={isSubmitting || isSavingDraft || isChangingStep}
               className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
             >
               {isSubmitting ? (

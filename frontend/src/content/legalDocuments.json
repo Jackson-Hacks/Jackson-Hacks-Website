@@ -1,6 +1,6 @@
 {
-  "version": "2026-08-19",
-  "lastUpdated": "August 19, 2026",
+  "version": "2026-08-21",
+  "lastUpdated": "August 21, 2026",
   "documents": [
     {
       "slug": "terms",
@@ -40,7 +40,7 @@
         {
           "heading": "5. Demographic survey and application review",
           "paragraphs": [
-            "Age is required to assess eligibility. Other demographic questions, including gender identity, pronouns, race or ethnicity, and first-generation status, are optional. Optional demographic answers are not used to calculate application scores or make admission decisions and are not displayed to reviewers while they score applications.",
+            "Age is required to assess eligibility. Other demographic questions, including gender identity, pronouns, and race or ethnicity, are optional. Optional demographic answers are not used to calculate application scores or make admission decisions and are not displayed to reviewers while they score applications.",
             "Authorized administrators may access demographic information only for the purposes described in the Privacy Notice, including aggregate inclusion and outreach reporting. Internal scores, reviewer notes, deliberations, and reviewer identities are confidential. Application decisions are final except where the Organizers identify a material technical error, conflict of interest, eligibility issue, or procedural problem."
           ]
         },
@@ -166,7 +166,7 @@
           "heading": "2. Information collected",
           "paragraphs": [
             "Depending on how a person uses the website, Jackson Hacks may collect account identifiers, name, email, phone number, age, school, grade, experience level, written application responses, dietary information, shirt size, emergency contact details, application status, review records, project information, waiver status, communications, and basic security or technical logs.",
-            "The application may also request optional demographic information, including gender identity, pronouns, race or ethnicity, and first-generation status."
+            "The application may also request optional demographic information, including gender identity, pronouns, and race or ethnicity."
           ]
         },
         {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CalendarClock,
   CheckCircle2,
+  ChevronDown,
   Clock,
   Download,
   Eye,
@@ -60,14 +61,15 @@ import { supabase } from "@/lib/supabaseClient";
 const PAGE_SIZE = 10;
 const applicantDetailFields = [
   { label: "Email", value: (application) => application.email, sensitive: true },
-  { label: "Phone", value: (application) => application.phone, sensitive: true },
   { label: "School", value: (application) => application.school },
   { label: "Grade", value: (application) => application.grade },
   { label: "Coding experience", value: (application) => application.experience_level },
+  { label: "Submitted", value: (application) => new Date(application.submitted_at || application.created_at).toLocaleString() },
+];
+const otherApplicantDetailFields = [
+  { label: "Phone", value: (application) => application.phone, sensitive: true },
   { label: "T-shirt size", value: (application) => application.tshirt_size },
   { label: "Heard from", value: (application) => application.heard_from },
-  { label: "Submitted", value: (application) => new Date(application.submitted_at || application.created_at).toLocaleString() },
-  { label: "Revision", value: (application) => application.revision_number || 1 },
 ];
 
 const csvColumns = [
@@ -795,7 +797,7 @@ export default function Dashboard() {
 
             {selectedApplication && (
               <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-2 backdrop-blur-sm sm:p-5"
+                className="fixed inset-0 z-50 flex items-start justify-center bg-black/75 p-2 backdrop-blur-sm sm:items-center sm:p-5"
                 onMouseDown={(event) => {
                   if (event.target === event.currentTarget) closeReview();
                 }}
@@ -866,6 +868,26 @@ export default function Dashboard() {
                           </div>
                         ))}
                       </dl>
+                      <details className="group mt-4 rounded-lg border border-white/10 bg-black/10">
+                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#B4BAC0] transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2072C7] [&::-webkit-details-marker]:hidden">
+                          Other info
+                          <ChevronDown
+                            size={18}
+                            className="shrink-0 transition-transform group-open:rotate-180"
+                            aria-hidden="true"
+                          />
+                        </summary>
+                        <dl className="grid gap-3 border-t border-white/10 p-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                          {otherApplicantDetailFields.map(({ label, value, sensitive }) => (
+                            <div key={label} className="min-w-0 rounded-lg border border-white/10 bg-white/[0.025] p-3">
+                              <dt className="text-xs uppercase tracking-wide text-[#8A9199]">{label}</dt>
+                              <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
+                                {blindReview && sensitive ? "Hidden" : value(selectedApplication) || "—"}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </details>
                     </aside>
 
                     <article className="rounded-xl border border-[#2072C7]/30 bg-[#2072C7]/[0.07] p-5" aria-label="Applicant response">

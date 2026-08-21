@@ -95,7 +95,129 @@ test('applicants can enter an Other grade level', async ({ page }) => {
   await page.getByRole('option', { name: 'Beginner - Just starting out' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
 
-  await expect(page.getByLabel(/Tell us why you want to attend Jackson Hacks/)).toBeVisible();
+  const writtenResponse = page.getByLabel(/Tell us why you want to attend Jackson Hacks/);
+  await expect(writtenResponse).toBeVisible();
+  await writtenResponse.fill('I want to build, learn, and meet other students.');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByLabel('Age')).toBeVisible();
+  await expect(page.getByText(/first-generation college or university student/i)).toHaveCount(0);
+});
+
+test('editing an application shows the final page after demographics', async ({ page }) => {
+  await mockApplicantSession(page);
+  await mockOpenApplicationCycle(page);
+  const existingApplication = {
+    id: '55555555-5555-4555-8555-555555555555',
+    cycle_id: openCycle.id,
+    user_id: applicantUser.id,
+    status: 'submitted',
+    full_name: 'Existing Applicant',
+    email: applicantUser.email,
+    phone: '',
+    age: 17,
+    school: 'Existing School',
+    grade: '12',
+    experience_level: 'intermediate',
+    why_attend: 'I want to build, learn, and meet other students.',
+    race_ethnicity: [],
+    agree_to_terms: true,
+    submitted_at: '2026-08-20T20:00:00.000Z',
+    updated_at: '2026-08-20T20:00:00.000Z',
+    revision_number: 1,
+  };
+
+  await page.route('**/rest/v1/applications*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(existingApplication),
+  }));
+  await page.route('**/rest/v1/application_drafts*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: '[]',
+  }));
+
+  await page.goto('/Register');
+  await page.getByRole('button', { name: 'Edit Submission' }).click();
+
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByText('Step 2 of 5: School & Experience')).toBeAttached();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByText('Step 3 of 5: Written Response')).toBeAttached();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByText('Step 4 of 5: Demographics')).toBeAttached();
+
+  const demographicsNext = page.getByRole('button', { name: 'Next' });
+  await expect(demographicsNext).toBeEnabled();
+  await demographicsNext.evaluate((button) => {
+    button.click();
+    button.click();
+  });
+
+  await expect(page.getByText('Step 5 of 5: Final Details')).toBeAttached();
+  await expect(page.getByRole('combobox', { name: 'T-Shirt Size' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Save Changes' })).toBeVisible();
+});
+
+test('admin review keeps secondary applicant details in Other info', async ({ page }) => {
+  await mockApplicantSession(page);
+  await mockOpenApplicationCycle(page);
+  const reviewedApplication = {
+    id: '66666666-6666-4666-8666-666666666666',
+    cycle_id: openCycle.id,
+    user_id: '77777777-7777-4777-8777-777777777777',
+    status: 'submitted',
+    full_name: 'Review Applicant',
+    email: 'review@example.com',
+    phone: '416-555-0199',
+    school: 'Review School',
+    grade: '12',
+    experience_level: 'intermediate',
+    tshirt_size: 'M',
+    heard_from: 'School announcement',
+    why_attend: 'I want to learn with other students.',
+    submitted_at: '2026-08-20T20:00:00.000Z',
+  };
+
+  await page.route('**/rest/v1/applications*', (route) => {
+    const isOwnApplicationRequest = new URL(route.request().url()).searchParams.has('user_id');
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(isOwnApplicationRequest ? [] : [reviewedApplication]),
+    });
+  });
+  await page.route('**/rest/v1/application_drafts*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: '[]',
+  }));
+  await page.route('**/rest/v1/admin_users*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify([{ user_id: applicantUser.id }]),
+  }));
+  await page.route('**/rest/v1/application_reviews*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: '[]',
+  }));
+
+  await page.goto('/Dashboard');
+  await page.getByRole('button', { name: 'Review', exact: true }).click();
+
+  const reviewDialog = page.getByRole('dialog', { name: 'Application review' });
+  await expect(reviewDialog.getByText('Phone', { exact: true })).toBeHidden();
+  await expect(reviewDialog.getByText('T-shirt size', { exact: true })).toBeHidden();
+  await expect(reviewDialog.getByText('Heard from', { exact: true })).toBeHidden();
+
+  await reviewDialog.getByText('Other info', { exact: true }).click();
+  await expect(reviewDialog.getByText('Phone', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('416-555-0199')).toBeVisible();
+  await expect(reviewDialog.getByText('T-shirt size', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('M', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('Heard from', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('School announcement')).toBeVisible();
 });
 
 test('applicants can save a draft, return to the dashboard, and resume it', async ({ page }) => {

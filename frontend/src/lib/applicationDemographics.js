@@ -19,13 +19,6 @@ export const RACE_ETHNICITY_OPTIONS = Object.freeze([
   { value: 'prefer_not_to_say', label: 'Prefer not to answer' },
 ]);
 
-export const FIRST_GENERATION_OPTIONS = Object.freeze([
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
-  { value: 'unsure', label: 'Not sure' },
-  { value: 'prefer_not_to_say', label: 'Prefer not to answer' },
-]);
-
 function optionLabel(options, value) {
   return options.find((option) => option.value === value)?.label || value || '—';
 }
@@ -39,6 +32,3 @@ export const formatRaceEthnicity = (values) =>
   Array.isArray(values) && values.length
     ? values.map((value) => optionLabel(RACE_ETHNICITY_OPTIONS, value)).join(', ')
     : '—';
-
-export const formatFirstGeneration = (value) =>
-  optionLabel(FIRST_GENERATION_OPTIONS, value);
