@@ -6,6 +6,7 @@ import {
   Download,
   Eye,
   EyeOff,
+  FilePenLine,
   FileText,
   Loader2,
   LockKeyhole,
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, logout, isLoadingAuth } = useAuth();
   const [application, setApplication] = useState(null);
+  const [applicationDraft, setApplicationDraft] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminApplications, setAdminApplications] = useState([]);
   const [adminReviews, setAdminReviews] = useState([]);
@@ -145,21 +147,33 @@ export default function Dashboard() {
         setApplicationCycle(cycle);
 
         if (!user?.id) return;
-        const { data: ownApplication, error: applicationError } = await supabase
-          .from("applications")
-          .select("*")
-          .eq("cycle_id", cycle.id)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (applicationError) throw applicationError;
-        setApplication(ownApplication || null);
+        const [applicationResult, draftResult, adminResult] = await Promise.all([
+          supabase
+            .from("applications")
+            .select("*")
+            .eq("cycle_id", cycle.id)
+            .eq("user_id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("application_drafts")
+            .select("*")
+            .eq("cycle_id", cycle.id)
+            .eq("user_id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("admin_users")
+            .select("user_id")
+            .eq("user_id", user.id)
+            .limit(1),
+        ]);
+        if (applicationResult.error) throw applicationResult.error;
+        if (draftResult.error) throw draftResult.error;
+        if (adminResult.error) throw adminResult.error;
+        const ownApplication = applicationResult.data || null;
+        setApplication(ownApplication);
+        setApplicationDraft(ownApplication ? null : draftResult.data || null);
 
-        const { data: adminRows, error: adminLookupError } = await supabase
-          .from("admin_users")
-          .select("user_id")
-          .eq("user_id", user.id)
-          .limit(1);
-        if (adminLookupError) throw adminLookupError;
+        const adminRows = adminResult.data;
         const hasAdminAccess = Boolean(adminRows?.length);
         setIsAdmin(hasAdminAccess);
         if (hasAdminAccess) {
@@ -190,7 +204,7 @@ export default function Dashboard() {
       }
     };
     if (!isLoadingAuth) loadDashboard();
-  }, [user, isLoadingAuth]);
+  }, [user?.id, isLoadingAuth]);
 
   useEffect(() => {
     const refresh = async () => {
@@ -420,6 +434,7 @@ export default function Dashboard() {
 
   const welcomeName =
     application?.full_name?.trim() ||
+    applicationDraft?.draft_data?.full_name?.trim() ||
     user?.user_metadata?.full_name?.trim() ||
     user?.email ||
     "Applicant";
@@ -491,6 +506,31 @@ export default function Dashboard() {
                 · Revision {application.revision_number || 1}
               </p>
             </div>
+          ) : applicationDraft ? (
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center gap-2 font-semibold text-[#9CC4EA]">
+                <FilePenLine /> Draft saved
+              </div>
+              <p className="text-sm text-[#B4BAC0]">
+                Your answers are private and saved at step {applicationDraft.current_step} of 5.
+              </p>
+              <p className="text-xs text-[#8A9199]">
+                Last saved {new Date(applicationDraft.updated_at).toLocaleString()}
+              </p>
+              {applicationWindow.canEdit ? (
+                <Button
+                  type="button"
+                  onClick={() => navigate('/Register')}
+                  className="bg-[#F68A42] text-white hover:bg-[#E06E0A]"
+                >
+                  Continue Application
+                </Button>
+              ) : (
+                <p className="text-sm text-amber-300">
+                  Applications are closed, so this draft can no longer be edited or submitted.
+                </p>
+              )}
+            </div>
           ) : (
             <div className="mt-4">
               <div className="flex items-center gap-2 font-semibold text-[#F68A42]">
@@ -499,6 +539,15 @@ export default function Dashboard() {
               <p className="mt-2 text-sm text-[#B4BAC0]">
                 Complete the application form to register.
               </p>
+              {applicationWindow.canEdit && user?.id && (
+                <Button
+                  type="button"
+                  onClick={() => navigate('/Register')}
+                  className="mt-3 bg-[#F68A42] text-white hover:bg-[#E06E0A]"
+                >
+                  Start Application
+                </Button>
+              )}
             </div>
           )}
         </Card>

@@ -55,3 +55,14 @@ test('RPC errors provide a specific closed-window message', () => {
     /closed while you were editing/i,
   );
 });
+
+test('draft RPC errors provide applicant-facing recovery guidance', () => {
+  assert.match(
+    getApplicationRpcErrorMessage({ message: 'application_already_submitted' }),
+    /already submitted/i,
+  );
+  assert.match(
+    getApplicationRpcErrorMessage({ message: 'draft_too_large' }),
+    /draft could not be saved/i,
+  );
+});

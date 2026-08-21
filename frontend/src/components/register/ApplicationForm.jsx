@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import {
 import { 
   User, Mail, Phone, School, Users,
   MessageSquare, AlertCircle,
-  ArrowLeft, ArrowRight, Check, Loader2
+  ArrowLeft, ArrowRight, Check, Loader2, Save
 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import {
@@ -26,6 +26,7 @@ import {
 import {
   APPLICATION_LIMITS,
   normalizeApplicationData,
+  STANDARD_GRADE_LEVELS,
   validateApplicationStep,
 } from '@/lib/applicationValidation';
 import {
@@ -42,53 +43,90 @@ const steps = [
   { id: 5, title: 'Final Details', icon: Check },
 ];
 
+const getInitialStep = (application, draft) => {
+  if (application) return 1;
+  const savedStep = Number(draft?.current_step);
+  return Number.isInteger(savedStep) && savedStep >= 1 && savedStep <= steps.length
+    ? savedStep
+    : 1;
+};
+
+const buildInitialFormData = (user, application = null, draft = null) => {
+  const savedData = application || draft?.draft_data || null;
+  const savedGrade = savedData?.grade || '';
+  const hasCustomGrade = Boolean(savedGrade) && !STANDARD_GRADE_LEVELS.includes(savedGrade);
+
+  return {
+    full_name: savedData?.full_name || user?.full_name || user?.user_metadata?.full_name || '',
+    email: savedData?.email || user?.email || '',
+    phone: savedData?.phone || '',
+    age: savedData?.age ? String(savedData.age) : '',
+    gender_identity: savedData?.gender_identity || '',
+    gender_self_description: savedData?.gender_self_description || '',
+    pronouns: savedData?.pronouns || '',
+    race_ethnicity: Array.isArray(savedData?.race_ethnicity) ? savedData.race_ethnicity : [],
+    first_generation: savedData?.first_generation || '',
+    school: savedData?.school || '',
+    grade: hasCustomGrade ? 'other' : savedGrade,
+    grade_other: savedData?.grade_other || (hasCustomGrade ? savedGrade : ''),
+    experience_level: savedData?.experience_level || '',
+    dietary_restrictions: savedData?.dietary_restrictions || '',
+    tshirt_size: savedData?.tshirt_size || '',
+    why_attend: savedData?.why_attend || '',
+    heard_from: savedData?.heard_from || '',
+    emergency_contact_name: savedData?.emergency_contact_name || '',
+    emergency_contact_phone: savedData?.emergency_contact_phone || '',
+    agree_to_terms: savedData?.agree_to_terms ?? false,
+  };
+};
+
 export default function ApplicationForm({
   user,
   onSuccess,
   existingApplication = null,
+  initialDraft = null,
   readOnly = false,
   onDone,
+  onSaveDraft,
   onWindowClosed,
 }) {
-  const buildInitialFormData = (application = null) => ({
-    full_name: application?.full_name || user?.full_name || '',
-    email: application?.email || user?.email || '',
-    phone: application?.phone || '',
-    age: application?.age ? String(application.age) : '',
-    gender_identity: application?.gender_identity || '',
-    gender_self_description: application?.gender_self_description || '',
-    pronouns: application?.pronouns || '',
-    race_ethnicity: Array.isArray(application?.race_ethnicity) ? application.race_ethnicity : [],
-    first_generation: application?.first_generation || '',
-    school: application?.school || '',
-    grade: application?.grade || '',
-    experience_level: application?.experience_level || '',
-    dietary_restrictions: application?.dietary_restrictions || '',
-    tshirt_size: application?.tshirt_size || '',
-    why_attend: application?.why_attend || '',
-    heard_from: application?.heard_from || '',
-    emergency_contact_name: application?.emergency_contact_name || '',
-    emergency_contact_phone: application?.emergency_contact_phone || '',
-    agree_to_terms: application?.agree_to_terms ?? false,
-  });
-
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(() => getInitialStep(existingApplication, initialDraft));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [errors, setErrors] = useState(/** @type {Record<string, string | null>} */ ({}));
 
-  const [formData, setFormData] = useState(buildInitialFormData(existingApplication));
+  const [formData, setFormData] = useState(() =>
+    buildInitialFormData(user, existingApplication, initialDraft),
+  );
+  const initializedSourceKey = useRef(null);
+  const sourceKey = existingApplication
+    ? `application:${existingApplication.id}:${existingApplication.updated_at || existingApplication.revision_number || ''}`
+    : initialDraft
+      ? `draft:${initialDraft.id}:${initialDraft.updated_at || ''}`
+      : `new:${user?.id || user?.email || ''}`;
 
   useEffect(() => {
-    setFormData(buildInitialFormData(existingApplication));
-    setCurrentStep(1);
+    if (initializedSourceKey.current === sourceKey) return;
+    initializedSourceKey.current = sourceKey;
+    setFormData(buildInitialFormData(user, existingApplication, initialDraft));
+    setCurrentStep(getInitialStep(existingApplication, initialDraft));
     setErrors({});
-  }, [existingApplication, user]);
+  }, [existingApplication, initialDraft, sourceKey, user]);
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
+  };
+
+  const updateGrade = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      grade: value,
+      grade_other: value === 'other' ? prev.grade_other : '',
+    }));
+    setErrors(prev => ({ ...prev, grade: null, grade_other: null }));
   };
 
   const toggleRaceEthnicity = (value, checked) => {
@@ -154,6 +192,23 @@ export default function ApplicationForm({
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!onSaveDraft || readOnly || existingApplication) return;
+    setIsSavingDraft(true);
+    setErrors((current) => ({ ...current, submit: null }));
+    try {
+      await onSaveDraft(formData, currentStep);
+    } catch (error) {
+      console.error('Failed to save application draft:', error);
+      setErrors({ submit: getApplicationRpcErrorMessage(error) });
+      if (`${error?.message || ''}`.toLowerCase().includes('applications_closed')) {
+        onWindowClosed?.();
+      }
+    } finally {
+      setIsSavingDraft(false);
     }
   };
 
@@ -262,7 +317,7 @@ export default function ApplicationForm({
               <Label htmlFor="grade" className="text-white mb-2 block">
                 Grade Level <span className="text-red-400">*</span>
               </Label>
-              <Select disabled={readOnly} value={formData.grade} onValueChange={(value) => updateField('grade', value)}>
+              <Select disabled={readOnly} value={formData.grade} onValueChange={updateGrade}>
                 <SelectTrigger id="grade" aria-invalid={Boolean(errors.grade)} aria-describedby={errors.grade ? 'grade-error' : undefined} className="bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select your grade" />
                 </SelectTrigger>
@@ -271,9 +326,31 @@ export default function ApplicationForm({
                   <SelectItem value="10">Grade 10</SelectItem>
                   <SelectItem value="11">Grade 11</SelectItem>
                   <SelectItem value="12">Grade 12</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               {errors.grade && <p id="grade-error" className="text-red-400 text-sm mt-1">{errors.grade}</p>}
+              {formData.grade === 'other' && (
+                <div className="mt-4">
+                  <Label htmlFor="grade_other" className="text-white mb-2 block">
+                    Enter your grade level <span className="text-red-400">*</span>
+                  </Label>
+                  <Input
+                    id="grade_other"
+                    disabled={readOnly}
+                    maxLength={APPLICATION_LIMITS.grade}
+                    aria-invalid={Boolean(errors.grade_other)}
+                    aria-describedby={errors.grade_other ? 'grade-other-error' : undefined}
+                    value={formData.grade_other}
+                    onChange={(event) => updateField('grade_other', event.target.value)}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
+                    placeholder="Enter your grade or year"
+                  />
+                  {errors.grade_other && (
+                    <p id="grade-other-error" className="text-red-400 text-sm mt-1">{errors.grade_other}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -666,7 +743,7 @@ export default function ApplicationForm({
       )}
 
       {/* Navigation buttons */}
-      <div className="flex justify-between mt-10">
+      <div className="flex flex-col gap-3 mt-10 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="button"
           variant="outline"
@@ -678,43 +755,63 @@ export default function ApplicationForm({
           Back
         </Button>
 
-        {currentStep < steps.length ? (
-          <Button
-            type="button"
-            onClick={nextStep}
-            className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
-          >
-            Next
-            <ArrowRight size={18} className="ml-2" />
-          </Button>
-        ) : readOnly ? (
-          <Button
-            type="button"
-            onClick={onDone}
-            className="bg-[#2072C7] hover:bg-[#084F9A] text-white"
-          >
-            <Check size={18} className="mr-2" />
-            Done
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
-          >
-            {isSubmitting ? (
-              <>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {onSaveDraft && !readOnly && !existingApplication && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSaveDraft}
+              disabled={isSavingDraft || isSubmitting}
+              className="border-[#2072C7]/60 bg-[#084F9A]/20 text-[#9CC4EA] hover:bg-[#084F9A]/40 hover:text-white"
+            >
+              {isSavingDraft ? (
                 <Loader2 size={18} className="mr-2 animate-spin" />
-                {existingApplication ? 'Saving...' : 'Submitting...'}
-              </>
-            ) : (
-              <>
-                <Check size={18} className="mr-2" />
-                {existingApplication ? 'Save Changes' : 'Submit Application'}
-              </>
-            )}
-          </Button>
-        )}
+              ) : (
+                <Save size={18} className="mr-2" />
+              )}
+              {isSavingDraft ? 'Saving Draft...' : 'Save Draft'}
+            </Button>
+          )}
+
+          {currentStep < steps.length ? (
+            <Button
+              type="button"
+              onClick={nextStep}
+              disabled={isSavingDraft}
+              className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
+            >
+              Next
+              <ArrowRight size={18} className="ml-2" />
+            </Button>
+          ) : readOnly ? (
+            <Button
+              type="button"
+              onClick={onDone}
+              className="bg-[#2072C7] hover:bg-[#084F9A] text-white"
+            >
+              <Check size={18} className="mr-2" />
+              Done
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              disabled={isSubmitting || isSavingDraft}
+              className="bg-[#F68A42] hover:bg-[#E06E0A] text-white"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="mr-2 animate-spin" />
+                  {existingApplication ? 'Saving...' : 'Submitting...'}
+                </>
+              ) : (
+                <>
+                  <Check size={18} className="mr-2" />
+                  {existingApplication ? 'Save Changes' : 'Submit Application'}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </form>
   );

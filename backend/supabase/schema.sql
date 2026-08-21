@@ -79,6 +79,19 @@ CREATE TABLE applications (
   CONSTRAINT applications_one_per_user_per_cycle UNIQUE (cycle_id, user_id)
 );
 
+CREATE TABLE application_drafts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  cycle_id UUID NOT NULL REFERENCES application_cycles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  draft_data JSONB NOT NULL DEFAULT '{}'::JSONB,
+  current_step SMALLINT NOT NULL DEFAULT 1 CHECK (current_step BETWEEN 1 AND 5),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT application_drafts_one_per_user_per_cycle UNIQUE (cycle_id, user_id),
+  CONSTRAINT application_drafts_object_only CHECK (jsonb_typeof(draft_data) = 'object'),
+  CONSTRAINT application_drafts_size_limit CHECK (octet_length(draft_data::TEXT) <= 32768)
+);
+
 CREATE TABLE admin_users (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -122,6 +135,7 @@ CREATE TABLE application_reviews (
 );
 
 CREATE INDEX applications_user_id_idx ON applications (user_id);
+CREATE INDEX application_drafts_user_id_idx ON application_drafts (user_id);
 CREATE INDEX application_cycles_closed_by_idx ON application_cycles (closed_by);
 CREATE INDEX application_status_events_application_id_idx
   ON application_status_events (application_id);
@@ -586,8 +600,104 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.save_application_draft(
+  p_draft JSONB,
+  p_current_step INTEGER DEFAULT 1,
+  p_event_key TEXT DEFAULT 'jackson-hacks-2026'
+)
+RETURNS public.application_drafts
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_cycle public.application_cycles%ROWTYPE;
+  v_saved public.application_drafts%ROWTYPE;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'authentication_required';
+  END IF;
+
+  IF p_draft IS NULL OR jsonb_typeof(p_draft) <> 'object' THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'invalid_draft';
+  END IF;
+
+  IF octet_length(p_draft::TEXT) > 32768 THEN
+    RAISE EXCEPTION USING ERRCODE = '22001', MESSAGE = 'draft_too_large';
+  END IF;
+
+  IF p_current_step IS NULL OR p_current_step NOT BETWEEN 1 AND 5 THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'invalid_draft_step';
+  END IF;
+
+  SELECT * INTO v_cycle
+  FROM public.application_cycles
+  WHERE event_key = p_event_key;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'application_cycle_not_found';
+  END IF;
+
+  IF NOW() < v_cycle.opens_at THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'applications_not_open';
+  END IF;
+
+  IF v_cycle.closed_at IS NOT NULL OR NOW() >= v_cycle.edits_close_at THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'applications_closed';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.applications
+    WHERE cycle_id = v_cycle.id
+      AND user_id = auth.uid()
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = '23505', MESSAGE = 'application_already_submitted';
+  END IF;
+
+  INSERT INTO public.application_drafts (
+    cycle_id,
+    user_id,
+    draft_data,
+    current_step
+  ) VALUES (
+    v_cycle.id,
+    auth.uid(),
+    p_draft,
+    p_current_step
+  )
+  ON CONFLICT (cycle_id, user_id) DO UPDATE
+  SET draft_data = EXCLUDED.draft_data,
+      current_step = EXCLUDED.current_step,
+      updated_at = NOW()
+  RETURNING * INTO v_saved;
+
+  RETURN v_saved;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.clear_application_draft_after_submission()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  DELETE FROM public.application_drafts
+  WHERE cycle_id = NEW.cycle_id
+    AND user_id = NEW.user_id;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER clear_application_draft_after_submission
+AFTER INSERT OR UPDATE ON public.applications
+FOR EACH ROW
+EXECUTE FUNCTION public.clear_application_draft_after_submission();
+
 ALTER TABLE application_cycles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE application_drafts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE application_status_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE application_export_events ENABLE ROW LEVEL SECURITY;
@@ -598,6 +708,10 @@ CREATE POLICY "Anyone can view application cycle" ON application_cycles
 
 CREATE POLICY "Users can view own application" ON applications
   FOR SELECT USING ((SELECT auth.uid()) = user_id OR public.is_admin());
+
+CREATE POLICY "Users can view own application draft" ON application_drafts
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Admins can view own admin row" ON admin_users
   FOR SELECT USING ((SELECT auth.uid()) = user_id);
@@ -613,18 +727,22 @@ CREATE POLICY "Admins can view application reviews" ON application_reviews
 
 REVOKE INSERT, UPDATE, DELETE ON application_cycles FROM anon, authenticated;
 REVOKE INSERT, UPDATE, DELETE ON applications FROM anon, authenticated;
+REVOKE ALL ON application_drafts FROM anon, authenticated;
 REVOKE INSERT, UPDATE, DELETE ON admin_users FROM anon, authenticated;
 REVOKE INSERT, UPDATE, DELETE ON application_status_events FROM anon, authenticated;
 REVOKE INSERT, UPDATE, DELETE ON application_export_events FROM anon, authenticated;
 REVOKE INSERT, UPDATE, DELETE ON application_reviews FROM anon, authenticated;
 GRANT SELECT ON application_cycles TO anon, authenticated;
 GRANT SELECT ON applications TO authenticated;
+GRANT SELECT ON application_drafts TO authenticated;
 GRANT SELECT ON admin_users TO authenticated;
 GRANT SELECT ON application_status_events TO authenticated;
 GRANT SELECT ON application_export_events TO authenticated;
 GRANT SELECT ON application_reviews TO authenticated;
 
 REVOKE ALL ON FUNCTION public.save_application(JSONB, UUID, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.save_application_draft(JSONB, INTEGER, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.clear_application_draft_after_submission() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.set_application_window_closed(BOOLEAN, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.set_application_status(UUID, TEXT, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.log_application_export(INTEGER, TEXT) FROM PUBLIC;
@@ -633,6 +751,7 @@ REVOKE ALL ON FUNCTION public.save_application_review(UUID, JSONB, TEXT) FROM PU
 REVOKE ALL ON FUNCTION public.get_random_unreviewed_application(UUID) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.save_application(JSONB, UUID, TEXT) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.save_application_draft(JSONB, INTEGER, TEXT) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_application_window_closed(BOOLEAN, TEXT) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_application_status(UUID, TEXT, TEXT) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.log_application_export(INTEGER, TEXT) FROM anon;
@@ -640,6 +759,7 @@ REVOKE EXECUTE ON FUNCTION public.save_application_review(UUID, JSONB, TEXT) FRO
 REVOKE EXECUTE ON FUNCTION public.get_random_unreviewed_application(UUID) FROM anon;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.save_application(JSONB, UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.save_application_draft(JSONB, INTEGER, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_application_window_closed(BOOLEAN, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_application_status(UUID, TEXT, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.log_application_export(INTEGER, TEXT) TO authenticated;

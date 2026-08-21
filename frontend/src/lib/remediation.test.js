@@ -33,8 +33,30 @@ test('application validation catches invalid identity, demographics, and paired 
   assert.equal(stepFive.emergency_contact_phone, 'Add a phone number for this contact');
 });
 
+test('application validation requires and accepts a custom grade level', () => {
+  const missingCustomGrade = validateApplicationStep({
+    school: 'A. Y. Jackson',
+    grade: 'other',
+    grade_other: '',
+    experience_level: 'beginner',
+  }, 2);
+  assert.equal(missingCustomGrade.grade_other, 'Enter your grade level');
+
+  const validCustomGrade = validateApplicationStep({
+    school: 'A. Y. Jackson',
+    grade: 'other',
+    grade_other: 'Year 1',
+    experience_level: 'beginner',
+  }, 2);
+  assert.deepEqual(validCustomGrade, {});
+});
+
 test('application normalization trims user-controlled strings', () => {
   assert.deepEqual(normalizeApplicationData({ full_name: '  Ada  ', agree_to_terms: true }), { full_name: 'Ada', agree_to_terms: true });
+  assert.deepEqual(
+    normalizeApplicationData({ grade: 'other', grade_other: '  Year 1  ' }),
+    { grade: 'Year 1' },
+  );
 });
 
 test('status mapping returns applicant-facing labels and safe unknown fallback', () => {

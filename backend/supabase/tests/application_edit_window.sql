@@ -8,6 +8,7 @@ DECLARE
   v_admin_id UUID := '10000000-0000-0000-0000-000000000002';
   v_second_user_id UUID := '10000000-0000-0000-0000-000000000003';
   v_application public.applications%ROWTYPE;
+  v_draft public.application_drafts%ROWTYPE;
   v_second_application public.applications%ROWTYPE;
   v_random_application public.applications%ROWTYPE;
   v_cycle public.application_cycles%ROWTYPE;
@@ -20,6 +21,27 @@ BEGIN
   INSERT INTO public.admin_users (user_id) VALUES (v_admin_id);
 
   PERFORM set_config('request.jwt.claim.sub', v_user_id::TEXT, false);
+
+  v_draft := public.save_application_draft(
+    jsonb_build_object(
+      'full_name', 'Draft Applicant',
+      'school', 'Draft School',
+      'grade', 'other',
+      'grade_other', 'Year 1'
+    ),
+    2
+  );
+  ASSERT v_draft.user_id = v_user_id, 'draft owner was not recorded';
+  ASSERT v_draft.current_step = 2, 'draft step was not recorded';
+  ASSERT v_draft.draft_data->>'grade_other' = 'Year 1', 'draft answers were not recorded';
+
+  v_draft := public.save_application_draft(
+    jsonb_build_object('full_name', 'Updated Draft Applicant'),
+    3
+  );
+  ASSERT v_draft.current_step = 3, 'draft upsert did not update the saved step';
+  ASSERT v_draft.draft_data->>'full_name' = 'Updated Draft Applicant',
+    'draft upsert did not replace the saved answers';
 
   v_application := public.save_application(jsonb_build_object(
     'full_name', 'Test Applicant',
@@ -40,6 +62,18 @@ BEGIN
   ASSERT v_application.revision_number = 1, 'initial revision must be one';
   ASSERT v_application.status = 'submitted', 'initial status must be submitted';
   ASSERT v_application.race_ethnicity = ARRAY['east_asian', 'white'], 'demographic survey was not saved';
+  ASSERT NOT EXISTS (
+    SELECT 1 FROM public.application_drafts
+    WHERE cycle_id = v_application.cycle_id AND user_id = v_user_id
+  ), 'submitting an application did not clear its draft';
+
+  BEGIN
+    PERFORM public.save_application_draft('{"full_name":"Too Late"}'::JSONB, 1);
+    RAISE EXCEPTION 'submitted applicant unexpectedly saved another draft';
+  EXCEPTION WHEN OTHERS THEN
+    ASSERT SQLERRM = 'application_already_submitted',
+      'post-submission draft failure did not use application_already_submitted';
+  END;
 
   v_application := public.save_application(
     jsonb_build_object(

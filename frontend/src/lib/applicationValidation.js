@@ -13,6 +13,8 @@ export const APPLICATION_LIMITS = Object.freeze({
   emergency_contact_phone: 40,
 });
 
+export const STANDARD_GRADE_LEVELS = Object.freeze(['9', '10', '11', '12']);
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** @returns {Record<string, string>} */
@@ -32,7 +34,12 @@ export function validateApplicationStep(formData, step) {
     if (!value('school')) errors.school = 'School is required';
     else if (value('school').length > APPLICATION_LIMITS.school) errors.school = 'School name is too long';
     if (!value('grade')) errors.grade = 'Grade is required';
-    else if (!['9', '10', '11', '12'].includes(value('grade'))) errors.grade = 'Applicants must be in Grade 9 to 12';
+    else if (value('grade') === 'other') {
+      if (!value('grade_other')) errors.grade_other = 'Enter your grade level';
+      else if (value('grade_other').length > APPLICATION_LIMITS.grade) errors.grade_other = 'Grade level is too long';
+    } else if (!STANDARD_GRADE_LEVELS.includes(value('grade'))) {
+      errors.grade = 'Select a grade level';
+    }
     if (!value('experience_level')) errors.experience_level = 'Experience level is required';
   }
 
@@ -77,8 +84,15 @@ export function validateApplicationStep(formData, step) {
 }
 
 export function normalizeApplicationData(formData) {
-  return Object.fromEntries(Object.entries(formData).map(([key, value]) => [
+  const normalized = Object.fromEntries(Object.entries(formData).map(([key, value]) => [
     key,
     typeof value === 'string' ? value.trim() : value,
   ]));
+
+  if (normalized.grade === 'other') {
+    normalized.grade = normalized.grade_other;
+  }
+  delete normalized.grade_other;
+
+  return normalized;
 }

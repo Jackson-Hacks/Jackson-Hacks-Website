@@ -112,5 +112,11 @@ export function getApplicationRpcErrorMessage(error) {
   if (message.includes('application_not_found_or_not_owned')) {
     return 'This application could not be updated. Refresh the page and try again.';
   }
+  if (message.includes('application_already_submitted')) {
+    return 'This application was already submitted. Return to the dashboard to view it.';
+  }
+  if (message.includes('draft_too_large') || message.includes('invalid_draft')) {
+    return 'This draft could not be saved. Review your answers and try again.';
+  }
   return 'Something went wrong while saving your application. Please try again.';
 }

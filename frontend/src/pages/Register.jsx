@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PartyPopper, Sparkles, CheckCircle2, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +17,7 @@ import {
 import { getApplicationStatusDetails } from '@/lib/applicationStatus';
 
 export default function Register() {
+  const navigate = useNavigate();
   const {
     user,
     isAuthenticated,
@@ -30,6 +31,7 @@ export default function Register() {
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [existingApplication, setExistingApplication] = useState(null);
+  const [applicationDraft, setApplicationDraft] = useState(null);
   const [isEditingApplication, setIsEditingApplication] = useState(false);
   const [isViewingApplication, setIsViewingApplication] = useState(false);
   const [applicationCycle, setApplicationCycle] = useState(null);
@@ -51,6 +53,7 @@ export default function Register() {
   useEffect(() => {
     const checkApplication = async () => {
       try {
+        setIsLoadingApp(true);
         setApplicationLoadError(null);
         const { data: cycle, error: cycleError } = await supabase
           .from('application_cycles')
@@ -61,19 +64,29 @@ export default function Register() {
         if (cycleError) throw cycleError;
         setApplicationCycle(cycle);
 
-        if (isAuthenticated && user?.email) {
-          const { data, error } = await supabase
-            .from('applications')
-            .select('*')
-            .eq('cycle_id', cycle.id)
-            .eq('user_id', user.id)
-            .maybeSingle();
+        if (isAuthenticated && user?.id) {
+          const [applicationResult, draftResult] = await Promise.all([
+            supabase
+              .from('applications')
+              .select('*')
+              .eq('cycle_id', cycle.id)
+              .eq('user_id', user.id)
+              .maybeSingle(),
+            supabase
+              .from('application_drafts')
+              .select('*')
+              .eq('cycle_id', cycle.id)
+              .eq('user_id', user.id)
+              .maybeSingle(),
+          ]);
 
-          if (error) throw error;
-
-          if (data) {
-            setExistingApplication(data);
-          }
+          if (applicationResult.error) throw applicationResult.error;
+          if (draftResult.error) throw draftResult.error;
+          setExistingApplication(applicationResult.data || null);
+          setApplicationDraft(applicationResult.data ? null : draftResult.data || null);
+        } else {
+          setExistingApplication(null);
+          setApplicationDraft(null);
         }
       } catch (error) {
         console.error("Error checking application status:", error);
@@ -85,7 +98,7 @@ export default function Register() {
     if (!isLoadingAuth) {
       checkApplication();
     }
-  }, [isAuthenticated, user, isLoadingAuth, applicationLoadAttempt]);
+  }, [isAuthenticated, user?.id, isLoadingAuth, applicationLoadAttempt]);
 
   useEffect(() => {
     const refreshApplicationWindow = async () => {
@@ -107,6 +120,18 @@ export default function Register() {
 
   const applicationWindow = getApplicationWindowState(applicationCycle, applicationWindowClock);
   const applicationWindowMessage = getApplicationWindowMessage(applicationWindow);
+
+  const handleSaveDraft = async (draftData, currentStep) => {
+    const { data, error } = await supabase.rpc('save_application_draft', {
+      p_draft: draftData,
+      p_current_step: currentStep,
+      p_event_key: CURRENT_EVENT_KEY,
+    });
+    if (error) throw error;
+    const savedDraft = Array.isArray(data) ? data[0] : data;
+    setApplicationDraft(savedDraft);
+    navigate('/Dashboard');
+  };
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
@@ -437,9 +462,9 @@ export default function Register() {
             >
               <div className="text-center mb-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-[#F3F1F1] mb-4">
-                  {isViewingApplication ? 'View Your ' : isEditingApplication ? 'Edit Your ' : 'Apply to '}
+                  {isViewingApplication ? 'View Your ' : isEditingApplication ? 'Edit Your ' : applicationDraft ? 'Continue Your ' : 'Apply to '}
                   <span className="text-[#F68A42]">
-                    {isViewingApplication || isEditingApplication ? 'Application' : 'Jackson Hacks'}
+                    {isViewingApplication || isEditingApplication || applicationDraft ? 'Application' : 'Jackson Hacks'}
                   </span>
                 </h1>
                 <p className="text-[#B4BAC0]">
@@ -447,7 +472,9 @@ export default function Register() {
                     ? 'Applications are closed. This is your final submitted version.'
                     : isEditingApplication
                       ? applicationWindowMessage
-                      : 'Fill out the form below to submit your application'}
+                      : applicationDraft
+                        ? `Draft restored from step ${applicationDraft.current_step}. You can save and return again at any time before applications close.`
+                        : 'Fill out the form below to submit your application'}
                 </p>
               </div>
 
@@ -455,7 +482,9 @@ export default function Register() {
                 <ApplicationForm
                   user={user}
                   existingApplication={existingApplication}
+                  initialDraft={applicationDraft}
                   readOnly={isViewingApplication || !applicationWindow.canEdit}
+                  onSaveDraft={handleSaveDraft}
                   onDone={() => {
                     setIsViewingApplication(false);
                     setIsEditingApplication(false);
@@ -468,6 +497,7 @@ export default function Register() {
                   }}
                   onSuccess={(savedApplication) => {
                     setExistingApplication(savedApplication || existingApplication);
+                    setApplicationDraft(null);
                     setApplicationSubmitted(true);
                     setIsEditingApplication(false);
                     setIsViewingApplication(false);

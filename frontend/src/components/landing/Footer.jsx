@@ -76,7 +76,6 @@ export default function Footer() {
           </nav>
 
           <nav aria-label="Legal documents">
-            <h3 className="mb-4 font-title text-[#F3F1F1]">Legal</h3>
             <ul className="space-y-3 text-sm">
               {legalLinks.map((link) => (
                 <li key={link.to}>
