@@ -2,6 +2,9 @@ export const APPLICATION_LIMITS = Object.freeze({
   full_name: 120,
   email: 320,
   phone: 40,
+  country: 100,
+  city: 120,
+  province_state: 120,
   gender_self_description: 120,
   pronouns: 80,
   school: 160,
@@ -28,6 +31,10 @@ export function validateApplicationStep(formData, step) {
     if (!value('email')) errors.email = 'Email is required';
     else if (!EMAIL_PATTERN.test(value('email'))) errors.email = 'Enter a valid email address';
     if (value('phone').length > APPLICATION_LIMITS.phone) errors.phone = 'Phone number is too long';
+    for (const [field, label] of [['country', 'Country'], ['city', 'City'], ['province_state', 'Province / State']]) {
+      if (field !== 'province_state' && !value(field)) errors[field] = `${label} is required`;
+      else if (value(field).length > APPLICATION_LIMITS[field]) errors[field] = `${label} is too long`;
+    }
   }
 
   if (step === 2) {

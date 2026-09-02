@@ -59,6 +59,9 @@ const buildInitialFormData = (user, application = null, draft = null) => {
     full_name: savedData?.full_name || user?.full_name || user?.user_metadata?.full_name || '',
     email: savedData?.email || user?.email || '',
     phone: savedData?.phone || '',
+    country: savedData?.country || '',
+    city: savedData?.city || '',
+    province_state: savedData?.province_state || '',
     age: savedData?.age ? String(savedData.age) : '',
     gender_identity: savedData?.gender_identity || '',
     gender_self_description: savedData?.gender_self_description || '',
@@ -194,7 +197,14 @@ export default function ApplicationForm({
   const handleSubmit = async (event) => {
     event?.preventDefault();
     if (readOnly) return;
-    if (!validateStep(5)) return;
+    // Older drafts may resume after questions added since they were saved.
+    // Return to the first incomplete step instead of sending an invalid payload.
+    for (const step of steps) {
+      if (!validateStep(step.id)) {
+        setCurrentStep(step.id);
+        return;
+      }
+    }
     
     setIsSubmitting(true);
     
@@ -310,6 +320,40 @@ export default function ApplicationForm({
                 />
               </div>
             </div>
+            <fieldset className="space-y-4">
+              <legend className="mb-2 font-semibold text-white">Location</legend>
+              <p className="text-sm text-[#B4BAC0]">
+                Where will you be travelling from? City-level information only; no street address is needed.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  { field: 'country', label: 'Country', autoComplete: 'country-name', placeholder: 'e.g. Canada', required: true },
+                  { field: 'city', label: 'City', autoComplete: 'address-level2', placeholder: 'e.g. Toronto', required: true },
+                  { field: 'province_state', label: 'Province / State', autoComplete: 'address-level1', placeholder: 'e.g. Ontario', required: false },
+                ].map(({ field, label, autoComplete, placeholder, required }) => (
+                  <div key={field}>
+                    <Label htmlFor={field} className="mb-2 block text-white">
+                      {label}{' '}
+                      {required ? <span className="text-red-400">*</span> : <span className="text-sm text-gray-400">(optional)</span>}
+                    </Label>
+                    <Input
+                      id={field}
+                      autoComplete={autoComplete}
+                      aria-required={required}
+                      maxLength={APPLICATION_LIMITS[field]}
+                      disabled={readOnly}
+                      aria-invalid={Boolean(errors[field])}
+                      aria-describedby={errors[field] ? `${field}-error` : undefined}
+                      value={formData[field]}
+                      onChange={(event) => updateField(field, event.target.value)}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#2072C7]"
+                      placeholder={placeholder}
+                    />
+                    {errors[field] && <p id={`${field}-error`} className="mt-1 text-sm text-red-400">{errors[field]}</p>}
+                  </div>
+                ))}
+              </div>
+            </fieldset>
           </motion.div>
         );
 

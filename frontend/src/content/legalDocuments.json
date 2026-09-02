@@ -150,6 +150,8 @@
     },
     {
       "slug": "privacy",
+      "version": "2026-09-02",
+      "lastUpdated": "September 2, 2026",
       "navLabel": "Privacy",
       "title": "Privacy Notice",
       "summary": "How Jackson Hacks collects, uses, shares, safeguards, and deletes personal information.",
@@ -165,7 +167,7 @@
         {
           "heading": "2. Information collected",
           "paragraphs": [
-            "Depending on how a person uses the website, Jackson Hacks may collect account identifiers, name, email, phone number, age, school, grade, experience level, written application responses, dietary information, shirt size, emergency contact details, application status, review records, project information, waiver status, communications, and basic security or technical logs.",
+            "Depending on how a person uses the website, Jackson Hacks may collect account identifiers, name, email, phone number, age, country, city, province or state, school, grade, experience level, written application responses, dietary information, shirt size, emergency contact details, application status, review records, project information, waiver status, communications, and basic security or technical logs. City-level location helps with Event planning and understanding where applicants are travelling from; the application does not request a street address.",
             "The application may also request optional demographic information, including gender identity, pronouns, and race or ethnicity."
           ]
         },

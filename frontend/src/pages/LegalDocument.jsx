@@ -54,7 +54,7 @@ export default function LegalDocument() {
             <h1 className="mt-4 font-title text-4xl leading-tight sm:text-5xl">{document.title}</h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-[#B4BAC0]">{document.summary}</p>
             <p className="mt-4 text-sm text-[#8A9199]">
-              Version {legalContent.version} · Last updated {legalContent.lastUpdated}
+              Version {document.version || legalContent.version} · Last updated {document.lastUpdated || legalContent.lastUpdated}
             </p>
             {document.status && (
               <div className="mt-6 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100">

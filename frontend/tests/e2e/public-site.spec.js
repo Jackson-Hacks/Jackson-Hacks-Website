@@ -67,7 +67,7 @@ test('registration and public dashboard direct routes render', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
 
-test('applicants can enter an Other grade level', async ({ page }) => {
+test('applicants can enter an Other grade level', async ({ page }, testInfo) => {
   await mockApplicantSession(page);
   await mockOpenApplicationCycle(page);
   await page.route('**/rest/v1/applications*', (route) => route.fulfill({
@@ -83,6 +83,12 @@ test('applicants can enter an Other grade level', async ({ page }) => {
 
   await page.goto('/Register');
   await page.getByLabel('Full Name').fill('Test Applicant');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByText('Country is required')).toBeVisible();
+  await expect(page.getByText('City is required')).toBeVisible();
+  await page.getByLabel('Country', { exact: false }).fill('Japan');
+  await page.getByLabel('City', { exact: false }).fill('Tokyo');
+  await page.screenshot({ path: testInfo.outputPath('application-location.png'), fullPage: true });
   await page.getByRole('button', { name: 'Next' }).click();
 
   await page.getByLabel('School / Institution').fill('Test School');
@@ -100,7 +106,66 @@ test('applicants can enter an Other grade level', async ({ page }) => {
   await writtenResponse.fill('I want to build, learn, and meet other students.');
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.getByLabel('Age')).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Gender identity' })).toBeVisible();
+  await expect(page.getByText('Race / ethnicity', { exact: false })).toBeVisible();
   await expect(page.getByText(/first-generation college or university student/i)).toHaveCount(0);
+});
+
+test('location and demographics submit, reload, and remain editable', async ({ page }) => {
+  await mockApplicantSession(page);
+  await mockOpenApplicationCycle(page);
+  let saved = null;
+  let request = null;
+  const browserErrors = [];
+  page.on('pageerror', (error) => browserErrors.push(error.message));
+  await page.route('**/rest/v1/applications*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(saved || []) }));
+  await page.route('**/rest/v1/application_drafts*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.route('**/rest/v1/rpc/save_application', (route) => {
+    request = route.request().postDataJSON();
+    saved = { ...request.p_application, id: '88888888-8888-4888-8888-888888888888', user_id: applicantUser.id, cycle_id: openCycle.id, status: 'submitted', revision_number: 1, submitted_at: new Date().toISOString() };
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(saved) });
+  });
+  await page.goto('/Register');
+  await page.getByLabel('Full Name').fill('Location Applicant');
+  await page.getByLabel('Country', { exact: false }).fill(' Canada ');
+  await page.getByLabel('City', { exact: false }).fill(' Montréal ');
+  await page.getByLabel('Province / State').fill(' Québec ');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel('School / Institution').fill('Test School');
+  await page.getByRole('combobox', { name: 'Grade Level' }).click();
+  await page.getByRole('option', { name: 'Grade 12' }).click();
+  await page.getByRole('combobox', { name: 'Coding Experience' }).click();
+  await page.getByRole('option', { name: 'Beginner - Just starting out' }).click();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel(/Tell us why you want to attend/).fill('I would like to learn and build with a team.');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel('Age').fill('17');
+  await page.getByRole('combobox', { name: 'Gender identity' }).click();
+  await page.getByRole('option', { name: 'Non-binary / gender diverse' }).click();
+  await page.getByRole('checkbox', { name: 'East Asian', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'White', exact: true }).check();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('checkbox', { name: /I confirm that my information is accurate/ }).check();
+  await page.getByRole('button', { name: 'Submit Application' }).click();
+  await expect(page.getByRole('button', { name: 'Edit Submission' })).toBeVisible();
+  expect(request.p_application).toMatchObject({ country: 'Canada', city: 'Montréal', province_state: 'Québec', age: '17', gender_identity: 'non_binary', race_ethnicity: ['east_asian', 'white'] });
+  await page.reload();
+  await page.getByRole('button', { name: 'Edit Submission' }).click();
+  await expect(page.getByLabel('Country', { exact: false })).toHaveValue('Canada');
+  await expect(page.getByLabel('City', { exact: false })).toHaveValue('Montréal');
+  await expect(page.getByLabel('Province / State')).toHaveValue('Québec');
+  await page.getByLabel('City', { exact: false }).fill('Ottawa');
+  await page.getByLabel('Province / State').fill('Ontario');
+  for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByLabel('Age')).toHaveValue('17');
+  await expect(page.getByRole('combobox', { name: 'Gender identity' })).toContainText('Non-binary');
+  await expect(page.getByRole('checkbox', { name: 'East Asian', exact: true })).toBeChecked();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await expect(page.getByRole('button', { name: 'Edit Submission' })).toBeVisible();
+  expect(request.p_application_id).toBe(saved.id);
+  expect(request.p_application.city).toBe('Ottawa');
+  expect(browserErrors).toEqual([]);
 });
 
 test('editing an application shows the final page after demographics', async ({ page }) => {
@@ -114,6 +179,9 @@ test('editing an application shows the final page after demographics', async ({ 
     full_name: 'Existing Applicant',
     email: applicantUser.email,
     phone: '',
+    country: 'Canada',
+    city: 'Toronto',
+    province_state: 'Ontario',
     age: 17,
     school: 'Existing School',
     grade: '12',
@@ -139,6 +207,10 @@ test('editing an application shows the final page after demographics', async ({ 
 
   await page.goto('/Register');
   await page.getByRole('button', { name: 'Edit Submission' }).click();
+
+  await expect(page.getByLabel('Country', { exact: false })).toHaveValue('Canada');
+  await expect(page.getByLabel('City', { exact: false })).toHaveValue('Toronto');
+  await expect(page.getByLabel('Province / State')).toHaveValue('Ontario');
 
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.getByText('Step 2 of 5: School & Experience')).toBeAttached();
@@ -170,6 +242,9 @@ test('admin review keeps secondary applicant details in Other info', async ({ pa
     full_name: 'Review Applicant',
     email: 'review@example.com',
     phone: '416-555-0199',
+    country: 'Canada',
+    city: 'Toronto',
+    province_state: 'Ontario',
     school: 'Review School',
     grade: '12',
     experience_level: 'intermediate',
@@ -210,6 +285,7 @@ test('admin review keeps secondary applicant details in Other info', async ({ pa
   await expect(reviewDialog.getByText('Phone', { exact: true })).toBeHidden();
   await expect(reviewDialog.getByText('T-shirt size', { exact: true })).toBeHidden();
   await expect(reviewDialog.getByText('Heard from', { exact: true })).toBeHidden();
+  await expect(reviewDialog.getByText('Toronto', { exact: true })).toBeHidden();
 
   await reviewDialog.getByText('Other info', { exact: true }).click();
   await expect(reviewDialog.getByText('Phone', { exact: true })).toBeVisible();
@@ -218,6 +294,9 @@ test('admin review keeps secondary applicant details in Other info', async ({ pa
   await expect(reviewDialog.getByText('M', { exact: true })).toBeVisible();
   await expect(reviewDialog.getByText('Heard from', { exact: true })).toBeVisible();
   await expect(reviewDialog.getByText('School announcement')).toBeVisible();
+  await expect(reviewDialog.getByText('Canada', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('Toronto', { exact: true })).toBeVisible();
+  await expect(reviewDialog.getByText('Ontario', { exact: true })).toBeVisible();
 });
 
 test('applicants can save a draft, return to the dashboard, and resume it', async ({ page }) => {
@@ -266,6 +345,9 @@ test('applicants can save a draft, return to the dashboard, and resume it', asyn
 
   await page.goto('/Register');
   await page.getByLabel('Full Name').fill('Saved Applicant');
+  await page.getByLabel('Country', { exact: false }).fill('Canada');
+  await page.getByLabel('City', { exact: false }).fill('Montréal');
+  await page.getByLabel('Province / State').fill('Québec');
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByLabel('School / Institution').fill('Saved School');
   await page.getByRole('combobox', { name: 'Grade Level' }).click();
@@ -284,6 +366,9 @@ test('applicants can save a draft, return to the dashboard, and resume it', asyn
   expect(savedRequest.p_current_step).toBe(2);
   expect(savedRequest.p_draft.school).toBe('Saved School');
   expect(savedRequest.p_draft.grade_other).toBe('Year 1');
+  expect(savedRequest.p_draft.country).toBe('Canada');
+  expect(savedRequest.p_draft.city).toBe('Montréal');
+  expect(savedRequest.p_draft.province_state).toBe('Québec');
   await expect(page.getByText('Draft saved')).toBeVisible();
   await expect(page.getByText('Your answers are private and saved at step 2 of 5.')).toBeVisible();
 
@@ -292,6 +377,44 @@ test('applicants can save a draft, return to the dashboard, and resume it', asyn
   await expect(page.getByRole('heading', { name: 'Continue Your Application' })).toBeVisible();
   await expect(page.getByLabel('School / Institution')).toHaveValue('Saved School');
   await expect(page.getByLabel('Enter your grade level')).toHaveValue('Year 1');
+  await page.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(page.getByLabel('Country', { exact: false })).toHaveValue('Canada');
+  await expect(page.getByLabel('City', { exact: false })).toHaveValue('Montréal');
+  await expect(page.getByLabel('Province / State')).toHaveValue('Québec');
+});
+
+test('older drafts return to missing location questions before submitting', async ({ page }) => {
+  await mockApplicantSession(page);
+  await mockOpenApplicationCycle(page);
+  const draft = {
+    id: '99999999-9999-4999-8999-999999999999',
+    user_id: applicantUser.id,
+    cycle_id: openCycle.id,
+    current_step: 5,
+    draft_data: {
+      full_name: 'Legacy Draft', email: applicantUser.email,
+      school: 'Test School', grade: '12', experience_level: 'beginner',
+      why_attend: 'I want to learn and build with other students.',
+      age: '17', agree_to_terms: true,
+    },
+  };
+  let submissionCount = 0;
+  await page.route('**/rest/v1/applications*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.route('**/rest/v1/application_drafts*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(draft) }));
+  await page.route('**/rest/v1/rpc/save_application', (route) => {
+    submissionCount++;
+    return route.fulfill({ status: 400, contentType: 'application/json', body: '{}' });
+  });
+  await page.goto('/Register');
+  await page.getByRole('button', { name: 'Submit Application' }).click();
+  await expect(page.getByText('Country is required')).toBeVisible();
+  await expect(page.getByText('City is required')).toBeVisible();
+  await expect(page.getByLabel('Full Name')).toHaveValue('Legacy Draft');
+  expect(submissionCount).toBe(0);
+  await page.getByLabel('Country', { exact: false }).fill('Canada');
+  await page.getByLabel('City', { exact: false }).fill('Toronto');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByLabel('School / Institution')).toHaveValue('Test School');
 });
 
 test('legal documents are public and provide matching PDF downloads', async ({ page }) => {

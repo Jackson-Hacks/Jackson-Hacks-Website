@@ -1,6 +1,6 @@
 -- Supabase Database Schema for Jackson Hacks
 -- Source-of-truth schema for a fresh project. Existing projects should apply
--- backend/supabase/migrations/20260807_application_edit_window.sql instead.
+-- all backend/supabase/migrations in timestamp order instead.
 
 CREATE TABLE application_cycles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -36,6 +36,9 @@ CREATE TABLE applications (
   full_name TEXT NOT NULL CHECK (char_length(btrim(full_name)) BETWEEN 1 AND 120),
   email TEXT NOT NULL CHECK (char_length(btrim(email)) BETWEEN 3 AND 320 AND email LIKE '%@%'),
   phone TEXT CHECK (phone IS NULL OR char_length(phone) <= 40),
+  country TEXT,
+  city TEXT,
+  province_state TEXT,
   age INTEGER NOT NULL CHECK (age BETWEEN 5 AND 120),
   gender_identity TEXT CHECK (
     gender_identity IS NULL OR gender_identity IN (
@@ -63,6 +66,15 @@ CREATE TABLE applications (
   emergency_contact_name TEXT CHECK (emergency_contact_name IS NULL OR char_length(emergency_contact_name) <= 120),
   emergency_contact_phone TEXT CHECK (emergency_contact_phone IS NULL OR char_length(emergency_contact_phone) <= 40),
   agree_to_terms BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT applications_location_check CHECK (
+    (country IS NULL AND city IS NULL AND province_state IS NULL)
+    OR (
+      country IS NOT NULL AND city IS NOT NULL
+      AND char_length(btrim(country)) BETWEEN 1 AND 100
+      AND char_length(btrim(city)) BETWEEN 1 AND 120
+      AND (province_state IS NULL OR char_length(btrim(province_state)) BETWEEN 1 AND 120)
+    )
+  ),
   CHECK ((emergency_contact_name IS NULL) = (emergency_contact_phone IS NULL)),
   CHECK (
     race_ethnicity <@ ARRAY[
@@ -180,6 +192,7 @@ DECLARE
   v_age INTEGER;
   v_agree BOOLEAN;
   v_race_ethnicity TEXT[];
+  v_has_location BOOLEAN := p_application ?| ARRAY['country', 'city', 'province_state'];
 BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'authentication_required';
@@ -202,6 +215,18 @@ BEGIN
   END IF;
 
   v_age := NULLIF(p_application->>'age', '')::INTEGER;
+  -- Pre-location clients may omit the entire group during a rolling deployment.
+  -- Once any location key is sent, require country/city and validate all three.
+  IF v_has_location AND (
+    jsonb_typeof(p_application->'country') IS DISTINCT FROM 'string'
+    OR jsonb_typeof(p_application->'city') IS DISTINCT FROM 'string'
+    OR COALESCE(jsonb_typeof(p_application->'province_state'), 'null') NOT IN ('string', 'null')
+    OR char_length(btrim(p_application->>'country')) NOT BETWEEN 1 AND 100
+    OR char_length(btrim(p_application->>'city')) NOT BETWEEN 1 AND 120
+    OR char_length(btrim(COALESCE(p_application->>'province_state', ''))) > 120
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'application_invalid';
+  END IF;
   v_agree := COALESCE((p_application->>'agree_to_terms')::BOOLEAN, FALSE);
   IF p_application ? 'race_ethnicity'
     AND jsonb_typeof(p_application->'race_ethnicity') <> 'array' THEN
@@ -228,7 +253,6 @@ BEGIN
     OR char_length(btrim(p_application->>'why_attend')) NOT BETWEEN 10 AND 2000
     OR char_length(COALESCE(p_application->>'phone', '')) > 40
     OR char_length(COALESCE(p_application->>'dietary_restrictions', '')) > 500
-    OR char_length(COALESCE(p_application->>'project_idea', '')) > 2000
     OR char_length(COALESCE(p_application->>'gender_self_description', '')) > 120
     OR char_length(COALESCE(p_application->>'pronouns', '')) > 80
     OR NULLIF(p_application->>'gender_identity', '') IS NOT NULL
@@ -259,6 +283,7 @@ BEGIN
   IF p_application_id IS NULL THEN
     INSERT INTO public.applications (
       cycle_id, user_id, status, full_name, email, phone, age,
+      country, city, province_state,
       gender_identity, gender_self_description, pronouns, race_ethnicity,
       first_generation, school, grade,
       experience_level, dietary_restrictions, tshirt_size, why_attend,
@@ -273,6 +298,9 @@ BEGIN
       btrim(p_application->>'email'),
       NULLIF(btrim(p_application->>'phone'), ''),
       v_age,
+      NULLIF(btrim(p_application->>'country'), ''),
+      NULLIF(btrim(p_application->>'city'), ''),
+      NULLIF(btrim(p_application->>'province_state'), ''),
       NULLIF(p_application->>'gender_identity', ''),
       NULLIF(btrim(p_application->>'gender_self_description'), ''),
       NULLIF(btrim(p_application->>'pronouns'), ''),
@@ -284,7 +312,7 @@ BEGIN
       NULLIF(btrim(p_application->>'dietary_restrictions'), ''),
       NULLIF(p_application->>'tshirt_size', ''),
       btrim(p_application->>'why_attend'),
-      NULLIF(btrim(p_application->>'project_idea'), ''),
+      NULL,
       NULLIF(p_application->>'heard_from', ''),
       NULLIF(btrim(p_application->>'emergency_contact_name'), ''),
       NULLIF(btrim(p_application->>'emergency_contact_phone'), ''),
@@ -295,6 +323,9 @@ BEGIN
       email = EXCLUDED.email,
       phone = EXCLUDED.phone,
       age = EXCLUDED.age,
+      country = CASE WHEN v_has_location THEN EXCLUDED.country ELSE public.applications.country END,
+      city = CASE WHEN v_has_location THEN EXCLUDED.city ELSE public.applications.city END,
+      province_state = CASE WHEN v_has_location THEN EXCLUDED.province_state ELSE public.applications.province_state END,
       gender_identity = EXCLUDED.gender_identity,
       gender_self_description = EXCLUDED.gender_self_description,
       pronouns = EXCLUDED.pronouns,
@@ -306,7 +337,7 @@ BEGIN
       dietary_restrictions = EXCLUDED.dietary_restrictions,
       tshirt_size = EXCLUDED.tshirt_size,
       why_attend = EXCLUDED.why_attend,
-      project_idea = EXCLUDED.project_idea,
+      project_idea = NULL,
       heard_from = EXCLUDED.heard_from,
       emergency_contact_name = EXCLUDED.emergency_contact_name,
       emergency_contact_phone = EXCLUDED.emergency_contact_phone,
@@ -320,6 +351,9 @@ BEGIN
       email = btrim(p_application->>'email'),
       phone = NULLIF(btrim(p_application->>'phone'), ''),
       age = v_age,
+      country = CASE WHEN v_has_location THEN NULLIF(btrim(p_application->>'country'), '') ELSE country END,
+      city = CASE WHEN v_has_location THEN NULLIF(btrim(p_application->>'city'), '') ELSE city END,
+      province_state = CASE WHEN v_has_location THEN NULLIF(btrim(p_application->>'province_state'), '') ELSE province_state END,
       gender_identity = NULLIF(p_application->>'gender_identity', ''),
       gender_self_description = NULLIF(btrim(p_application->>'gender_self_description'), ''),
       pronouns = NULLIF(btrim(p_application->>'pronouns'), ''),
@@ -331,7 +365,7 @@ BEGIN
       dietary_restrictions = NULLIF(btrim(p_application->>'dietary_restrictions'), ''),
       tshirt_size = NULLIF(p_application->>'tshirt_size', ''),
       why_attend = btrim(p_application->>'why_attend'),
-      project_idea = NULLIF(btrim(p_application->>'project_idea'), ''),
+      project_idea = NULL,
       heard_from = NULLIF(p_application->>'heard_from', ''),
       emergency_contact_name = NULLIF(btrim(p_application->>'emergency_contact_name'), ''),
       emergency_contact_phone = NULLIF(btrim(p_application->>'emergency_contact_phone'), ''),

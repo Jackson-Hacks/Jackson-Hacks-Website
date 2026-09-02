@@ -30,6 +30,7 @@ bootstrap="CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE S
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -c "$bootstrap"
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/schema.sql
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
+docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 
 docker exec "$container" createdb -U postgres legacy
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -c "CREATE SCHEMA auth; CREATE TABLE auth.users (id uuid PRIMARY KEY); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT nullif(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';"
@@ -40,9 +41,13 @@ docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/m
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817230812_application_review_five_point_scale.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260821033736_application_drafts.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902211016_application_location.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260807_application_edit_window.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260810_application_security_and_indexes.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817230812_application_review_five_point_scale.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260821033736_application_drafts.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902211016_application_location.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql

@@ -68,6 +68,9 @@ const applicantDetailFields = [
 ];
 const otherApplicantDetailFields = [
   { label: "Phone", value: (application) => application.phone, sensitive: true },
+  { label: "Country", value: (application) => application.country, sensitive: true },
+  { label: "City", value: (application) => application.city, sensitive: true },
+  { label: "Province / State", value: (application) => application.province_state, sensitive: true },
   { label: "T-shirt size", value: (application) => application.tshirt_size },
   { label: "Heard from", value: (application) => application.heard_from },
 ];
@@ -87,6 +90,9 @@ const csvColumns = [
   },
   { label: "Name", value: (application) => application.full_name },
   { label: "Email", value: (application) => application.email },
+  { label: "Country", value: (application) => application.country },
+  { label: "City", value: (application) => application.city },
+  { label: "Province / State", value: (application) => application.province_state },
   { label: "School", value: (application) => application.school },
   { label: "Grade", value: (application) => application.grade },
   { label: "Experience", value: (application) => application.experience_level },

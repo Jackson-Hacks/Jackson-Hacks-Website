@@ -10,6 +10,13 @@
 6. Obtain organizer sign-off before applying the migration and frontend build to production.
 7. Repeat the smoke test immediately after deployment.
 
+## Application location rollout
+
+- Apply `backend/supabase/migrations/20260902211016_application_location.sql` before deploying the frontend with location fields. Otherwise the old RPC will not persist them.
+- The new form requires country and city; province/state remains optional. Existing age, optional gender identity, and optional race/ethnicity questions are unchanged.
+- Existing applications and drafts are preserved. Older clients that omit the entire location group remain compatible and cannot erase saved location answers. New clients validate missing location answers before submitting an older draft.
+- Verify location survives draft resume, submit, and edit, and remains hidden in blind review. The PostgreSQL suite includes location validation, legacy-client preservation, cutoff, ownership, and RLS checks.
+
 ## Rollback
 
 - Record the frontend deployment identifier and database backup identifier before release.

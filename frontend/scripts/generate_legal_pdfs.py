@@ -226,7 +226,7 @@ def build_document(document: dict, legal_content: dict, destination: Path):
         Paragraph(escape(document["title"]), STYLES["title"]),
         Paragraph(escape(document["summary"]), STYLES["summary"]),
         Paragraph(
-            f"Version {escape(legal_content['version'])} | Last updated {escape(legal_content['lastUpdated'])}",
+            f"Version {escape(document.get('version', legal_content['version']))} | Last updated {escape(document.get('lastUpdated', legal_content['lastUpdated']))}",
             STYLES["meta"],
         ),
     ]

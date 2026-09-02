@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EVENT } from '../config/event.js';
-import { validateApplicationStep, normalizeApplicationData } from './applicationValidation.js';
+import { APPLICATION_LIMITS, validateApplicationStep, normalizeApplicationData } from './applicationValidation.js';
 import { createCsv, neutralizeSpreadsheetFormula } from './csv.js';
 import { getApplicationStatusDetails } from './applicationStatus.js';
 import {
@@ -49,6 +49,26 @@ test('application validation requires and accepts a custom grade level', () => {
     experience_level: 'beginner',
   }, 2);
   assert.deepEqual(validCustomGrade, {});
+});
+
+test('location requires country and city, accepts international names, and bounds field lengths', () => {
+  const identity = { full_name: 'Test Applicant', email: 'test@example.com' };
+  assert.deepEqual(validateApplicationStep(identity, 1), { country: 'Country is required', city: 'City is required' });
+  assert.deepEqual(validateApplicationStep({ ...identity, country: '  ', city: '' }, 1), {
+    country: 'Country is required', city: 'City is required',
+  });
+  assert.deepEqual(validateApplicationStep({ ...identity, country: '日本', city: '東京', province_state: '' }, 1), {});
+  for (const field of ['country', 'city', 'province_state']) {
+    assert.ok(validateApplicationStep({ ...identity, country: 'Canada', city: 'Toronto', [field]: 'x'.repeat(APPLICATION_LIMITS[field] + 1) }, 1)[field]);
+  }
+  assert.deepEqual(normalizeApplicationData({ country: ' Canada ', city: ' Montréal ', province_state: ' Québec ' }), {
+    country: 'Canada', city: 'Montréal', province_state: 'Québec',
+  });
+});
+
+test('age remains required while gender and race remain optional', () => {
+  assert.deepEqual(validateApplicationStep({ age: '17', gender_identity: '', race_ethnicity: [] }, 4), {});
+  assert.equal(validateApplicationStep({ age: '' }, 4).age, 'Age is required');
 });
 
 test('application normalization trims user-controlled strings', () => {
