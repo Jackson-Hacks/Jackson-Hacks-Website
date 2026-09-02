@@ -41,7 +41,7 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817230812_application_review_five_point_scale.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260821033736_application_drafts.sql
-  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902211016_application_location.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902234026_application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260807_application_edit_window.sql
@@ -49,7 +49,7 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817211104_application_review_scoring.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260817230812_application_review_five_point_scale.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260821033736_application_drafts.sql
-  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902211016_application_location.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902234026_application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 
   Write-Host 'Fresh schema, legacy migration, database behavior, and migration idempotency tests passed.'

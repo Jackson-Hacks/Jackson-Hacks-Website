@@ -1,4 +1,5 @@
 -- Add city-level location without deleting or changing existing submissions.
+-- Filename matches the production migration version assigned by Supabase.
 -- Apply before deploying the frontend. Older clients may omit the location group;
 -- their writes preserve previously saved location answers. No RLS/grant expansion.
 BEGIN;
