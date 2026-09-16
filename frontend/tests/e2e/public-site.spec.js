@@ -12,6 +12,7 @@ const openCycle = {
   event_key: 'jackson-hacks-2026',
   opens_at: '2026-01-01T05:00:00.000Z',
   edits_close_at: '2099-11-21T13:00:00.000Z',
+  launched_at: '2026-08-01T12:00:00.000Z',
   closed_at: null,
 };
 
@@ -60,11 +61,96 @@ test('home navigation, FAQ semantics, and interactive nesting are valid', async 
 });
 
 test('registration and public dashboard direct routes render', async ({ page }) => {
+  await mockOpenApplicationCycle(page);
   await page.goto('/Register');
   await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Forgot your password?' })).toBeVisible();
   await page.goto('/Dashboard');
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+});
+
+test('registration stays on the coming-soon page before an admin launches it', async ({ page }) => {
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ ...openCycle, launched_at: null, closed_at: new Date().toISOString() }),
+  }));
+
+  await page.goto('/Register');
+  await expect(page.getByRole('heading', { name: 'Applications Opening Soon' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toHaveCount(0);
+});
+
+test('an admin can launch applications without a redeployment', async ({ page }) => {
+  await mockApplicantSession(page);
+  let cycle = { ...openCycle, launched_at: null, closed_at: new Date().toISOString() };
+  let toggleRequest = null;
+
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(cycle),
+  }));
+  await page.route('**/rest/v1/applications*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.route('**/rest/v1/application_drafts*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.route('**/rest/v1/admin_users*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify([{ user_id: applicantUser.id }]),
+  }));
+  await page.route('**/rest/v1/application_reviews*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.route('**/rest/v1/rpc/set_application_window_closed', (route) => {
+    toggleRequest = route.request().postDataJSON();
+    cycle = {
+      ...cycle,
+      launched_at: new Date().toISOString(),
+      closed_at: null,
+      closed_by: null,
+    };
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(cycle) });
+  });
+
+  await page.goto('/Dashboard');
+  const openButton = page.getByRole('button', { name: 'Open Applications' });
+  await expect(openButton).toBeVisible();
+  await openButton.click();
+  await expect(page.getByRole('button', { name: 'Close Applications' })).toBeVisible();
+  expect(toggleRequest).toMatchObject({ p_closed: false, p_event_key: 'jackson-hacks-2026' });
+
+  await page.goto('/Register');
+  await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toBeVisible();
+});
+
+test('application analytics are admin-only and load numeric summaries without identity fields', async ({ page }) => {
+  await mockApplicantSession(page);
+  let applicationRequestUrl = '';
+  await page.route('**/rest/v1/admin_users*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ user_id: applicantUser.id }]) }));
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: openCycle.id, name: 'Jackson Hacks 2026' }) }));
+  await page.route(/\/rest\/v1\/applications\?/, (route) => {
+    applicationRequestUrl = decodeURIComponent(route.request().url());
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
+      { id: 'app-1', status: 'submitted', submitted_at: new Date().toISOString(), age: 17, gender_identity: 'woman', race_ethnicity: ['east_asian'], country: 'Canada', city: 'Toronto', province_state: 'Ontario', school: 'Test School', grade: '12', experience_level: 'beginner', heard_from: 'friend', tshirt_size: 'M' },
+      { id: 'app-2', status: 'under_review', submitted_at: new Date().toISOString(), age: 16, gender_identity: null, race_ethnicity: [], country: 'Canada', city: 'Ottawa', province_state: 'Ontario', school: 'Another School', grade: '11', experience_level: 'advanced', heard_from: null, tshirt_size: 'S' },
+    ]) });
+  });
+  await page.route('**/rest/v1/application_reviews*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
+    { id: 'review-1', application_id: 'app-1', reviewer_id: applicantUser.id, total_score: 20, motivation_score: 4, learning_score: 4, creativity_score: 4, collaboration_score: 4, response_score: 4 },
+  ]) }));
+  await page.goto('/ApplicationAnalytics');
+  await expect(page.getByRole('heading', { name: 'Application Analytics' })).toBeVisible();
+  await expect(page.getByText('2', { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Application status' })).toBeVisible();
+  expect(applicationRequestUrl).not.toContain('full_name');
+  expect(applicationRequestUrl).not.toContain('email');
+  expect(applicationRequestUrl).not.toContain('why_attend');
+});
+
+test('non-admins cannot view application analytics', async ({ page }) => {
+  await mockApplicantSession(page);
+  await page.route('**/rest/v1/admin_users*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.goto('/ApplicationAnalytics');
+  await expect(page.getByRole('heading', { name: 'Admin access required' })).toBeVisible();
+  await expect(page.getByText('Total applications')).toHaveCount(0);
 });
 
 test('applicants can enter an Other grade level', async ({ page }, testInfo) => {

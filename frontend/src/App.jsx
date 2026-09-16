@@ -11,6 +11,7 @@ import { queryClientInstance } from '@/lib/query-client';
 const Home = lazy(() => import('@/pages/Home'));
 const Register = lazy(() => import('@/pages/Register'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const ApplicationAnalytics = lazy(() => import('@/pages/ApplicationAnalytics'));
 const LegalDocument = lazy(() => import('@/pages/LegalDocument'));
 
 function RouteLoadingState() {
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/:documentSlug" element={<LegalDocument />} />
                 {/* Dashboard intentionally remains public for the current testing workflow. */}
                 <Route path="/Dashboard" element={<Dashboard />} />
+                <Route path="/ApplicationAnalytics" element={<ApplicationAnalytics />} />
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </Suspense>

@@ -120,6 +120,7 @@ export default function Register() {
 
   const applicationWindow = getApplicationWindowState(applicationCycle, applicationWindowClock);
   const applicationWindowMessage = getApplicationWindowMessage(applicationWindow);
+  const applicationsLaunched = Boolean(applicationCycle?.launched_at);
 
   const handleSaveDraft = async (draftData, currentStep) => {
     const { data, error } = await supabase.rpc('save_application_draft', {
@@ -203,8 +204,32 @@ export default function Register() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-20">
         <div className="w-full max-w-2xl">
+          {authMode !== 'recovery' && !applicationsLaunched && !applicationLoadError && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+            >
+              <div className="mb-6 inline-flex rounded-full bg-[#F68A42]/15 p-5">
+                <Sparkles className="h-12 w-12 text-[#F68A42]" />
+              </div>
+              <h1 className="mb-4 text-4xl font-bold text-[#F3F1F1] md:text-5xl">
+                Applications Opening Soon
+              </h1>
+              <p className="mx-auto mb-3 max-w-lg text-xl text-[#B4BAC0]">
+                Applications for Jackson Hacks 2026 aren&apos;t open yet.
+              </p>
+              <p className="mx-auto mb-8 max-w-lg text-[#8A9199]">
+                Check back soon for application updates.
+              </p>
+              <Button asChild size="lg" className="rounded-full bg-[#F68A42] px-8 text-white hover:bg-[#E06E0A]">
+                <Link to={createPageUrl('Home')}>Back to Home</Link>
+              </Button>
+            </motion.div>
+          )}
+
           {/* Success State */}
-          {authMode !== 'recovery' && (applicationSubmitted || (existingApplication && !isEditingApplication && !isViewingApplication)) && (
+          {applicationsLaunched && authMode !== 'recovery' && (applicationSubmitted || (existingApplication && !isEditingApplication && !isViewingApplication)) && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -269,7 +294,7 @@ export default function Register() {
             </motion.div>
           )}
 
-          {authMode !== 'recovery' && isAuthenticated && applicationLoadError && !existingApplication && (
+          {authMode !== 'recovery' && applicationLoadError && !existingApplication && (
             <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-200">
               <AlertCircle className="mx-auto mb-3" size={28} />
               <p>{applicationLoadError}</p>
@@ -287,7 +312,7 @@ export default function Register() {
             </div>
           )}
 
-          {authMode !== 'recovery' && isAuthenticated && !applicationLoadError && !existingApplication && !applicationWindow.canEdit && (
+          {applicationsLaunched && authMode !== 'recovery' && isAuthenticated && !applicationLoadError && !existingApplication && !applicationWindow.canEdit && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -300,7 +325,7 @@ export default function Register() {
           )}
 
           {/* Not Authenticated */}
-          {(!isAuthenticated || authMode === 'recovery') && !applicationSubmitted && (
+          {(authMode === 'recovery' || (applicationsLaunched && !isAuthenticated)) && !applicationSubmitted && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -451,7 +476,7 @@ export default function Register() {
           )}
 
           {/* Application Form */}
-          {authMode !== 'recovery' && isAuthenticated && !applicationLoadError && (
+          {applicationsLaunched && authMode !== 'recovery' && isAuthenticated && !applicationLoadError && (
             isEditingApplication ||
             isViewingApplication ||
             (!applicationSubmitted && !existingApplication && applicationWindow.canEdit)

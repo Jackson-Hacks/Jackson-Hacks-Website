@@ -17,6 +17,13 @@
 - Existing applications and drafts are preserved. Older clients that omit the entire location group remain compatible and cannot erase saved location answers. New clients validate missing location answers before submitting an older draft.
 - Verify location survives draft resume, submit, and edit, and remains hidden in blind review. The PostgreSQL suite includes location validation, legacy-client preservation, cutoff, ownership, and RLS checks.
 
+## Application launch gate
+
+- The current application cycle starts unlaunched in Supabase. While unlaunched, `/Register` shows the public “Applications Opening Soon” page and the database rejects submissions and drafts.
+- When applications are ready, an administrator can select **Open Applications** in `/Dashboard`. This records the launch time and opens the page and database immediately; no Vercel setting or redeployment is required.
+- The same control closes or reopens applications. The scheduled opening and cutoff timestamps remain hard server-side limits.
+- Password-recovery links remain available while the public application gate is closed.
+
 ## Rollback
 
 - Record the frontend deployment identifier and database backup identifier before release.

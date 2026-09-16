@@ -9,8 +9,18 @@ import {
 const cycle = {
   opens_at: '2026-01-01T05:00:00.000Z',
   edits_close_at: '2026-11-21T13:00:00.000Z',
+  launched_at: '2026-08-01T12:00:00.000Z',
   closed_at: null,
 };
+
+test('application window stays closed until an administrator launches it', () => {
+  const state = getApplicationWindowState(
+    { ...cycle, launched_at: null },
+    new Date('2026-08-07T12:00:00.000Z'),
+  );
+  assert.equal(state.status, 'not_launched');
+  assert.equal(state.canEdit, false);
+});
 
 test('application window is open between its configured timestamps', () => {
   const state = getApplicationWindowState(cycle, new Date('2026-08-07T12:00:00.000Z'));

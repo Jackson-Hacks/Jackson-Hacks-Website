@@ -26,6 +26,7 @@ export function getApplicationWindowState(cycle, now = new Date()) {
   const opensAt = toValidDate(cycle.opens_at);
   const closesAt = toValidDate(cycle.edits_close_at);
   const closedAt = toValidDate(cycle.closed_at);
+  const launchedAt = toValidDate(cycle.launched_at);
 
   if (!opensAt || !closesAt) {
     return {
@@ -35,6 +36,19 @@ export function getApplicationWindowState(cycle, now = new Date()) {
       opensAt,
       closesAt,
       closedAt,
+      launchedAt,
+    };
+  }
+
+  if (!launchedAt) {
+    return {
+      status: 'not_launched',
+      isOpen: false,
+      canEdit: false,
+      opensAt,
+      closesAt,
+      closedAt,
+      launchedAt: null,
     };
   }
 
@@ -46,6 +60,7 @@ export function getApplicationWindowState(cycle, now = new Date()) {
       opensAt,
       closesAt,
       closedAt,
+      launchedAt,
     };
   }
 
@@ -57,6 +72,7 @@ export function getApplicationWindowState(cycle, now = new Date()) {
       opensAt,
       closesAt,
       closedAt,
+      launchedAt,
     };
   }
 
@@ -67,6 +83,7 @@ export function getApplicationWindowState(cycle, now = new Date()) {
     opensAt,
     closesAt,
     closedAt,
+    launchedAt,
   };
 }
 
@@ -86,6 +103,9 @@ export function formatApplicationDate(value) {
 }
 
 export function getApplicationWindowMessage(windowState) {
+  if (windowState.status === 'not_launched') {
+    return 'Applications have not opened yet. An administrator can open them from this dashboard.';
+  }
   if (windowState.status === 'open') {
     return `You can edit your submitted application until ${formatApplicationDate(windowState.closesAt)}.`;
   }

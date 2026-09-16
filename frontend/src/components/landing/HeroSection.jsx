@@ -429,16 +429,6 @@ export default function HeroSection() {
         </motion.div>
 
         <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-[#2072C7]/50 bg-[#2072C7]/15 px-4 py-2 text-sm text-[#9CC4EA]"
-          >
-            <Sparkles size={16} className="text-[#F68A42]" />
-            <span>Applications Now Open</span>
-          </motion.div>
-
           <h1 className="sr-only">Jackson Hacks</h1>
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 16 }}

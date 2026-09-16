@@ -228,6 +228,7 @@ export default function Dashboard() {
   }, []);
 
   const applicationWindow = getApplicationWindowState(applicationCycle);
+  const applicationsNeverLaunched = applicationWindow.status === "not_launched";
   const statusDetails = getApplicationStatusDetails(application?.status);
   const reviewsByApplication = useMemo(() => {
     const grouped = new Map();
@@ -572,7 +573,9 @@ export default function Dashboard() {
                 {applicationWindow.canEdit ? <Unlock /> : <LockKeyhole />}
                 {applicationWindow.canEdit
                   ? "Open for submissions and edits"
-                  : "Closed and read-only"}
+                  : applicationsNeverLaunched
+                    ? "Applications not yet open"
+                    : "Closed and read-only"}
               </div>
               <p className="mt-2 text-sm text-[#B4BAC0]">
                 {getApplicationWindowMessage(applicationWindow)}
@@ -604,8 +607,10 @@ export default function Dashboard() {
                   <Unlock />
                 )}
                 {applicationWindow.canEdit
-                  ? "Close Submissions"
-                  : "Reopen Submissions"}
+                  ? "Close Applications"
+                  : applicationsNeverLaunched
+                    ? "Open Applications"
+                    : "Reopen Applications"}
               </Button>
             )}
           </div>
@@ -632,6 +637,14 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/ApplicationAnalytics')}
+                  className="border-white/15 bg-transparent text-white hover:bg-white/10"
+                >
+                  Application Analytics
+                </Button>
                 <Button
                   type="button"
                   variant="outline"

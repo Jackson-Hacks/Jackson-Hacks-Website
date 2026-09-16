@@ -22,6 +22,21 @@ BEGIN
 
   PERFORM set_config('request.jwt.claim.sub', v_user_id::TEXT, false);
 
+  BEGIN
+    PERFORM public.save_application_draft('{"full_name":"Too Early"}'::JSONB, 1);
+    RAISE EXCEPTION 'unlaunched application cycle unexpectedly accepted a draft';
+  EXCEPTION WHEN OTHERS THEN
+    ASSERT SQLERRM = 'applications_not_open',
+      'unlaunched draft failure did not use applications_not_open';
+  END;
+
+  PERFORM set_config('request.jwt.claim.sub', v_admin_id::TEXT, false);
+  v_cycle := public.set_application_window_closed(false);
+  ASSERT v_cycle.launched_at IS NOT NULL, 'admin launch did not set launched_at';
+  ASSERT v_cycle.closed_at IS NULL, 'admin launch did not open the window';
+
+  PERFORM set_config('request.jwt.claim.sub', v_user_id::TEXT, false);
+
   v_draft := public.save_application_draft(
     jsonb_build_object(
       'full_name', 'Draft Applicant',
@@ -195,6 +210,7 @@ BEGIN
 
   v_cycle := public.set_application_window_closed(false);
   ASSERT v_cycle.closed_at IS NULL, 'admin reopen did not clear closed_at';
+  ASSERT v_cycle.launched_at IS NOT NULL, 'admin reopen erased launched_at';
 
   PERFORM set_config('request.jwt.claim.sub', v_user_id::TEXT, false);
   v_application := public.save_application(

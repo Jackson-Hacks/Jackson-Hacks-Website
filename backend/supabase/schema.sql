@@ -8,6 +8,7 @@ CREATE TABLE application_cycles (
   name TEXT NOT NULL,
   opens_at TIMESTAMPTZ NOT NULL,
   edits_close_at TIMESTAMPTZ NOT NULL,
+  launched_at TIMESTAMPTZ,
   closed_at TIMESTAMPTZ,
   closed_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -175,6 +176,51 @@ AS $$
     WHERE user_id = auth.uid()
   );
 $$;
+
+CREATE OR REPLACE FUNCTION public.enforce_application_cycle_writable()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_cycle public.application_cycles%ROWTYPE;
+BEGIN
+  -- Database maintenance and authorized administrative updates do not represent
+  -- applicant writes. Applicant-facing RPCs separately require auth.uid().
+  IF auth.uid() IS NULL OR public.is_admin() THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT * INTO v_cycle
+  FROM public.application_cycles
+  WHERE id = NEW.cycle_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'application_cycle_not_found';
+  END IF;
+
+  IF v_cycle.launched_at IS NULL OR NOW() < v_cycle.opens_at THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'applications_not_open';
+  END IF;
+
+  IF v_cycle.closed_at IS NOT NULL OR NOW() >= v_cycle.edits_close_at THEN
+    RAISE EXCEPTION USING ERRCODE = 'P0001', MESSAGE = 'applications_closed';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER enforce_application_cycle_writable
+BEFORE INSERT OR UPDATE ON public.applications
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_application_cycle_writable();
+
+CREATE TRIGGER enforce_application_draft_cycle_writable
+BEFORE INSERT OR UPDATE ON public.application_drafts
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_application_cycle_writable();
 
 CREATE OR REPLACE FUNCTION public.save_application(
   p_application JSONB,
@@ -406,7 +452,15 @@ BEGIN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'admin_required';
   END IF;
 
+  IF p_closed IS NULL THEN
+    RAISE EXCEPTION USING ERRCODE = '22004', MESSAGE = 'application_window_state_required';
+  END IF;
+
   UPDATE public.application_cycles SET
+    launched_at = CASE
+      WHEN p_closed THEN launched_at
+      ELSE COALESCE(launched_at, NOW())
+    END,
     closed_at = CASE WHEN p_closed THEN NOW() ELSE NULL END,
     closed_by = CASE WHEN p_closed THEN auth.uid() ELSE NULL END,
     updated_at = NOW()
@@ -777,6 +831,7 @@ GRANT SELECT ON application_reviews TO authenticated;
 REVOKE ALL ON FUNCTION public.save_application(JSONB, UUID, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.save_application_draft(JSONB, INTEGER, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.clear_application_draft_after_submission() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.enforce_application_cycle_writable() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.set_application_window_closed(BOOLEAN, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.set_application_status(UUID, TEXT, TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.log_application_export(INTEGER, TEXT) FROM PUBLIC;

@@ -17,8 +17,8 @@ DECLARE
   v_payload JSONB := '{"full_name":"Location Test","email":"location@example.com","age":17,"school":"Test School","grade":"12","experience_level":"beginner","why_attend":"I want to learn and build.","agree_to_terms":true}'::JSONB;
 BEGIN
   INSERT INTO auth.users(id) VALUES (v_owner), (v_other);
-  INSERT INTO public.application_cycles(event_key, name, opens_at, edits_close_at)
-  VALUES ('location-test', 'Location test', NOW() - INTERVAL '1 day', NOW() + INTERVAL '1 day');
+  INSERT INTO public.application_cycles(event_key, name, opens_at, edits_close_at, launched_at)
+  VALUES ('location-test', 'Location test', NOW() - INTERVAL '1 day', NOW() + INTERVAL '1 day', NOW());
   PERFORM set_config('request.jwt.claim.sub', v_owner::TEXT, true);
 
   v_draft := public.save_application_draft('{"country":"Canada","city":"Montréal","province_state":"Québec"}'::JSONB, 1, 'location-test');
