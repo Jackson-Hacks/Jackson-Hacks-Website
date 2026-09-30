@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PartyPopper, Sparkles, CheckCircle2, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,8 @@ import { getApplicationStatusDetails } from '@/lib/applicationStatus';
 
 export default function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const organizerSignIn = searchParams.get('signin') === '1';
   const {
     user,
     isAuthenticated,
@@ -49,6 +51,12 @@ export default function Register() {
   const [authError, setAuthError] = useState(null);
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (organizerSignIn && isAuthenticated && !isLoadingAuth) {
+      navigate('/Dashboard', { replace: true });
+    }
+  }, [organizerSignIn, isAuthenticated, isLoadingAuth, navigate]);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -204,7 +212,7 @@ export default function Register() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-20">
         <div className="w-full max-w-2xl">
-          {authMode !== 'recovery' && !applicationsLaunched && !applicationLoadError && (
+          {authMode !== 'recovery' && !organizerSignIn && !applicationsLaunched && !applicationLoadError && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -217,7 +225,7 @@ export default function Register() {
                 Applications Opening Soon
               </h1>
               <p className="mx-auto mb-3 max-w-lg text-xl text-[#B4BAC0]">
-                Applications for Jackson Hacks 2026 aren&apos;t open yet.
+                Applications for Jackson Hacks 2027 aren&apos;t open yet.
               </p>
               <p className="mx-auto mb-8 max-w-lg text-[#8A9199]">
                 Check back soon for application updates.
@@ -225,6 +233,11 @@ export default function Register() {
               <Button asChild size="lg" className="rounded-full bg-[#F68A42] px-8 text-white hover:bg-[#E06E0A]">
                 <Link to={createPageUrl('Home')}>Back to Home</Link>
               </Button>
+              <p className="mt-6 text-sm">
+                <Link to="/Register?signin=1" className="text-[#6EA8DF] hover:text-[#F68A42]">
+                  Organizer sign in
+                </Link>
+              </p>
             </motion.div>
           )}
 
@@ -325,7 +338,7 @@ export default function Register() {
           )}
 
           {/* Not Authenticated */}
-          {(authMode === 'recovery' || (applicationsLaunched && !isAuthenticated)) && !applicationSubmitted && (
+          {(authMode === 'recovery' || ((applicationsLaunched || organizerSignIn) && !isAuthenticated)) && !applicationSubmitted && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -335,13 +348,15 @@ export default function Register() {
                 <Sparkles className="w-8 h-8 text-[#F68A42]" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold text-[#F3F1F1] mb-4">
-                Apply to{' '}
+                {organizerSignIn && !applicationsLaunched ? 'Sign in to ' : 'Apply to '}
                 <span className="text-[#F68A42]">
                   Jackson Hacks
                 </span>
               </h1>
               <p className="text-xl text-[#B4BAC0] mb-10 max-w-md mx-auto">
-                Create an account or sign in to start your application
+                {organizerSignIn && !applicationsLaunched
+                  ? 'Organizer sign-in remains available before applications open. Admin permissions are checked on the dashboard.'
+                  : 'Create an account or sign in to start your application'}
               </p>
 
               <div className="p-8 rounded-2xl bg-[#2C2C2C] border border-white/10 max-w-md mx-auto text-left">
@@ -448,7 +463,7 @@ export default function Register() {
                       Forgot your password?
                     </button>
                   )}
-                  <button
+                  {applicationsLaunched && <button
                     type="button"
                     onClick={() => {
                       setIsLogin(!isLogin);
@@ -457,7 +472,7 @@ export default function Register() {
                     className="text-[#6EA8DF] hover:text-[#F68A42] text-sm transition-colors"
                   >
                     {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
-                  </button>
+                  </button>}
                 </div>}
                 {authMode === 'forgot' && (
                   <button

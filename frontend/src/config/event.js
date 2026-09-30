@@ -1,11 +1,12 @@
 export const EVENT = Object.freeze({
+  // This persisted cycle key stays the same when the event is rescheduled.
   key: 'jackson-hacks-2026',
   name: 'Jackson Hacks',
-  date: '2026-11-21',
-  startsAt: '2026-11-21T08:00:00-05:00',
-  endsAt: '2026-11-21T22:00:00-05:00',
-  dateLabel: 'November 21, 2026',
-  shortDateLabel: 'Nov. 21, 2026',
+  date: '2027-02-20',
+  startsAt: '2027-02-20T08:00:00-05:00',
+  endsAt: '2027-02-20T22:00:00-05:00',
+  dateLabel: 'February 20, 2027',
+  shortDateLabel: 'Feb. 20, 2027',
   timeLabel: '8 AM–10 PM',
   timeZone: 'America/Toronto',
   timeZoneLabel: 'EST',
@@ -16,7 +17,7 @@ export const EVENT = Object.freeze({
   contactEmail: 'ayjacksonhacks@gmail.com',
   contactMailto: 'mailto:ayjacksonhacks@gmail.com',
   applicationOpensAt: '2026-01-01T00:00:00-05:00',
-  applicationClosesAt: '2026-11-21T08:00:00-05:00',
+  applicationClosesAt: '2027-02-20T08:00:00-05:00',
 });
 
 export const EVENT_MARQUEE_ITEMS = Object.freeze([

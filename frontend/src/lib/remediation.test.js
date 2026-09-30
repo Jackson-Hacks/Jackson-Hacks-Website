@@ -95,6 +95,8 @@ test('review rubric validates five decimal five-point categories and summarizes 
 });
 
 test('shared event configuration has a valid chronological schedule', () => {
+  assert.equal(EVENT.date, '2027-02-20');
   assert.ok(new Date(EVENT.startsAt) < new Date(EVENT.endsAt));
+  assert.equal(EVENT.applicationClosesAt, EVENT.startsAt);
   assert.equal(EVENT.timeZone, 'America/Toronto');
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarClock,
   CheckCircle2,
@@ -57,6 +57,7 @@ import {
 } from "@/lib/applicationReview";
 import { createCsv } from "@/lib/csv";
 import { supabase } from "@/lib/supabaseClient";
+import { readAllRows } from "@/lib/supabasePagination";
 
 const PAGE_SIZE = 10;
 const applicantDetailFields = [
@@ -135,6 +136,7 @@ export default function Dashboard() {
   const [isSavingReview, setIsSavingReview] = useState(false);
   const [isLoadingRandom, setIsLoadingRandom] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const reviewDialogRef = useRef(null);
 
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft(getCountdown()), 1000);
@@ -186,20 +188,19 @@ export default function Dashboard() {
         setIsAdmin(hasAdminAccess);
         if (hasAdminAccess) {
           const [applicationsResult, reviewsResult] = await Promise.all([
-            supabase
+            readAllRows(() => supabase
               .from("applications")
-              .select("*")
+              .select("*", { count: "exact" })
               .eq("cycle_id", cycle.id)
-              .order("submitted_at", { ascending: false }),
-            supabase.from("application_reviews").select("*"),
+              .order("submitted_at", { ascending: false })
+              .order("id")),
+            readAllRows(() => supabase.from("application_reviews").select("*", { count: "exact" }).order("id")),
           ]);
-          if (applicationsResult.error) throw applicationsResult.error;
-          if (reviewsResult.error) throw reviewsResult.error;
-          const applications = applicationsResult.data || [];
+          const applications = applicationsResult;
           const applicationIds = new Set(applications.map((item) => item.id));
           setAdminApplications(applications);
           setAdminReviews(
-            (reviewsResult.data || []).filter((review) => applicationIds.has(review.application_id)),
+            reviewsResult.filter((review) => applicationIds.has(review.application_id)),
           );
         }
       } catch (error) {
@@ -276,17 +277,40 @@ export default function Dashboard() {
   useEffect(() => {
     if (!selectedApplication) return undefined;
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event) => {
+    const previousFocus = document.activeElement;
+    const getFocusTargets = () => Array.from(
+      reviewDialogRef.current?.querySelectorAll(
+        'button, a[href], input, select, textarea, summary, [tabindex]',
+      ) || [],
+    ).filter((element) => !element.disabled && element.tabIndex >= 0 && element.getClientRects().length);
+    const handleDialogKey = (event) => {
       if (event.key === "Escape") {
         setSelectedApplication(null);
         setRandomReviewMode(false);
+      } else if (event.key === "Tab") {
+        const targets = getFocusTargets();
+        const first = targets[0];
+        const last = targets[targets.length - 1];
+        const active = document.activeElement;
+        if (!first) {
+          event.preventDefault();
+          reviewDialogRef.current?.focus();
+        } else if (event.shiftKey && (active === first || !reviewDialogRef.current?.contains(active))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (active === last || !reviewDialogRef.current?.contains(active))) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
+    (getFocusTargets()[0] || reviewDialogRef.current)?.focus();
+    window.addEventListener("keydown", handleDialogKey);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handleDialogKey);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
   }, [selectedApplication]);
 
@@ -823,6 +847,8 @@ export default function Dashboard() {
               >
                 <section
                   role="dialog"
+                  ref={reviewDialogRef}
+                  tabIndex={-1}
                   aria-modal="true"
                   aria-labelledby="application-review-title"
                   className="max-h-[96vh] w-full max-w-7xl overflow-y-auto rounded-2xl border border-[#2072C7]/40 bg-[#242424] p-4 shadow-2xl sm:p-6"

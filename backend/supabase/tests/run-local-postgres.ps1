@@ -27,6 +27,7 @@ try {
   $bootstrap = "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE SCHEMA auth; CREATE TABLE auth.users (id uuid PRIMARY KEY); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT nullif(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';"
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -c $bootstrap
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/schema.sql
+  Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 
@@ -44,6 +45,8 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902234026_application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260916225704_admin_application_launch_control.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260916230234_normalize_unlaunched_application_cycle.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260923234547_reschedule_jackson_hacks_to_february_2027.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260807_application_edit_window.sql
@@ -54,6 +57,8 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260902234026_application_location.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260916225704_admin_application_launch_control.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260916230234_normalize_unlaunched_application_cycle.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260923234547_reschedule_jackson_hacks_to_february_2027.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 
   Write-Host 'Fresh schema, legacy migration, database behavior, and migration idempotency tests passed.'

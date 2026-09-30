@@ -19,9 +19,9 @@ CREATE TABLE application_cycles (
 INSERT INTO application_cycles (event_key, name, opens_at, edits_close_at)
 VALUES (
   'jackson-hacks-2026',
-  'Jackson Hacks 2026',
+  'Jackson Hacks 2027',
   '2026-01-01T00:00:00-05:00',
-  '2026-11-21T08:00:00-05:00'
+  '2027-02-20T08:00:00-05:00'
 );
 
 CREATE TABLE applications (

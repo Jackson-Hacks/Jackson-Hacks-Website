@@ -222,7 +222,7 @@ def build_document(document: dict, legal_content: dict, destination: Path):
     )
     story = [
         Spacer(1, 8),
-        Paragraph("JACKSON HACKS 2026", STYLES["eyebrow"]),
+        Paragraph("JACKSON HACKS 2027", STYLES["eyebrow"]),
         Paragraph(escape(document["title"]), STYLES["title"]),
         Paragraph(escape(document["summary"]), STYLES["summary"]),
         Paragraph(

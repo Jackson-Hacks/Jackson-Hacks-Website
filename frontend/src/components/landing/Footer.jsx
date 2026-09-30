@@ -1,4 +1,4 @@
-import { Github, Heart, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
+import { Github, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EVENT } from '@/config/event';
 
@@ -98,11 +98,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-[#8A9199] sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 border-t border-white/10 pt-6 text-sm text-[#8A9199]">
           <p>Copyright {new Date().getFullYear()} Jackson Hacks. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Made with <Heart size={14} className="text-[#F68A42]" /> by the organizing team
-          </p>
         </div>
       </div>
     </footer>

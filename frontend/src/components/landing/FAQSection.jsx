@@ -126,9 +126,6 @@ export default function FAQSection() {
               Frequently Asked<br className="hidden sm:block" /> Questions
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-6 text-[#B4BAC0] sm:text-base md:justify-self-end md:text-right">
-            The practical stuff: teams, skill levels,<br className="hidden md:block" /> food, judging, and what to bring.
-          </p>
         </motion.div>
 
         <motion.div

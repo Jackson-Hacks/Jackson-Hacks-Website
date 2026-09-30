@@ -72,7 +72,7 @@ export default function LocationSection() {
               <div className="rounded-xl border border-white/10 bg-[#262626] p-4">
                 <Navigation size={19} className="mb-3 text-[#F68A42]" />
                 <span className="block text-xs uppercase tracking-widest text-[#8A9199]">Arrival</span>
-                <span className="mt-1 block text-sm font-medium sm:text-base">Details before check-in</span>
+                <span className="mt-1 block text-sm font-medium sm:text-base">Detail coming soon</span>
               </div>
             </div>
           </motion.div>

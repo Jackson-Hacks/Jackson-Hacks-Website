@@ -2,6 +2,7 @@ import { GENDER_OPTIONS, RACE_ETHNICITY_OPTIONS } from './applicationDemographic
 import { REVIEW_CATEGORIES } from './applicationReview.js';
 import { APPLICATION_STATUSES, getApplicationStatusDetails } from './applicationStatus.js';
 import { EVENT } from '../config/event.js';
+import { readAllRows } from './supabasePagination.js';
 
 export const ANALYTICS_APPLICATION_COLUMNS = 'id,status,submitted_at,age,gender_identity,race_ethnicity,country,city,province_state,school,grade,experience_level,heard_from,tshirt_size';
 export const ANALYTICS_REVIEW_COLUMNS = 'id,application_id,reviewer_id,total_score,motivation_score,learning_score,creativity_score,collaboration_score,response_score';
@@ -96,21 +97,6 @@ export function buildApplicationAnalytics(applications = [], reviews = [], now =
   };
 }
 
-// Page through every result; do not silently report only the API's first page.
-async function readAll(makeQuery) {
-  const rows = [];
-  for (;;) {
-    const { data, error, count } = await makeQuery().range(rows.length, rows.length + 499);
-    if (error) throw error;
-    const page = data || [];
-    rows.push(...page);
-    if (count !== null && count !== undefined) {
-      if (rows.length >= count) return rows;
-      if (!page.length) throw new Error('Analytics results were incomplete. Please refresh.');
-    } else if (page.length < 500) return rows;
-  }
-}
-
 export async function loadApplicationAnalytics(client, userId, eventKey) {
   if (!userId) return { allowed: false };
   const { data: admins, error: adminError } = await client.from('admin_users').select('user_id').eq('user_id', userId).limit(1);
@@ -118,11 +104,11 @@ export async function loadApplicationAnalytics(client, userId, eventKey) {
   if (!admins?.length) return { allowed: false };
   const { data: cycle, error: cycleError } = await client.from('application_cycles').select('id,name').eq('event_key', eventKey).single();
   if (cycleError) throw cycleError;
-  const applications = await readAll(() => client.from('applications').select(ANALYTICS_APPLICATION_COLUMNS, { count: 'exact' }).eq('cycle_id', cycle.id).order('id'));
+  const applications = await readAllRows(() => client.from('applications').select(ANALYTICS_APPLICATION_COLUMNS, { count: 'exact' }).eq('cycle_id', cycle.id).order('id'));
   const reviews = [];
   for (let start = 0; start < applications.length; start += 100) {
     const ids = applications.slice(start, start + 100).map((application) => application.id);
-    reviews.push(...await readAll(() => client.from('application_reviews').select(ANALYTICS_REVIEW_COLUMNS, { count: 'exact' }).in('application_id', ids).order('id')));
+    reviews.push(...await readAllRows(() => client.from('application_reviews').select(ANALYTICS_REVIEW_COLUMNS, { count: 'exact' }).in('application_id', ids).order('id')));
   }
   return { allowed: true, cycle, analytics: buildApplicationAnalytics(applications, reviews), updatedAt: new Date() };
 }

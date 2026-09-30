@@ -8,7 +8,7 @@ import {
 
 const cycle = {
   opens_at: '2026-01-01T05:00:00.000Z',
-  edits_close_at: '2026-11-21T13:00:00.000Z',
+  edits_close_at: '2027-02-20T13:00:00.000Z',
   launched_at: '2026-08-01T12:00:00.000Z',
   closed_at: null,
 };
@@ -55,7 +55,7 @@ test('missing or invalid cycle data fails closed', () => {
 
 test('deadline formatting uses the Toronto event timezone', () => {
   const formatted = formatApplicationDate(cycle.edits_close_at);
-  assert.match(formatted, /November 21, 2026/);
+  assert.match(formatted, /February 20, 2027/);
   assert.match(formatted, /8:00/);
 });
 

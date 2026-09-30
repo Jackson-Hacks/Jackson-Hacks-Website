@@ -69,6 +69,35 @@ test('registration and public dashboard direct routes render', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
 
+test('homepage application buttons follow the admin-controlled window', async ({ page }) => {
+  let cycle = { ...openCycle, launched_at: null };
+  const expectTopBarAction = async (label) => {
+    if (page.viewportSize().width < 768) {
+      await page.getByRole('button', { name: 'Open menu' }).click();
+      await expect(page.getByRole('dialog', { name: 'Navigation menu' }).getByRole('link', { name: label })).toBeVisible();
+      await page.getByRole('button', { name: 'Close menu' }).click();
+    } else {
+      await expect(page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: label })).toBeVisible();
+    }
+  };
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(cycle),
+  }));
+
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Applications Open Soon' }).first()).toBeVisible();
+  await expectTopBarAction('Applications Open Soon');
+  await expect(page.getByRole('link', { name: 'Apply Now' })).toHaveCount(0);
+
+  cycle = openCycle;
+  await page.reload();
+  await expect(page.getByRole('link', { name: 'Apply Now' }).first()).toBeVisible();
+  await expectTopBarAction('Apply Now');
+  await expect(page.getByRole('link', { name: 'Applications Open Soon' })).toHaveCount(0);
+});
+
 test('registration stays on the coming-soon page before an admin launches it', async ({ page }) => {
   await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({
     status: 200,
@@ -121,11 +150,60 @@ test('an admin can launch applications without a redeployment', async ({ page })
   await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toBeVisible();
 });
 
+test('organizers can reach sign-in before launch without exposing an application form', async ({ page }) => {
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ ...openCycle, launched_at: null }),
+  }));
+  await page.goto('/Register');
+  await expect(page.getByRole('heading', { name: 'Applications Opening Soon' })).toBeVisible();
+  await page.getByRole('link', { name: 'Organizer sign in' }).click();
+  await expect(page.getByRole('heading', { name: 'Sign In', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Forgot your password?' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Sign Up/ })).toHaveCount(0);
+  await expect(page.getByLabel('Full Name')).toHaveCount(0);
+});
+
+test('a sign-out in another tab immediately clears private review data', async ({ page }) => {
+  await mockApplicantSession(page);
+  await mockOpenApplicationCycle(page);
+  const privateApplication = {
+    id: '66666666-6666-4666-8666-666666666666', cycle_id: openCycle.id,
+    user_id: '77777777-7777-4777-8777-777777777777', status: 'submitted',
+    full_name: 'Private Review Applicant', email: 'private@example.com',
+    school: 'Review School', grade: '11', experience_level: 'beginner',
+    submitted_at: '2026-08-20T20:00:00.000Z', why_attend: 'A private application response.',
+  };
+  await page.route('**/rest/v1/applications*', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify(new URL(route.request().url()).searchParams.has('user_id') ? [] : [privateApplication]),
+  }));
+  await page.route('**/rest/v1/admin_users*', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify([{ user_id: applicantUser.id }]),
+  }));
+  for (const table of ['application_drafts', 'application_reviews']) {
+    await page.route(`**/rest/v1/${table}*`, route => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  }
+  await page.goto('/Dashboard');
+  await page.getByRole('button', { name: 'Review', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Application review' })).toContainText(privateApplication.why_attend);
+  // Supabase's real cross-tab notification channel, using only the mocked session.
+  await page.evaluate(() => {
+    window.localStorage.removeItem('sb-127-auth-token');
+    const channel = new BroadcastChannel('sb-127-auth-token');
+    channel.postMessage({ event: 'SIGNED_OUT', session: null });
+    channel.close();
+  });
+  await expect(page.getByRole('dialog', { name: 'Application review' })).toHaveCount(0);
+  await expect(page.getByText(privateApplication.full_name)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Export CSV' })).toHaveCount(0);
+});
+
 test('application analytics are admin-only and load numeric summaries without identity fields', async ({ page }) => {
   await mockApplicantSession(page);
   let applicationRequestUrl = '';
   await page.route('**/rest/v1/admin_users*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ user_id: applicantUser.id }]) }));
-  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: openCycle.id, name: 'Jackson Hacks 2026' }) }));
+  await page.route('**/rest/v1/application_cycles*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: openCycle.id, name: 'Jackson Hacks 2027' }) }));
   await page.route(/\/rest\/v1\/applications\?/, (route) => {
     applicationRequestUrl = decodeURIComponent(route.request().url());
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
@@ -368,6 +446,12 @@ test('admin review keeps secondary applicant details in Other info', async ({ pa
   await page.getByRole('button', { name: 'Review', exact: true }).click();
 
   const reviewDialog = page.getByRole('dialog', { name: 'Application review' });
+  const identityToggle = reviewDialog.getByRole('button', { name: 'Hide identity' });
+  await expect(identityToggle).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(reviewDialog.getByText('Other info', { exact: true })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(identityToggle).toBeFocused();
   await expect(reviewDialog.getByText('Phone', { exact: true })).toBeHidden();
   await expect(reviewDialog.getByText('T-shirt size', { exact: true })).toBeHidden();
   await expect(reviewDialog.getByText('Heard from', { exact: true })).toBeHidden();
@@ -383,6 +467,9 @@ test('admin review keeps secondary applicant details in Other info', async ({ pa
   await expect(reviewDialog.getByText('Canada', { exact: true })).toBeVisible();
   await expect(reviewDialog.getByText('Toronto', { exact: true })).toBeVisible();
   await expect(reviewDialog.getByText('Ontario', { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(reviewDialog).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Review', exact: true })).toBeFocused();
 });
 
 test('applicants can save a draft, return to the dashboard, and resume it', async ({ page }) => {

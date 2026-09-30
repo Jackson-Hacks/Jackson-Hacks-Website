@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import {
   ChevronDown,
   Sparkles,
-  Zap,
   Code2,
   Users,
   Trophy,
@@ -149,7 +148,7 @@ const parallaxDoodads = [
   { src: squiggle2Gradient, className: 'left-[225vw] top-[6%] w-64 rotate-12 opacity-15' },
 ];
 
-function AboutHorizontal() {
+function AboutHorizontal({ applicationCtaLabel }) {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -316,8 +315,7 @@ function AboutHorizontal() {
                   className="rounded-full bg-[#F68A42] px-10 py-6 text-lg font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A] hover:scale-105"
                 >
                 <Link to={createPageUrl('Register')}>
-                  <Zap className="mr-2" size={20} />
-                  Apply Now
+                  {applicationCtaLabel}
                 </Link>
               </Button>
             </div>
@@ -362,7 +360,7 @@ function AboutVertical() {
   );
 }
 
-export default function HeroSection() {
+export default function HeroSection({ applicationCtaLabel }) {
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -482,8 +480,7 @@ export default function HeroSection() {
                 className="rounded-full bg-[#F68A42] px-10 py-6 text-lg font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-[#E06E0A] hover:scale-105"
               >
               <Link to={createPageUrl('Register')}>
-                <Zap className="mr-2" size={20} />
-                Apply Now
+                {applicationCtaLabel}
               </Link>
             </Button>
             <Button asChild
@@ -535,7 +532,7 @@ export default function HeroSection() {
       <MarqueeBanner />
 
       {/* What is Jackson Hacks: scrolling down slides the whole screen sideways */}
-      {isMobile || prefersReducedMotion ? <AboutVertical /> : <AboutHorizontal />}
+      {isMobile || prefersReducedMotion ? <AboutVertical /> : <AboutHorizontal applicationCtaLabel={applicationCtaLabel} />}
     </>
   );
 }
