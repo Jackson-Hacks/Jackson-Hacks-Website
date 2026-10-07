@@ -33,7 +33,9 @@ export default function Home() {
     };
   }, []);
 
-  const applicationCtaLabel = getApplicationWindowState(applicationCycle).isOpen
+  const applicationWindow = getApplicationWindowState(applicationCycle);
+  const showComingSoon = ['unknown', 'not_launched', 'not_open'].includes(applicationWindow.status);
+  const applicationCtaLabel = applicationWindow.isOpen
     ? 'Apply Now'
     : 'Applications Open Soon';
 
@@ -41,7 +43,7 @@ export default function Home() {
     <div className="bg-[#272727] min-h-screen">
       <CursorGlow />
       <Navbar applicationCtaLabel={applicationCtaLabel} />
-      <HeroSection applicationCtaLabel={applicationCtaLabel} />
+      <HeroSection applicationCtaLabel={applicationCtaLabel} showComingSoon={showComingSoon} />
       <LocationSection />
       <FAQSection />
       <MarqueeBanner single />

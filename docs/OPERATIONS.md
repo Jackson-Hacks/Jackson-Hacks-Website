@@ -1,5 +1,16 @@
 # Operations Runbook
 
+## Email updates signup rollout
+
+- The October 3 local preview does not require working signups. No live database migration was applied for this change.
+- Clicking **Notify me** submits an explicit opt-in to the application-opening announcement; there is no separate consent checkbox. This does not authorize unrelated event marketing.
+- Before publishing the signup form, apply `backend/supabase/migrations/20261003143234_email_updates_signup.sql` to staging and then production after verification. Do not blindly reapply historical migrations.
+- The public `join_email_updates` RPC accepts only a valid email, explicit consent and the current consent version. Duplicate addresses receive the same generic acknowledgment; no subscriber data is returned. Anonymous users cannot read or directly modify the list. Admins can read `email_update_signups` through the database's RLS-protected API.
+- The form only collects subscribers; it does not send email. Before sending, choose an authorized sender workflow, include sender identity/contact and working unsubscribe instructions, and process unsubscribe requests within 10 business days. An email signup is not an event application.
+- Add gateway/server-side rate limiting and, if public traffic warrants it, a verified CAPTCHA before promoting the signup widely. The honeypot only filters simple bots and is not robust abuse prevention.
+- A subscriber's email is unverified: do not treat it as an authenticated identity, application, or admission. Follow the published event-specific retention policy and protect any exported list.
+- Run `backend/supabase/tests/email_updates.sql` to verify consent, deduplication, honeypot filtering, anonymous read denial and admin-only access. Sending/unsubscribe automation is not part of this release.
+
 ## Release sequence
 
 1. Export or snapshot the current Supabase schema and verify the most recent database backup.

@@ -27,6 +27,7 @@ try {
   $bootstrap = "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE SCHEMA auth; CREATE TABLE auth.users (id uuid PRIMARY KEY); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT nullif(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';"
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -c $bootstrap
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/schema.sql
+  Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
   Invoke-Docker exec $container psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
@@ -61,6 +62,10 @@ try {
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
   Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
 
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20261003143234_email_updates_signup.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20261003143234_email_updates_signup.sql
+  Invoke-Docker exec $container psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql
   Write-Host 'Fresh schema, legacy migration, database behavior, and migration idempotency tests passed.'
 }
 finally {

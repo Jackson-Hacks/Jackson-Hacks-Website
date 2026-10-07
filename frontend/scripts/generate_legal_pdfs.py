@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 import shutil
 from html import escape
 from pathlib import Path
@@ -260,11 +261,16 @@ def build_document(document: dict, legal_content: dict, destination: Path):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--slug", help="Regenerate only the selected document")
+    args = parser.parse_args()
     legal_content = json.loads(SOURCE.read_text(encoding="utf-8"))
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
 
     for document in legal_content["documents"]:
+        if args.slug and document["slug"] != args.slug:
+            continue
         filename = Path(document["pdf"]).name
         output_path = OUTPUT_DIR / filename
         build_document(document, legal_content, output_path)

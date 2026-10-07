@@ -125,6 +125,51 @@
   }
 }
 
+.team-lane {
+  --team-stride: 180px;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.team-lane::-webkit-scrollbar { display: none; }
+.team-track { position: relative; display: flex; width: max-content; animation: team-prowl 60s linear infinite; }
+/* Equal distance per second keeps the alternating half-step trail aligned. */
+.team-lane-blue .team-track { left: calc(var(--team-stride) / -2); }
+.team-lane:has(:focus-visible) .team-track { animation: none; left: 0; }
+.team-lane:has(:focus-visible) .team-track-copy { display: none; }
+.team-lane:has(:focus-visible) { overflow-x: auto; }
+.team-track-group { display: flex; gap: 24px; padding: 10px 24px 10px 0; }
+.team-person { width: 156px; }
+.team-portrait {
+  height: 146px;
+  width: 146px;
+  color: #f68a42;
+  filter: drop-shadow(0 6px 12px #00000035);
+}
+.team-lane-blue .team-portrait { color: #6ea8df; }
+.team-portrait:hover, .team-portrait.is-selected {
+  color: #ffae78;
+  filter: drop-shadow(0 0 12px #f68a4250);
+  transform: translateY(-4px);
+}
+.team-lane-blue .team-portrait:hover, .team-lane-blue .team-portrait.is-selected {
+  color: #a8d3f8;
+  filter: drop-shadow(0 0 12px #2072c770);
+}
+@keyframes team-prowl { to { transform: translateX(-50%); } }
+@media (min-width: 640px) {
+  .team-lane { --team-stride: 210px; }
+  .team-track-group { gap: 32px; padding-right: 32px; }
+  .team-person { width: 178px; }
+  .team-portrait { width: 168px; height: 168px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-lane { overflow-x: auto; }
+  .team-track { animation: none; left: 0 !important; }
+  .team-track-copy { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

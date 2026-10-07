@@ -150,8 +150,8 @@
     },
     {
       "slug": "privacy",
-      "version": "2026-09-02",
-      "lastUpdated": "September 2, 2026",
+      "version": "2026-10-03",
+      "lastUpdated": "October 3, 2026",
       "navLabel": "Privacy",
       "title": "Privacy Notice",
       "summary": "How Jackson Hacks collects, uses, shares, safeguards, and deletes personal information.",
@@ -168,13 +168,15 @@
           "heading": "2. Information collected",
           "paragraphs": [
             "Depending on how a person uses the website, Jackson Hacks may collect account identifiers, name, email, phone number, age, country, city, province or state, school, grade, experience level, written application responses, dietary information, shirt size, emergency contact details, application status, review records, project information, waiver status, communications, and basic security or technical logs. City-level location helps with Event planning and understanding where applicants are travelling from; the application does not request a street address.",
-            "The application may also request optional demographic information, including gender identity, pronouns, and race or ethnicity."
+            "The application may also request optional demographic information, including gender identity, pronouns, and race or ethnicity.",
+            "If you choose to join the email updates list, we collect your email address, the Event cycle, signup time, signup source, and the wording and version of your email consent. Joining this list does not create an account, submit an application, or guarantee admission."
           ]
         },
         {
           "heading": "3. Purposes",
           "paragraphs": [
-            "Information is used to create and secure accounts; determine eligibility; receive, review, and administer applications; communicate decisions; plan capacity, meals, accessibility, and shirts; administer guardian permission and emergency processes; operate check-in; judge projects; distribute prizes; enforce safety and conduct rules; investigate incidents; secure the website; and improve future Events."
+            "Information is used to create and secure accounts; determine eligibility; receive, review, and administer applications; communicate decisions; plan capacity, meals, accessibility, and shirts; administer guardian permission and emergency processes; operate check-in; judge projects; distribute prizes; enforce safety and conduct rules; investigate incidents; secure the website; and improve future Events.",
+            "Email-list subscribers separately opt in to the application-opening announcement and Jackson Hacks 2027 updates. This consent is optional and is not required to apply or attend. You may withdraw it at any time by emailing ayjacksonhacks@gmail.com. We will stop these optional messages within 10 business days of an unsubscribe request. Email updates will identify Jackson Hacks and provide unsubscribe instructions."
           ]
         },
         {
@@ -215,7 +217,8 @@
           "heading": "9. Retention and deletion",
           "paragraphs": [
             "Application answers, optional demographics, emergency contacts, reviewer scores, and unnecessary account information are scheduled for deletion or de-identification within 90 days after the Event. Information connected to a safety incident, security investigation, prize, legal obligation, or active dispute may be kept longer only as reasonably necessary.",
-            "Signed waivers and school-required forms follow the retention period approved by A. Y. Jackson Secondary School or TDSB and are not covered by the automatic 90-day deletion commitment until that period is confirmed. Aggregate statistics that no longer identify a person may be retained."
+            "Signed waivers and school-required forms follow the retention period approved by A. Y. Jackson Secondary School or TDSB and are not covered by the automatic 90-day deletion commitment until that period is confirmed. Aggregate statistics that no longer identify a person may be retained.",
+            "The email updates list is for Jackson Hacks 2027 only. Subscriber addresses are removed from the active list following an unsubscribe request or within 90 days after the Event. A minimal consent or unsubscribe record may be retained where reasonably required to demonstrate compliance or prevent further unwanted messages."
           ]
         },
         {

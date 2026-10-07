@@ -110,6 +110,180 @@ test('registration stays on the coming-soon page before an admin launches it', a
   await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toHaveCount(0);
 });
 
+test('team roster excludes removed members and preserves the remaining organizers', async ({ page }) => {
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  await expect(team.getByRole('article')).toHaveCount(19);
+  await expect(team.getByRole('heading', { name: 'Justen Visva', exact: true })).toHaveCount(0);
+  await expect(team.getByRole('heading', { name: 'Alex Ning', exact: true })).toHaveCount(0);
+  await expect(team.getByRole('heading', { level: 3 })).toHaveText([
+    'Philip Yu', 'Grace Yao', 'Ella Li', 'David Huang', 'Ayaan Zahoor', 'Somyung Hong',
+    'Ricky Tu', 'Joanna Zhang', 'Ryan Zhang', 'Kenta Ogawa-Hollander', 'Ethan Vuong',
+    'Simon Lu', 'Avin Chiu', 'Olivia Yu', 'Conner Lee', 'Andrew Liu', 'Justin Chen',
+    'Timothy Chiang', 'Richard Li',
+  ]);
+});
+
+test('paw-print team rows reveal complete facts and pause for interaction', async ({ page }, testInfo) => {
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  await expect(team.getByText('Every face has a story.', { exact: true })).toHaveCount(0);
+  await expect(team.getByText('Pick a portrait to see their fun fact.', { exact: true })).toHaveCount(0);
+  await expect(team.getByRole('region', { name: /Team portraits/ })).toHaveCount(2);
+  await expect(team.locator('article svg[data-facing="left"]')).toHaveCount(19);
+  for (const track of await team.locator('.team-track').all()) {
+    expect(await track.evaluate(element => getComputedStyle(element).animationDirection)).toBe('normal');
+  }
+  await expect(team.locator('article svg image').first()).toHaveAttribute('clip-path', /url\(#paw-pad-/);
+  await expect(team.locator('article svg').first()).toHaveAttribute('viewBox', '0 0 200 200');
+  await expect(team.locator('article svg').first().locator('ellipse')).toHaveCount(4);
+  expect(await team.locator('article svg').first().locator('ellipse').evaluateAll(toes => toes.every(toe =>
+    Number(toe.getAttribute('rx')) > Number(toe.getAttribute('ry'))
+  ))).toBe(true);
+  const rowSpacing = await team.locator('.team-lane').evaluateAll(rows => {
+    const top = rows[0].getBoundingClientRect();
+    const bottom = rows[1].getBoundingClientRect();
+    return bottom.top - top.bottom;
+  });
+  expect(rowSpacing).toBeLessThanOrEqual(1);
+  const trail = await team.locator('.team-track').evaluateAll(tracks => tracks.map(track => {
+    const style = getComputedStyle(track);
+    const group = track.querySelector('.team-track-group');
+    return {
+      offset: parseFloat(style.left) || 0,
+      stride: parseFloat(getComputedStyle(track.parentElement).getPropertyValue('--team-stride')),
+      speed: group.getBoundingClientRect().width / parseFloat(style.animationDuration),
+    };
+  }));
+  expect(trail[1].offset).toBe(-trail[1].stride / 2);
+  expect(trail[0].speed).toBeCloseTo(trail[1].speed, 2);
+  await expect(team.getByText('Hover or tap a portrait', { exact: true })).toHaveCount(0);
+  await expect(team.getByRole('button', { name: 'Pause team animation' })).toHaveClass(/sr-only/);
+  const grace = team.getByRole('button', { name: 'Meet Grace Yao, VP Marketing', exact: true });
+  if (testInfo.project.name === 'mobile-chromium') {
+    await grace.tap({ force: true });
+  } else {
+    await grace.hover({ force: true });
+  }
+  const details = team.getByRole('region', { name: 'Selected organizer' });
+  await expect(details).toContainText('Grace Yao');
+  await expect(details).toContainText('VP Marketing');
+  await expect(details).toContainText('I love all things STEM and my cat, Rocky! Excited to support Jackson Hacks this year and hopefully many more to come. 🐈‍⬛');
+  await expect.poll(() => team.locator('.team-track').first().evaluate(track => getComputedStyle(track).animationPlayState)).toBe('paused');
+  await grace.click();
+  await expect(team.getByRole('button', { name: 'Pause team animation' })).toHaveClass(/sr-only/);
+  await page.keyboard.press('Escape');
+  await expect(details).not.toContainText('Grace Yao');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('team fact box clears when leaving a portrait or dismissing a touch selection', async ({ page }, testInfo) => {
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  const details = team.getByRole('region', { name: 'Selected organizer' });
+  const grace = team.getByRole('button', { name: 'Meet Grace Yao, VP Marketing', exact: true });
+  const heading = team.getByRole('heading', { name: 'Meet the Team', exact: true });
+  if (testInfo.project.name === 'mobile-chromium') {
+    await grace.tap({ force: true });
+    await expect(details).toContainText('Grace Yao');
+    await heading.tap();
+  } else {
+    await grace.hover({ force: true });
+    await expect(details).toContainText('Grace Yao');
+    await heading.hover();
+    await expect(details).toBeEmpty();
+    await grace.click({ force: true });
+    await expect(details).toContainText('Grace Yao');
+    await heading.hover();
+  }
+  await expect(details).toBeEmpty();
+  await expect(details).toHaveClass(/border-transparent/);
+  const ella = team.getByRole('button', { name: 'Meet Ella Li, VP Logistics', exact: true });
+  await ella.focus();
+  await expect(details).toContainText('Ella Li');
+  await team.getByRole('button', { name: 'Pause team animation' }).focus();
+  await expect(details).toBeEmpty();
+});
+
+test('team portraits support reduced motion and keyboard access to both rows', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  await expect(team.getByRole('button', { name: 'Pause team animation' })).toHaveCount(0);
+  await expect.poll(() => team.locator('.team-track').first().evaluate(track => getComputedStyle(track).animationName)).toBe('none');
+  const ella = team.getByRole('button', { name: 'Meet Ella Li, VP Logistics', exact: true });
+  await ella.focus();
+  await expect(ella).toBeInViewport();
+  await expect(team.getByRole('region', { name: 'Selected organizer' })).toContainText('Two roads diverged in a wood, and I took both in parallel because OCaml supports multicore, and that has made all the difference.');
+  const richard = team.getByRole('button', { name: 'Meet Richard Li, Creative', exact: true });
+  await richard.focus();
+  await expect(richard).toBeInViewport();
+  await expect(team.getByRole('region', { name: 'Selected organizer' })).toContainText('Hi, I swim and occasionally play piano.');
+});
+
+test('keyboard focus makes moving team rows stationary and reachable', async ({ page }) => {
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  await team.getByRole('button', { name: 'Pause team animation' }).focus();
+  await page.keyboard.press('Tab');
+  await expect(team.getByRole('button', { name: 'Meet Philip Yu, President', exact: true })).toBeFocused();
+  for (let index = 0; index < 18; index++) await page.keyboard.press('Tab');
+  const richard = team.getByRole('button', { name: 'Meet Richard Li, Creative', exact: true });
+  await expect(richard).toBeFocused();
+  await expect(richard).toBeInViewport();
+  await expect(team.getByRole('region', { name: 'Selected organizer' })).toContainText('Richard Li');
+});
+
+test('coming-soon hero collects only consented email signups and acknowledges actual saves', async ({ page }) => {
+  await page.route('**/rest/v1/application_cycles*', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({ ...openCycle, launched_at: null }),
+  }));
+  let signupRequest = null;
+  let shouldFail = false;
+  await page.route('**/rest/v1/rpc/join_email_updates', route => {
+    signupRequest = route.request().postDataJSON();
+    return route.fulfill({ status: shouldFail ? 503 : 200, contentType: 'application/json', body: JSON.stringify(shouldFail ? { message: 'unavailable' } : { accepted: true }) });
+  });
+  await page.goto('/');
+  const comingSoon = page.getByRole('heading', { name: 'Applications Open Soon', exact: true });
+  const wordmark = page.getByRole('img', { name: 'Jackson Hacks — hand-drawn wordmark with a sleeping jaguar cub' });
+  await expect(comingSoon).toBeVisible();
+  await expect(page.getByText("We're getting ready. Get the opening announcement in your inbox.", { exact: true })).toHaveCount(0);
+  expect(await comingSoon.evaluate(heading => {
+    const range = document.createRange();
+    range.selectNodeContents(heading);
+    return range.getClientRects().length;
+  })).toBe(1);
+  expect(await comingSoon.evaluate(heading => heading.scrollWidth <= heading.clientWidth)).toBe(true);
+  await expect(wordmark).toHaveClass(/max-w-xl.*sm:max-w-2xl/);
+  await expect.poll(async () => {
+    const titleBounds = await wordmark.boundingBox();
+    const announcementBounds = await comingSoon.boundingBox();
+    return announcementBounds.y > titleBounds.y + titleBounds.height;
+  }).toBe(true);
+  const form = page.getByRole('region', { name: 'Be first to know.' });
+  await expect(form).not.toContainText('Signing up is not an application.');
+  await expect(form).not.toContainText('Unsubscribe anytime');
+  await expect(form).not.toContainText('50 Francine Dr');
+  await expect(form.getByRole('link', { name: 'Privacy Notice' })).toHaveCount(0);
+  await expect(form.getByRole('checkbox')).toHaveCount(0);
+  await expect(form).not.toContainText('Email me when applications open and about Jackson Hacks 2027 updates.');
+  expect(signupRequest).toBeNull();
+  await form.getByRole('button', { name: 'Notify me' }).click();
+  await expect(form.getByRole('alert')).toContainText('valid email');
+  expect(signupRequest).toBeNull();
+  await form.getByRole('textbox', { name: 'Email address' }).fill('Test@Example.com');
+  await form.getByRole('button', { name: 'Notify me' }).click();
+  await expect(form.getByRole('status')).toContainText("You're on the list");
+  expect(signupRequest).toEqual({ p_email: 'test@example.com', p_consent: true, p_consent_version: '2026-10-03', p_event_key: 'jackson-hacks-2026', p_website: '' });
+  await expect(form.getByRole('textbox', { name: 'Email address' })).toHaveValue('');
+  shouldFail = true;
+  await form.getByRole('textbox', { name: 'Email address' }).fill('second@example.com');
+  await form.getByRole('button', { name: 'Notify me' }).click();
+  await expect(form.getByRole('alert')).toContainText('could not be saved');
+  await expect(form.getByRole('textbox', { name: 'Email address' })).toHaveValue('second@example.com');
+});
+
 test('an admin can launch applications without a redeployment', async ({ page }) => {
   await mockApplicantSession(page);
   let cycle = { ...openCycle, launched_at: null, closed_at: new Date().toISOString() };

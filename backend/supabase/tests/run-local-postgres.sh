@@ -29,6 +29,7 @@ docker cp backend/supabase/. "$container":/sql
 bootstrap="CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE SCHEMA auth; CREATE TABLE auth.users (id uuid PRIMARY KEY); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT nullif(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';"
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -c "$bootstrap"
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/schema.sql
+docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_edit_window.sql
 docker exec "$container" psql -U postgres -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
@@ -60,3 +61,7 @@ docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/m
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20260923234547_reschedule_jackson_hacks_to_february_2027.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_event_date.sql
 docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/application_location.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20261003143234_email_updates_signup.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/migrations/20261003143234_email_updates_signup.sql
+docker exec "$container" psql -U postgres -d legacy -v ON_ERROR_STOP=1 -f /sql/tests/email_updates.sql

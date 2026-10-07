@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import MarqueeBanner from '@/components/landing/MarqueeBanner';
+import EmailUpdatesSignup from '@/components/landing/EmailUpdatesSignup';
 import { Button } from '@/components/ui/button';
 import {
   ChevronDown,
@@ -360,7 +361,7 @@ function AboutVertical() {
   );
 }
 
-export default function HeroSection({ applicationCtaLabel }) {
+export default function HeroSection({ applicationCtaLabel, showComingSoon = false }) {
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -444,6 +445,13 @@ export default function HeroSection({ applicationCtaLabel }) {
             />
           </motion.div>
 
+          {showComingSoon && (
+            <div className="w-full">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#F68A42]">Jackson Hacks 2027</p>
+              <h2 className="whitespace-nowrap font-title text-[clamp(1.125rem,5.8vw,3.75rem)] leading-tight text-[#F3F1F1]">Applications Open Soon</h2>
+            </div>
+          )}
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -468,6 +476,8 @@ export default function HeroSection({ applicationCtaLabel }) {
               {EVENT.venueShort}
             </span>
           </motion.div>
+
+          {showComingSoon && <EmailUpdatesSignup />}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
