@@ -110,6 +110,69 @@ test('registration stays on the coming-soon page before an admin launches it', a
   await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toHaveCount(0);
 });
 
+test('sponsor wall follows confirmed tiers and preserves existing partners', async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#sponsors');
+  const sponsors = page.locator('#sponsors');
+  await sponsors.scrollIntoViewIfNeeded();
+  const sponsorHeading = sponsors.getByRole('heading', { name: 'Sponsors Make Jackson Hacks Possible' });
+  await sponsorHeading.scrollIntoViewIfNeeded();
+  await expect(sponsorHeading.locator('..')).toHaveCSS('opacity', '1');
+  await expect(sponsors.locator('[data-sponsor-tier]')).toHaveCount(4);
+  const silver = sponsors.getByRole('group', { name: 'Silver sponsors', exact: true });
+  const bronze = sponsors.getByRole('group', { name: 'Bronze sponsors', exact: true });
+  const inKind = sponsors.getByRole('group', { name: 'In-kind sponsors', exact: true });
+  const partners = sponsors.getByRole('group', { name: 'Partner sponsors', exact: true });
+  await expect(silver.getByRole('link')).toHaveCount(1);
+  await expect(silver.getByRole('link', { name: 'York University — School of the Arts, Media, Performance & Design', exact: true })).toHaveAttribute('href', 'https://ampd.yorku.ca/');
+  await expect(bronze.getByRole('link')).toHaveCount(2);
+  await expect(bronze.getByRole('link', { name: 'PCBWay', exact: true })).toBeVisible();
+  await expect(bronze.getByRole('link', { name: 'Youth Culture Inc.', exact: true })).toBeVisible();
+  await expect(inKind.getByRole('link')).toHaveCount(10);
+  for (const name of ['Art of Problem Solving', 'CodeCrafters', 'Toronto Public Library', 'NordVPN', 'NordPass', 'Incogni', 'Saily', '.xyz', 'University of Waterloo', 'McMaster Engineering']) {
+    await expect(inKind.getByRole('link', { name, exact: true })).toHaveCount(1);
+  }
+  await expect(partners.getByRole('link', { name: 'Wolfram Alpha', exact: true })).toHaveCount(1);
+  await expect(sponsors.locator('[data-sponsor-tier="Gold"]')).toHaveCount(0);
+  for (const [group, colour, width] of [
+    [silver, 'rgb(184, 194, 207)', '3px'],
+    [bronze, 'rgb(183, 121, 70)', '3px'],
+    [inKind, 'rgb(0, 0, 0)', '2px'],
+    [partners, 'rgb(0, 0, 0)', '2px'],
+  ]) {
+    for (const link of await group.getByRole('link').all()) {
+      await expect(link).toHaveCSS('border-left-color', colour);
+      await expect(link).toHaveCSS('border-left-width', width);
+    }
+  }
+  expect(await sponsors.locator('[data-sponsor-tier] a').evaluateAll(links => links.every(link =>
+    getComputedStyle(link).backgroundColor === (link.getAttribute('aria-label') === '.xyz' ? 'rgb(33, 33, 33)' : 'rgb(255, 255, 255)')
+  ))).toBe(true);
+  await expect(inKind.getByRole('img', { name: 'University of Waterloo', exact: true })).toHaveAttribute('viewBox', '42 34 315 90');
+  const widthOf = locator => locator.first().evaluate(element => element.getBoundingClientRect().width);
+  expect(await widthOf(silver.getByRole('link'))).toBeGreaterThan(await widthOf(bronze.getByRole('link')));
+  expect(await widthOf(bronze.getByRole('link'))).toBeGreaterThan(await widthOf(inKind.getByRole('link')));
+  for (const link of await sponsors.getByRole('link').all()) {
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toHaveCSS('opacity', '1');
+  }
+  await expect(sponsors.locator('[data-sponsor-layout="small"]').getByRole('link')).toHaveCount(11);
+  if (page.viewportSize().width >= 1016) {
+    const lastRow = await Promise.all(['University of Waterloo', 'McMaster Engineering', 'Wolfram Alpha'].map(name =>
+      sponsors.getByRole('link', { name, exact: true }).boundingBox()
+    ));
+    expect(Math.abs(lastRow[0].y - lastRow[1].y)).toBeLessThan(1);
+    expect(Math.abs(lastRow[0].y - lastRow[2].y)).toBeLessThan(1);
+    expect(lastRow[0].x).toBeLessThan(lastRow[1].x);
+    expect(lastRow[1].x).toBeLessThan(lastRow[2].x);
+  }
+  await expect.poll(() => sponsors.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await expect(sponsors).not.toContainText('$800');
+  await expect(sponsors).not.toContainText('Resumes/Contact list');
+  await sponsors.screenshot({ path: testInfo.outputPath('sponsor-tiers.png'), style: 'nav[aria-label="Primary navigation"] { visibility: hidden; }' });
+});
+
 test('team roster excludes removed members and preserves the remaining organizers', async ({ page }) => {
   await page.goto('/#team');
   const team = page.locator('#team');
