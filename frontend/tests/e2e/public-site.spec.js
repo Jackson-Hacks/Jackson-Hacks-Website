@@ -149,6 +149,19 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
     getComputedStyle(link).backgroundColor === 'rgb(255, 255, 255)'
   ))).toBe(true);
   await expect(inKind.getByRole('img', { name: 'University of Waterloo', exact: true })).toHaveAttribute('viewBox', '42 34 315 90');
+  const xyzArtwork = inKind.getByRole('img', { name: '.xyz', exact: true });
+  const xyzSource = await xyzArtwork.getAttribute('src');
+  expect(xyzSource).toMatch(/^data:image\/svg\+xml,|\.svg(?:\?|$)/);
+  let xyzSvg;
+  if (xyzSource.startsWith('data:image/svg+xml,')) {
+    xyzSvg = decodeURIComponent(xyzSource.slice(xyzSource.indexOf(',') + 1));
+  } else {
+    const xyzResponse = await page.request.get(xyzSource);
+    expect(xyzResponse.ok()).toBe(true);
+    xyzSvg = await xyzResponse.text();
+  }
+  expect(xyzSvg).toMatch(/fill=["']#000000["']/);
+  expect(xyzSvg).not.toMatch(/#fff|white/i);
   const widthOf = locator => locator.first().evaluate(element => element.getBoundingClientRect().width);
   expect(await widthOf(silver.getByRole('link'))).toBeGreaterThan(await widthOf(bronze.getByRole('link')));
   expect(await widthOf(bronze.getByRole('link'))).toBeGreaterThan(await widthOf(inKind.getByRole('link')));
@@ -173,41 +186,26 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
   await sponsors.screenshot({ path: testInfo.outputPath('sponsor-tiers.png'), style: 'nav[aria-label="Primary navigation"] { visibility: hidden; }' });
 });
 
-test('sponsor tier tooltips support hover, keyboard focus, and Escape', async ({ page }, testInfo) => {
+test('sponsor cards do not show tier tooltips on hover or keyboard focus', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#sponsors');
   const sponsors = page.locator('#sponsors');
   const pcbway = sponsors.getByRole('link', { name: 'PCBWay', exact: true });
-  const heading = sponsors.getByRole('heading', { name: 'Sponsors Make Jackson Hacks Possible' });
   await expect(page.getByRole('tooltip')).toHaveCount(0);
   if (testInfo.project.name === 'desktop-chromium') {
     await pcbway.hover();
-    await expect(page.getByRole('tooltip')).toHaveText('Bronze tier');
-    await expect(pcbway).toHaveAccessibleDescription('Bronze tier');
-    await page.getByRole('tooltip').hover();
-    await expect(page.getByRole('tooltip')).toBeVisible();
-    await page.keyboard.press('Escape');
     await expect(page.getByRole('tooltip')).toHaveCount(0);
     await expect(pcbway).not.toHaveAttribute('aria-describedby');
-    await heading.hover();
-    await pcbway.hover();
-    await expect(page.getByRole('tooltip')).toHaveText('Bronze tier');
-    await heading.hover();
-    await expect(page.getByRole('tooltip')).toHaveCount(0);
   }
-  for (const [name, tier] of [
-    ['York University — School of the Arts, Media, Performance & Design', 'Silver tier'],
-    ['Youth Culture Inc.', 'Bronze tier'],
-    ['CodeCrafters', 'In-kind tier'],
-    ['.xyz', 'In-kind tier'],
-    ['Wolfram Alpha', 'Partner'],
+  for (const name of [
+    'York University — School of the Arts, Media, Performance & Design',
+    'Youth Culture Inc.', 'CodeCrafters', '.xyz', 'Wolfram Alpha',
   ]) {
     const link = sponsors.getByRole('link', { name, exact: true });
     await link.focus();
-    await expect(page.getByRole('tooltip')).toHaveText(tier);
-    await expect(link).toHaveAccessibleDescription(tier);
-    await page.keyboard.press('Escape');
     await expect(page.getByRole('tooltip')).toHaveCount(0);
+    await expect(link).not.toHaveAttribute('aria-describedby');
+    await expect(link).not.toHaveAttribute('title');
   }
 });
 
