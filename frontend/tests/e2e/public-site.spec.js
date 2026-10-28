@@ -146,7 +146,7 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
     }
   }
   expect(await sponsors.locator('[data-sponsor-tier] a').evaluateAll(links => links.every(link =>
-    getComputedStyle(link).backgroundColor === (link.getAttribute('aria-label') === '.xyz' ? 'rgb(33, 33, 33)' : 'rgb(255, 255, 255)')
+    getComputedStyle(link).backgroundColor === 'rgb(255, 255, 255)'
   ))).toBe(true);
   await expect(inKind.getByRole('img', { name: 'University of Waterloo', exact: true })).toHaveAttribute('viewBox', '42 34 315 90');
   const widthOf = locator => locator.first().evaluate(element => element.getBoundingClientRect().width);
@@ -171,6 +171,44 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
   await expect(sponsors).not.toContainText('$800');
   await expect(sponsors).not.toContainText('Resumes/Contact list');
   await sponsors.screenshot({ path: testInfo.outputPath('sponsor-tiers.png'), style: 'nav[aria-label="Primary navigation"] { visibility: hidden; }' });
+});
+
+test('sponsor tier tooltips support hover, keyboard focus, and Escape', async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#sponsors');
+  const sponsors = page.locator('#sponsors');
+  const pcbway = sponsors.getByRole('link', { name: 'PCBWay', exact: true });
+  const heading = sponsors.getByRole('heading', { name: 'Sponsors Make Jackson Hacks Possible' });
+  await expect(page.getByRole('tooltip')).toHaveCount(0);
+  if (testInfo.project.name === 'desktop-chromium') {
+    await pcbway.hover();
+    await expect(page.getByRole('tooltip')).toHaveText('Bronze tier');
+    await expect(pcbway).toHaveAccessibleDescription('Bronze tier');
+    await page.getByRole('tooltip').hover();
+    await expect(page.getByRole('tooltip')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+    await expect(pcbway).not.toHaveAttribute('aria-describedby');
+    await heading.hover();
+    await pcbway.hover();
+    await expect(page.getByRole('tooltip')).toHaveText('Bronze tier');
+    await heading.hover();
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+  }
+  for (const [name, tier] of [
+    ['York University — School of the Arts, Media, Performance & Design', 'Silver tier'],
+    ['Youth Culture Inc.', 'Bronze tier'],
+    ['CodeCrafters', 'In-kind tier'],
+    ['.xyz', 'In-kind tier'],
+    ['Wolfram Alpha', 'Partner'],
+  ]) {
+    const link = sponsors.getByRole('link', { name, exact: true });
+    await link.focus();
+    await expect(page.getByRole('tooltip')).toHaveText(tier);
+    await expect(link).toHaveAccessibleDescription(tier);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+  }
 });
 
 test('team roster excludes removed members and preserves the remaining organizers', async ({ page }) => {

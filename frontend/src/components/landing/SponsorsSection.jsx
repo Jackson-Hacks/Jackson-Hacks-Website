@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
 import { EVENT } from '@/config/event';
@@ -18,10 +18,10 @@ import nordpassLogo from '@/assets/visuals/sponsorLogos/nordpass.svg';
 import incogniLogo from '@/assets/visuals/sponsorLogos/incogni.svg';
 import sailyLogo from '@/assets/visuals/sponsorLogos/saily.svg';
 
-// No tier labels — logo size and border colour distinguish tiers, big → small.
+// Tier labels appear on hover/focus; logo size and borders distinguish tiers.
 // York's possible Gold upgrade is not confirmed. Wolfram keeps its existing
 // partner classification, but shares the smaller-logo flow instead of a lone row.
-/** @type {{ tier: string, chip: string, sponsors: { name: string, logo: string, href: string, caption?: string, wordmark?: boolean, dark?: boolean, cropPadding?: boolean }[] }[]} */
+/** @type {{ tier: string, chip: string, sponsors: { name: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
 const sponsorRows = [
   {
     tier: 'Silver',
@@ -52,7 +52,7 @@ const sponsorRows = [
       { name: 'NordPass', logo: nordpassLogo, href: 'https://nordpass.com/' },
       { name: 'Incogni', logo: incogniLogo, href: 'https://incogni.com/', wordmark: true },
       { name: 'Saily', logo: sailyLogo, href: 'https://saily.com/' },
-      { name: '.xyz', logo: xyzLogo, href: 'https://gen.xyz/', dark: true },
+      { name: '.xyz', logo: xyzLogo, href: 'https://gen.xyz/' },
       { name: 'University of Waterloo', logo: waterlooLogo, href: 'https://uwaterloo.ca/', cropPadding: true },
       { name: 'McMaster Engineering', logo: mcmasterLogo, href: 'https://www.eng.mcmaster.ca/' },
     ],
@@ -65,6 +65,24 @@ const sponsorRows = [
 ];
 
 export default function SponsorsSection() {
+  const [hoveredTooltip, setHoveredTooltip] = useState(null);
+  const [focusedTooltip, setFocusedTooltip] = useState(null);
+  // Keyboard focus wins over incidental pointer events caused by scrolling.
+  const activeTooltip = focusedTooltip || hoveredTooltip;
+  const tierTooltipId = useId();
+
+  useEffect(() => {
+    if (!activeTooltip) return;
+    const dismissTooltip = event => {
+      if (event.key === 'Escape') {
+        setHoveredTooltip(null);
+        setFocusedTooltip(null);
+      }
+    };
+    document.addEventListener('keydown', dismissTooltip);
+    return () => document.removeEventListener('keydown', dismissTooltip);
+  }, [activeTooltip]);
+
   return (
     <section id="sponsors" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(243,241,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(243,241,241,0.04)_1px,transparent_1px)] bg-[size:90px_90px]" />
@@ -104,14 +122,23 @@ export default function SponsorsSection() {
                       href={sponsor.href}
                       target="_blank"
                       rel="noreferrer"
-                      title={sponsor.name}
                       aria-label={sponsor.name}
+                      aria-describedby={activeTooltip === sponsor.name ? tierTooltipId : undefined}
+                      onPointerEnter={event => { if (event.pointerType !== 'touch') setHoveredTooltip(sponsor.name); }}
+                      onPointerLeave={() => setHoveredTooltip(null)}
+                      onFocus={() => setFocusedTooltip(sponsor.name)}
+                      onBlur={() => setFocusedTooltip(null)}
                       initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: '-60px' }}
                       transition={{ duration: 0.55, delay: (rowIndex * 2 + i) * 0.08, ease: 'easeOut' }}
-                      className={`${row.chip} flex items-center justify-center rounded-2xl ${sponsor.dark ? 'bg-[#212121] ring-1 ring-inset ring-white/15' : 'bg-white'} transition-transform hover:-rotate-1 hover:scale-105`}
+                      className={`${row.chip} relative flex items-center justify-center rounded-2xl bg-white transition-transform hover:-rotate-1 hover:scale-105 ${activeTooltip === sponsor.name ? 'z-30' : 'z-0'}`}
                     >
+                      {activeTooltip === sponsor.name && <span className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2">
+                        <span id={tierTooltipId} role="tooltip" className="block whitespace-nowrap rounded-lg border border-white/20 bg-[#171717] px-3 py-2 text-xs font-semibold text-white shadow-lg">
+                          {row.tier === 'Partner' ? 'Partner' : `${row.tier} tier`}
+                        </span>
+                      </span>}
                       {sponsor.cropPadding ? <svg role="img" aria-label={sponsor.name} viewBox="42 34 315 90" width="315" height="90" className="max-h-full max-w-full">
                         {/* Frame the visible artwork, leaving clear space without changing the original image. */}
                         <image href={sponsor.logo} x="0" y="0" width="400" height="160" />
@@ -134,7 +161,6 @@ export default function SponsorsSection() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="mt-12 flex flex-col items-center gap-3 text-center"
         >
-          <p className="text-sm text-[#B4BAC0] sm:text-base">Want to support the next generation of hackers?</p>
           <a
             href={EVENT.contactMailto}
             aria-label={`Email ${EVENT.contactEmail} about sponsorship`}
