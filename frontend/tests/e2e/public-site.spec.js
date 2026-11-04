@@ -135,8 +135,8 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
   await expect(partners.getByRole('link', { name: 'Wolfram Alpha', exact: true })).toHaveCount(1);
   await expect(sponsors.locator('[data-sponsor-tier="Gold"]')).toHaveCount(0);
   for (const [group, colour, width] of [
-    [silver, 'rgb(184, 194, 207)', '3px'],
-    [bronze, 'rgb(183, 121, 70)', '3px'],
+    [silver, 'rgb(184, 194, 207)', '5px'],
+    [bronze, 'rgb(183, 121, 70)', '5px'],
     [inKind, 'rgb(0, 0, 0)', '2px'],
     [partners, 'rgb(0, 0, 0)', '2px'],
   ]) {
@@ -186,7 +186,7 @@ test('sponsor wall follows confirmed tiers and preserves existing partners', asy
   await sponsors.screenshot({ path: testInfo.outputPath('sponsor-tiers.png'), style: 'nav[aria-label="Primary navigation"] { visibility: hidden; }' });
 });
 
-test('sponsor cards do not show tier tooltips on hover or keyboard focus', async ({ page }, testInfo) => {
+test('sponsor cards reveal names and tiers on hover, focus, and touch', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#sponsors');
   const sponsors = page.locator('#sponsors');
@@ -194,19 +194,57 @@ test('sponsor cards do not show tier tooltips on hover or keyboard focus', async
   await expect(page.getByRole('tooltip')).toHaveCount(0);
   if (testInfo.project.name === 'desktop-chromium') {
     await pcbway.hover();
+    const details = page.getByRole('tooltip');
+    await expect(details).toContainText('PCBWay');
+    await expect(details).toContainText('Bronze Sponsor');
+    await expect(pcbway).toHaveAttribute('aria-describedby', await details.getAttribute('id'));
+    // The details cover the logo itself, not a floating panel below it.
+    await details.hover();
+    await expect(details).toBeVisible();
+    await page.mouse.move(0, 0);
+    await expect(details).toHaveCount(0);
+  } else {
+    await pcbway.tap();
+    await expect(page.getByRole('tooltip')).toContainText('Bronze Sponsor');
+    await expect(page).toHaveURL('/#sponsors');
+    await page.locator('#sponsors h2').tap();
     await expect(page.getByRole('tooltip')).toHaveCount(0);
-    await expect(pcbway).not.toHaveAttribute('aria-describedby');
   }
-  for (const name of [
-    'York University — School of the Arts, Media, Performance & Design',
-    'Youth Culture Inc.', 'CodeCrafters', '.xyz', 'Wolfram Alpha',
+  for (const [name, tier] of [
+    ['York University — School of the Arts, Media, Performance & Design', 'Silver Sponsor'],
+    ['Youth Culture Inc.', 'Bronze Sponsor'], ['CodeCrafters', 'In-kind Sponsor'],
+    ['.xyz', 'In-kind Sponsor'], ['Wolfram Alpha', 'Partner'],
   ]) {
     const link = sponsors.getByRole('link', { name, exact: true });
     await link.focus();
-    await expect(page.getByRole('tooltip')).toHaveCount(0);
-    await expect(link).not.toHaveAttribute('aria-describedby');
+    const details = page.getByRole('tooltip');
+    await expect(details).toContainText(name);
+    await expect(details).toContainText(tier);
+    await expect(link).toHaveAttribute('aria-describedby', await details.getAttribute('id'));
     await expect(link).not.toHaveAttribute('title');
+    // One clipping edge prevents white crescents between nested rounded corners.
+    await expect(link).toHaveCSS('overflow', 'hidden');
+    await expect(details).toHaveCSS('border-radius', '0px');
+    await expect(link).toHaveCSS('background-color', 'rgb(46, 46, 46)');
+    await expect(link.locator('[data-sponsor-artwork]')).toHaveCSS('filter', 'brightness(0.18)');
+    const bounds = await details.boundingBox();
+    const cardBounds = await link.boundingBox();
+    const borderWidth = await link.evaluate(element => parseFloat(getComputedStyle(element).borderTopWidth));
+    expect(Math.abs(bounds.y - cardBounds.y)).toBeLessThanOrEqual(borderWidth);
+    expect(bounds.height).toBeLessThanOrEqual(cardBounds.height);
+    expect(await details.evaluate(element => element.scrollHeight <= element.clientHeight)).toBe(true);
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize().width);
+    await page.keyboard.press('Escape');
+    await expect(details).toHaveCount(0);
+    await link.blur();
   }
+  await pcbway.focus();
+  await page.keyboard.press('Tab');
+  await expect(sponsors.getByRole('link', { name: 'Youth Culture Inc.', exact: true })).toBeFocused();
+  await expect(page.getByRole('tooltip')).toContainText('Youth Culture Inc.');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('tooltip')).toHaveCount(0);
 });
 
 test('team roster excludes removed members and preserves the remaining organizers', async ({ page }) => {

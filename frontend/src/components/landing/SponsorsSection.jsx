@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
 import { EVENT } from '@/config/event';
@@ -18,14 +18,14 @@ import nordpassLogo from '@/assets/visuals/sponsorLogos/nordpass.svg';
 import incogniLogo from '@/assets/visuals/sponsorLogos/incogni.svg';
 import sailyLogo from '@/assets/visuals/sponsorLogos/saily.svg';
 
-// Logo size and border colour distinguish tiers without hover labels.
+// Logo size, border colour, and the interactive details distinguish tiers.
 // York's possible Gold upgrade is not confirmed. Wolfram keeps its existing
 // partner classification, but shares the smaller-logo flow instead of a lone row.
 /** @type {{ tier: string, chip: string, sponsors: { name: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
 const sponsorRows = [
   {
     tier: 'Silver',
-    chip: 'h-32 w-72 border-[3px] border-[#B8C2CF] border-t-[#E4E9EF] border-b-[#929EAC] p-4 shadow-[0_0_0_1px_#697582,0_4px_20px_#B8C2CF20] sm:h-36 sm:w-96 sm:p-5',
+    chip: 'h-32 w-72 border-[5px] border-[#B8C2CF] border-t-[#E4E9EF] border-b-[#929EAC] p-4 shadow-[0_0_0_1px_#697582,0_4px_20px_#B8C2CF20] sm:h-36 sm:w-96 sm:p-5',
     sponsors: [{
       name: 'York University — School of the Arts, Media, Performance & Design',
       logo: yorkLogo,
@@ -35,7 +35,7 @@ const sponsorRows = [
   },
   {
     tier: 'Bronze',
-    chip: 'h-20 w-56 border-[3px] border-[#B77946] border-t-[#DCAD82] border-b-[#8D5832] p-4 shadow-[0_0_0_1px_#71472C,0_4px_18px_#B7794620] sm:h-24 sm:w-64 sm:p-5',
+    chip: 'h-20 w-56 border-[5px] border-[#B77946] border-t-[#DCAD82] border-b-[#8D5832] p-4 shadow-[0_0_0_1px_#71472C,0_4px_18px_#B7794620] sm:h-24 sm:w-64 sm:p-5',
     sponsors: [
       { name: 'PCBWay', logo: pcbwayLogo, href: 'https://www.pcbway.com/' },
       { name: 'Youth Culture Inc.', logo: youthCultureLogo, href: 'https://youthculture.com/' },
@@ -65,8 +65,21 @@ const sponsorRows = [
 ];
 
 export default function SponsorsSection() {
+  const [hovered, setHovered] = useState(null);
+  const [focused, setFocused] = useState(null);
+  const [tapped, setTapped] = useState(null);
+  const pointerType = useRef('');
+  const touchWasOpen = useRef(false);
+  const detailsId = useId();
+  const active = hovered || focused || tapped;
+  const clearDetails = () => {
+    setHovered(null);
+    setFocused(null);
+    setTapped(null);
+  };
+
   return (
-    <section id="sponsors" className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
+    <section id="sponsors" onKeyDown={event => { if (event.key === 'Escape') clearDetails(); }} onPointerDown={event => { if (event.target instanceof Element && !event.target.closest('[data-sponsor-card]')) clearDetails(); }} className="relative overflow-hidden bg-[#272727] py-12 sm:py-16 lg:py-24">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(243,241,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(243,241,241,0.04)_1px,transparent_1px)] bg-[size:90px_90px]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F68A42]/40 to-transparent" />
       <img
@@ -105,18 +118,42 @@ export default function SponsorsSection() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={sponsor.name}
+                      aria-describedby={active === sponsor.name ? detailsId : undefined}
+                      data-sponsor-card
+                      onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(sponsor.name); }}
+                      onPointerLeave={() => setHovered(null)}
+                      onFocus={() => setFocused(sponsor.name)}
+                      onBlur={() => { setFocused(null); setTapped(null); }}
+                      onPointerDown={event => {
+                        pointerType.current = event.pointerType;
+                        touchWasOpen.current = event.pointerType === 'touch' && tapped === sponsor.name;
+                      }}
+                      onClick={event => {
+                        // First touch reveals the details; a second touch follows the sponsor link.
+                        if (event.detail !== 0 && pointerType.current === 'touch' && !touchWasOpen.current) {
+                          event.preventDefault();
+                          setTapped(sponsor.name);
+                        }
+                      }}
                       initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: '-60px' }}
                       transition={{ duration: 0.55, delay: (rowIndex * 2 + i) * 0.08, ease: 'easeOut' }}
-                      className={`${row.chip} flex items-center justify-center rounded-2xl bg-white transition-transform hover:-rotate-1 hover:scale-105`}
+                      className={`${row.chip} relative flex items-center justify-center overflow-hidden rounded-2xl transition-transform hover:-rotate-1 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F68A42] ${active === sponsor.name ? 'z-20 bg-[#2e2e2e]' : 'bg-white'}`}
                     >
+                      {/* Darken the artwork and its backing together, leaving no white beneath the rounded edge. */}
+                      <span data-sponsor-artwork className={`flex h-full w-full items-center justify-center bg-white ${active === sponsor.name ? 'brightness-[0.18]' : ''}`}>
                       {sponsor.cropPadding ? <svg role="img" aria-label={sponsor.name} viewBox="42 34 315 90" width="315" height="90" className="max-h-full max-w-full">
                         {/* Frame the visible artwork, leaving clear space without changing the original image. */}
                         <image href={sponsor.logo} x="0" y="0" width="400" height="160" />
                       </svg> : sponsor.wordmark ? <span className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight text-black"><img src={sponsor.logo} alt="" loading="lazy" decoding="async" className="h-5 w-9 object-contain" />{sponsor.name}</span> : <span className="flex h-full w-full flex-col items-center justify-center gap-2">
                         <img src={sponsor.logo} alt={sponsor.name} loading="lazy" decoding="async" className={`${sponsor.caption ? 'max-h-14 sm:max-h-16' : 'max-h-full'} max-w-full object-contain`} />
                         {sponsor.caption && <span className="text-center text-xs leading-tight text-[#272727] sm:text-sm">{sponsor.caption}</span>}
+                      </span>}
+                      </span>
+                      {active === sponsor.name && <span id={detailsId} role="tooltip" className="absolute inset-0 z-20 flex flex-col items-center justify-center px-2 text-center sm:px-4">
+                        <span className="block text-xs font-semibold leading-tight text-[#F3F1F1] sm:text-sm">{sponsor.name}</span>
+                        <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F68A42] sm:mt-1.5 sm:text-xs">{row.tier === 'Partner' ? 'Partner' : `${row.tier} Sponsor`}</span>
                       </span>}
                     </motion.a>
                   ))}
