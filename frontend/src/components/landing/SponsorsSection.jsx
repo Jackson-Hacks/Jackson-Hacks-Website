@@ -19,8 +19,7 @@ import incogniLogo from '@/assets/visuals/sponsorLogos/incogni.svg';
 import sailyLogo from '@/assets/visuals/sponsorLogos/saily.svg';
 
 // Logo size, border colour, and the interactive details distinguish tiers.
-// York's possible Gold upgrade is not confirmed. Wolfram keeps its existing
-// partner classification, but shares the smaller-logo flow instead of a lone row.
+// York's possible Gold upgrade is not confirmed.
 /** @type {{ tier: string, chip: string, sponsors: { name: string, hoverName?: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
 const sponsorRows = [
   {
@@ -56,12 +55,8 @@ const sponsorRows = [
       { name: '.xyz', logo: xyzLogo, href: 'https://gen.xyz/' },
       { name: 'University of Waterloo', logo: waterlooLogo, href: 'https://uwaterloo.ca/', cropPadding: true },
       { name: 'McMaster Engineering', logo: mcmasterLogo, href: 'https://www.eng.mcmaster.ca/' },
+      { name: 'Wolfram Alpha', logo: wolframAlphaLogo, href: 'https://www.wolframalpha.com/' },
     ],
-  },
-  {
-    tier: 'Partner',
-    chip: 'h-16 w-[calc((100vw-4rem)/2)] max-w-44 border-2 border-black p-3 sm:h-20 sm:w-56 sm:max-w-none sm:p-4',
-    sponsors: [{ name: 'Wolfram Alpha', logo: wolframAlphaLogo, href: 'https://www.wolframalpha.com/' }],
   },
 ];
 
@@ -154,7 +149,7 @@ export default function SponsorsSection() {
                       </span>
                       {active === sponsor.name && <span id={detailsId} role="tooltip" className="absolute inset-0 z-20 flex flex-col items-center justify-center px-2 text-center sm:px-4">
                         <span className="block text-xs font-semibold leading-tight text-[#F3F1F1] sm:text-sm">{sponsor.hoverName || sponsor.name}</span>
-                        <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F68A42] sm:mt-1.5 sm:text-xs">{row.tier === 'Partner' ? 'Partner' : `${row.tier} Sponsor`}</span>
+                        <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F68A42] sm:mt-1.5 sm:text-xs">{row.tier} Sponsor</span>
                       </span>}
                     </motion.a>
                   ))}
