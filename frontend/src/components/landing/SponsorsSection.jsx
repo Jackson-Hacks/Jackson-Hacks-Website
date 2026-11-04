@@ -21,13 +21,14 @@ import sailyLogo from '@/assets/visuals/sponsorLogos/saily.svg';
 // Logo size, border colour, and the interactive details distinguish tiers.
 // York's possible Gold upgrade is not confirmed. Wolfram keeps its existing
 // partner classification, but shares the smaller-logo flow instead of a lone row.
-/** @type {{ tier: string, chip: string, sponsors: { name: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
+/** @type {{ tier: string, chip: string, sponsors: { name: string, hoverName?: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
 const sponsorRows = [
   {
     tier: 'Silver',
     chip: 'h-32 w-72 border-[5px] border-[#B8C2CF] border-t-[#E4E9EF] border-b-[#929EAC] p-4 shadow-[0_0_0_1px_#697582,0_4px_20px_#B8C2CF20] sm:h-36 sm:w-96 sm:p-5',
     sponsors: [{
       name: 'York University — School of the Arts, Media, Performance & Design',
+      hoverName: 'York University',
       logo: yorkLogo,
       href: 'https://ampd.yorku.ca/',
       caption: 'School of the Arts, Media, Performance & Design',
@@ -152,7 +153,7 @@ export default function SponsorsSection() {
                       </span>}
                       </span>
                       {active === sponsor.name && <span id={detailsId} role="tooltip" className="absolute inset-0 z-20 flex flex-col items-center justify-center px-2 text-center sm:px-4">
-                        <span className="block text-xs font-semibold leading-tight text-[#F3F1F1] sm:text-sm">{sponsor.name}</span>
+                        <span className="block text-xs font-semibold leading-tight text-[#F3F1F1] sm:text-sm">{sponsor.hoverName || sponsor.name}</span>
                         <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F68A42] sm:mt-1.5 sm:text-xs">{row.tier === 'Partner' ? 'Partner' : `${row.tier} Sponsor`}</span>
                       </span>}
                     </motion.a>

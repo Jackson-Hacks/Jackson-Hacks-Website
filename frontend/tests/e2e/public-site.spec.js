@@ -218,7 +218,8 @@ test('sponsor cards reveal names and tiers on hover, focus, and touch', async ({
     const link = sponsors.getByRole('link', { name, exact: true });
     await link.focus();
     const details = page.getByRole('tooltip');
-    await expect(details).toContainText(name);
+    await expect(details).toContainText(name.startsWith('York University') ? 'York University' : name);
+    if (name.startsWith('York University')) await expect(details).not.toContainText('School');
     await expect(details).toContainText(tier);
     await expect(link).toHaveAttribute('aria-describedby', await details.getAttribute('id'));
     await expect(link).not.toHaveAttribute('title');
