@@ -110,7 +110,7 @@ test('registration stays on the coming-soon page before an admin launches it', a
   await expect(page.getByRole('heading', { name: 'Apply to Jackson Hacks' })).toHaveCount(0);
 });
 
-test('sponsor wall follows confirmed tiers and includes Wolfram as in-kind', async ({ page }, testInfo) => {
+test('sponsor wall places McMaster in Gold and preserves the other tiers', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#sponsors');
   const sponsors = page.locator('#sponsors');
@@ -118,23 +118,26 @@ test('sponsor wall follows confirmed tiers and includes Wolfram as in-kind', asy
   const sponsorHeading = sponsors.getByRole('heading', { name: 'Sponsors Make Jackson Hacks Possible' });
   await sponsorHeading.scrollIntoViewIfNeeded();
   await expect(sponsorHeading.locator('..')).toHaveCSS('opacity', '1');
-  await expect(sponsors.locator('[data-sponsor-tier]')).toHaveCount(3);
+  expect(await sponsors.locator('[data-sponsor-tier]').evaluateAll(groups => groups.map(group => group.dataset.sponsorTier))).toEqual(['Gold', 'Silver', 'Bronze', 'In-kind']);
+  const gold = sponsors.getByRole('group', { name: 'Gold sponsors', exact: true });
   const silver = sponsors.getByRole('group', { name: 'Silver sponsors', exact: true });
   const bronze = sponsors.getByRole('group', { name: 'Bronze sponsors', exact: true });
   const inKind = sponsors.getByRole('group', { name: 'In-kind sponsors', exact: true });
   await expect(sponsors.getByRole('group', { name: 'Partner sponsors', exact: true })).toHaveCount(0);
+  await expect(gold.getByRole('link')).toHaveCount(1);
+  await expect(gold.getByRole('link', { name: 'McMaster Engineering', exact: true })).toHaveAttribute('href', 'https://www.eng.mcmaster.ca/');
   await expect(silver.getByRole('link')).toHaveCount(1);
   await expect(silver.getByRole('link', { name: 'York University — School of the Arts, Media, Performance & Design', exact: true })).toHaveAttribute('href', 'https://ampd.yorku.ca/');
   await expect(bronze.getByRole('link')).toHaveCount(2);
   await expect(bronze.getByRole('link', { name: 'PCBWay', exact: true })).toBeVisible();
   await expect(bronze.getByRole('link', { name: 'Youth Culture Inc.', exact: true })).toBeVisible();
-  await expect(inKind.getByRole('link')).toHaveCount(11);
-  for (const name of ['Art of Problem Solving', 'CodeCrafters', 'Toronto Public Library', 'NordVPN', 'NordPass', 'Incogni', 'Saily', '.xyz', 'University of Waterloo', 'McMaster Engineering', 'Wolfram Alpha']) {
+  await expect(inKind.getByRole('link')).toHaveCount(10);
+  for (const name of ['Art of Problem Solving', 'CodeCrafters', 'Toronto Public Library', 'NordVPN', 'NordPass', 'Incogni', 'Saily', '.xyz', 'University of Waterloo', 'Wolfram Alpha']) {
     await expect(inKind.getByRole('link', { name, exact: true })).toHaveCount(1);
   }
   await expect(inKind.getByRole('link', { name: 'Wolfram Alpha', exact: true })).toHaveAttribute('href', 'https://www.wolframalpha.com/');
-  await expect(sponsors.locator('[data-sponsor-tier="Gold"]')).toHaveCount(0);
   for (const [group, colour, width] of [
+    [gold, 'rgb(212, 170, 73)', '5px'],
     [silver, 'rgb(184, 194, 207)', '5px'],
     [bronze, 'rgb(183, 121, 70)', '5px'],
     [inKind, 'rgb(0, 0, 0)', '2px'],
@@ -162,21 +165,20 @@ test('sponsor wall follows confirmed tiers and includes Wolfram as in-kind', asy
   expect(xyzSvg).toMatch(/fill=["']#000000["']/);
   expect(xyzSvg).not.toMatch(/#fff|white/i);
   const widthOf = locator => locator.first().evaluate(element => element.getBoundingClientRect().width);
+  expect(await widthOf(gold.getByRole('link'))).toBeGreaterThan(await widthOf(silver.getByRole('link')));
   expect(await widthOf(silver.getByRole('link'))).toBeGreaterThan(await widthOf(bronze.getByRole('link')));
   expect(await widthOf(bronze.getByRole('link'))).toBeGreaterThan(await widthOf(inKind.getByRole('link')));
   for (const link of await sponsors.getByRole('link').all()) {
     await link.scrollIntoViewIfNeeded();
     await expect(link).toHaveCSS('opacity', '1');
   }
-  await expect(sponsors.locator('[data-sponsor-layout="small"]').getByRole('link')).toHaveCount(11);
+  await expect(sponsors.locator('[data-sponsor-layout="small"]').getByRole('link')).toHaveCount(10);
   if (page.viewportSize().width >= 1016) {
-    const lastRow = await Promise.all(['University of Waterloo', 'McMaster Engineering', 'Wolfram Alpha'].map(name =>
+    const lastRow = await Promise.all(['University of Waterloo', 'Wolfram Alpha'].map(name =>
       sponsors.getByRole('link', { name, exact: true }).boundingBox()
     ));
     expect(Math.abs(lastRow[0].y - lastRow[1].y)).toBeLessThan(1);
-    expect(Math.abs(lastRow[0].y - lastRow[2].y)).toBeLessThan(1);
     expect(lastRow[0].x).toBeLessThan(lastRow[1].x);
-    expect(lastRow[1].x).toBeLessThan(lastRow[2].x);
   }
   await expect.poll(() => sponsors.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -210,6 +212,7 @@ test('sponsor cards reveal names and tiers on hover, focus, and touch', async ({
     await expect(page.getByRole('tooltip')).toHaveCount(0);
   }
   for (const [name, tier] of [
+    ['McMaster Engineering', 'Gold Sponsor'],
     ['York University — School of the Arts, Media, Performance & Design', 'Silver Sponsor'],
     ['Youth Culture Inc.', 'Bronze Sponsor'], ['CodeCrafters', 'In-kind Sponsor'],
     ['.xyz', 'In-kind Sponsor'], ['Wolfram Alpha', 'In-kind Sponsor'],

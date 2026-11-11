@@ -23,6 +23,11 @@ import sailyLogo from '@/assets/visuals/sponsorLogos/saily.svg';
 /** @type {{ tier: string, chip: string, sponsors: { name: string, hoverName?: string, logo: string, href: string, caption?: string, wordmark?: boolean, cropPadding?: boolean }[] }[]} */
 const sponsorRows = [
   {
+    tier: 'Gold',
+    chip: 'h-36 w-[19rem] max-w-full border-[5px] border-[#D4AA49] border-t-[#FFE59C] border-b-[#9E7424] p-4 shadow-[0_0_0_1px_#806121,0_4px_20px_#D4AA4920] sm:h-40 sm:w-[26rem] sm:p-5',
+    sponsors: [{ name: 'McMaster Engineering', logo: mcmasterLogo, href: 'https://www.eng.mcmaster.ca/' }],
+  },
+  {
     tier: 'Silver',
     chip: 'h-32 w-72 border-[5px] border-[#B8C2CF] border-t-[#E4E9EF] border-b-[#929EAC] p-4 shadow-[0_0_0_1px_#697582,0_4px_20px_#B8C2CF20] sm:h-36 sm:w-96 sm:p-5',
     sponsors: [{
@@ -54,7 +59,6 @@ const sponsorRows = [
       { name: 'Saily', logo: sailyLogo, href: 'https://saily.com/' },
       { name: '.xyz', logo: xyzLogo, href: 'https://gen.xyz/' },
       { name: 'University of Waterloo', logo: waterlooLogo, href: 'https://uwaterloo.ca/', cropPadding: true },
-      { name: 'McMaster Engineering', logo: mcmasterLogo, href: 'https://www.eng.mcmaster.ca/' },
       { name: 'Wolfram Alpha', logo: wolframAlphaLogo, href: 'https://www.wolframalpha.com/' },
     ],
   },
@@ -103,10 +107,9 @@ export default function SponsorsSection() {
 
         {/* Logo wall */}
         <div className="flex flex-col items-center gap-6 sm:gap-8">
-          {[[sponsorRows[0]], [sponsorRows[1]], sponsorRows.slice(2)].map((rows, rowIndex) => (
-            <div key={rows[0].tier} data-sponsor-layout={rowIndex === 2 ? 'small' : undefined} className={`flex flex-wrap items-center justify-center gap-4 sm:gap-6 ${rowIndex === 2 ? 'w-full max-w-[968px]' : 'max-w-full'}`}>
-              {rows.map(row => (
-                <div key={row.tier} role="group" aria-label={`${row.tier} sponsors`} data-sponsor-tier={row.tier} className="contents">
+          {sponsorRows.map((row, rowIndex) => (
+            <div key={row.tier} data-sponsor-layout={row.tier === 'In-kind' ? 'small' : undefined} className={`flex flex-wrap items-center justify-center gap-4 sm:gap-6 ${row.tier === 'In-kind' ? 'w-full max-w-[968px]' : 'max-w-full'}`}>
+                <div role="group" aria-label={`${row.tier} sponsors`} data-sponsor-tier={row.tier} className="contents">
                   {row.sponsors.map((sponsor, i) => (
                     <motion.a
                       key={sponsor.name}
@@ -154,7 +157,6 @@ export default function SponsorsSection() {
                     </motion.a>
                   ))}
                 </div>
-              ))}
             </div>
           ))}
         </div>
